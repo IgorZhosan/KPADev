@@ -1,0 +1,21 @@
+# ninja log v6
+24	136	7456044288691740	KPA_autogen/timestamp	6aead6be1238ab7c
+2829	3017	7456044316746161	KPA.exe	fbd05e20d4ba2161
+24	136	7456044288691740	KPA_autogen/mocs_compilation.cpp	6aead6be1238ab7c
+24	136	7456044288691740	C:/Users/zhosa/Documents/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/KPA_autogen/timestamp	6aead6be1238ab7c
+137	2310	7456044289818729	CMakeFiles/KPA.dir/main.cpp.obj	8f9873a3e0574fe4
+539	2091	7455375681681517	CMakeFiles/KPA.dir/KPA_autogen/mocs_compilation.cpp.obj	6b7ea1ea6f509a13
+24	136	7456044288691740	C:/Users/zhosa/Documents/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/KPA_autogen/mocs_compilation.cpp	6aead6be1238ab7c
+139	2829	7456044289838669	CMakeFiles/KPA.dir/mainwindow.cpp.obj	3900d5d17e6e53dd
+23	132	7456044570183403	KPA_autogen/timestamp	6aead6be1238ab7c
+23	132	7456044570183403	KPA_autogen/mocs_compilation.cpp	6aead6be1238ab7c
+23	132	7456044570183403	C:/Users/zhosa/Documents/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/KPA_autogen/timestamp	6aead6be1238ab7c
+23	132	7456044570183403	C:/Users/zhosa/Documents/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/KPA_autogen/mocs_compilation.cpp	6aead6be1238ab7c
+135	2482	7456044571302050	CMakeFiles/KPA.dir/mainwindow.cpp.obj	3900d5d17e6e53dd
+21	124	7456044743580546	KPA_autogen/timestamp	6aead6be1238ab7c
+21	124	7456044743580546	KPA_autogen/mocs_compilation.cpp	6aead6be1238ab7c
+21	124	7456044743580546	C:/Users/zhosa/Documents/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/KPA_autogen/timestamp	6aead6be1238ab7c
+21	124	7456044743580546	C:/Users/zhosa/Documents/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/KPA_autogen/mocs_compilation.cpp	6aead6be1238ab7c
+125	2007	7456044744617773	CMakeFiles/KPA.dir/main.cpp.obj	8f9873a3e0574fe4
+127	2456	7456044744637725	CMakeFiles/KPA.dir/mainwindow.cpp.obj	3900d5d17e6e53dd
+2456	2628	7456044767926125	KPA.exe	fbd05e20d4ba2161
