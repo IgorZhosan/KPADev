@@ -5,6 +5,13 @@
 #include <QPushButton>
 #include <QTableWidgetItem>
 #include <QHeaderView>
+#include <QTextEdit>
+#include <QIODevice>
+#include <QMessageBox>
+#include <QFile>
+#include <QDir>
+#include <QStringDecoder>
+
 
 int main(int argc, char *argv[])
 {
@@ -42,6 +49,34 @@ int main(int argc, char *argv[])
         table->setMinimumHeight(totalHeight);
         table->setMaximumHeight(totalHeight);
     }
+
+    QTextEdit *terminal = w.findChild<QTextEdit*>("terminal_up");
+
+    if (terminal) {
+        // Отображаем текущий путь для диагностики
+        qDebug() << "Текущий каталог:" << QDir::currentPath();
+
+        // Путь к файлу ControlInfo.rtf
+        QString filePath = "C:\\Users\\zhosa\\Desktop\\KPA\\KPA\\GUI\\Controlinfo.txt";  // Относительный путь из папки build
+
+        QFile file(filePath);
+
+        // Проверим, что файл открылся успешно
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+            QMessageBox::warning(&w, "Ошибка", "Не удалось открыть файл " + filePath);
+            return -1;
+        }
+
+        // Чтение содержимого файла
+        QStringDecoder decoder(QStringConverter::Utf8);  // Указываем, что файл в кодировке UTF-8
+        QString fileContent = decoder.decode(file.readAll());
+        file.close();
+
+        // Установка текста в QTextEdit
+        terminal->setPlainText(fileContent);  // Если файл в формате текста без форматирования
+    }
+
+
 
     w.show();
     return a.exec();
