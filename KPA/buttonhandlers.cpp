@@ -3,8 +3,14 @@
 
 // Пустые реализации функций-слотов для каждой кнопки
 
+QTextEdit *terminal_down = nullptr;
+
+void preparation() {
+
+}
+
 void handleButtonClick1() {
-    qDebug() << "Кнопка 1 нажата";
+
 }
 
 void handleButtonClick2() {

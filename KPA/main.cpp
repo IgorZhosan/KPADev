@@ -20,6 +20,7 @@ int main(int argc, char *argv[])
     MainWindow w;
 
     // Доступ к таблице через класс MainWindow, объект интерфейса создается внутри MainWindow
+    terminal_down = w.findChild<QTextEdit*>("terminal_down");
     QTableWidget *turning_on_the_equipment = w.findChild<QTableWidget*>("turning_on_the_equipment");  //
 
     if (turning_on_the_equipment) {
@@ -35,8 +36,8 @@ int main(int argc, char *argv[])
         turning_on_the_equipment->setItem(1, 1, new QTableWidgetItem("СПС"));
         turning_on_the_equipment->setItem(1, 2, new QTableWidgetItem("Тспс = (Допуск (2±0.2) мин)"));
 
-        QPushButton *button = new QPushButton("Подготовка");
-        turning_on_the_equipment->setCellWidget(2, 0, button);
+        QPushButton *preparation = new QPushButton("Подготовка");
+        turning_on_the_equipment->setCellWidget(2, 0, preparation);
 
         turning_on_the_equipment->setItem(2, 1, new QTableWidgetItem("Т1А ГОТ"));
         turning_on_the_equipment->setItem(2, 2, new QTableWidgetItem("Тгот = (Допуск (0-15)с)"));
@@ -85,6 +86,9 @@ int main(int argc, char *argv[])
 
     QTableWidget *checking_the_operation = w.findChild<QTableWidget*>("checking_the_operation");
 
+    checking_the_operation->setSelectionMode(QAbstractItemView::NoSelection);
+    checking_the_operation->setSelectionBehavior(QAbstractItemView::SelectItems);
+
     if (checking_the_operation) {
         // Устанавливаем количество строк и столбцов (4 столбца)
         checking_the_operation->setRowCount(15);
@@ -126,7 +130,6 @@ int main(int argc, char *argv[])
         QObject::connect(checking_the_operation_button3, &QPushButton::clicked, handleButtonClick3);
         checking_the_operation->setItem(2, 0, new QTableWidgetItem(parameters[2]));
         checking_the_operation->setCellWidget(2, 1, checking_the_operation_button3);
-        checking_the_operation->setItem(2, 3, new QTableWidgetItem("Визуальный контроль по изображению"));
 
         // Строка 4
         QPushButton *checking_the_operation_button4 = new QPushButton("Запуск");
@@ -166,7 +169,6 @@ int main(int argc, char *argv[])
         QObject::connect(checking_the_operation_button8, &QPushButton::clicked, handleButtonClick8);
         checking_the_operation->setItem(7, 0, new QTableWidgetItem(parameters[7]));
         checking_the_operation->setCellWidget(7, 1, checking_the_operation_button8);
-        checking_the_operation->setItem(7, 3, new QTableWidgetItem("Контроль видеосигнала"));
 
         // Строка 9
         QPushButton *checking_the_operation_button9 = new QPushButton("Запуск");
@@ -174,7 +176,7 @@ int main(int argc, char *argv[])
         QObject::connect(checking_the_operation_button9, &QPushButton::clicked, handleButtonClick9);
         checking_the_operation->setItem(8, 0, new QTableWidgetItem(parameters[8]));
         checking_the_operation->setCellWidget(8, 1, checking_the_operation_button9);
-        checking_the_operation->setItem(8, 3, new QTableWidgetItem("Визуальный контроль по изображению"));
+        checking_the_operation->setItem(8, 3, new QTableWidgetItem("Контроль видеосигнала"));
 
         // Строка 10
         QPushButton *checking_the_operation_button10 = new QPushButton("Запуск");
@@ -182,7 +184,6 @@ int main(int argc, char *argv[])
         QObject::connect(checking_the_operation_button10, &QPushButton::clicked, handleButtonClick10);
         checking_the_operation->setItem(9, 0, new QTableWidgetItem(parameters[9]));
         checking_the_operation->setCellWidget(9, 1, checking_the_operation_button10);
-        checking_the_operation->setItem(9, 3, new QTableWidgetItem("Визуальный контроль по изображению"));
 
         // Строка 11
         QPushButton *checking_the_operation_button11 = new QPushButton("Запуск");
@@ -190,7 +191,6 @@ int main(int argc, char *argv[])
         QObject::connect(checking_the_operation_button11, &QPushButton::clicked, handleButtonClick11);
         checking_the_operation->setItem(10, 0, new QTableWidgetItem(parameters[10]));
         checking_the_operation->setCellWidget(10, 1, checking_the_operation_button11);
-        checking_the_operation->setItem(10, 3, new QTableWidgetItem("Визуальный контроль по изображению"));
 
         // Строка 12
         QPushButton *checking_the_operation_button12 = new QPushButton("Запуск");
@@ -206,7 +206,6 @@ int main(int argc, char *argv[])
         QObject::connect(checking_the_operation_button13, &QPushButton::clicked, handleButtonClick13);
         checking_the_operation->setItem(12, 0, new QTableWidgetItem(parameters[12]));
         checking_the_operation->setCellWidget(12, 1, checking_the_operation_button13);
-        checking_the_operation->setItem(12, 3, new QTableWidgetItem("Визуальный контроль по изображению"));
 
         // Строка 14
         QPushButton *checking_the_operation_button14 = new QPushButton("Запуск");
@@ -214,7 +213,6 @@ int main(int argc, char *argv[])
         QObject::connect(checking_the_operation_button14, &QPushButton::clicked, handleButtonClick14);
         checking_the_operation->setItem(13, 0, new QTableWidgetItem(parameters[13]));
         checking_the_operation->setCellWidget(13, 1, checking_the_operation_button14);
-        checking_the_operation->setItem(13, 3, new QTableWidgetItem("Визуальный контроль по изображению"));
 
         // Строка 15
         QPushButton *checking_the_operation_button15 = new QPushButton("Запуск");
@@ -222,7 +220,6 @@ int main(int argc, char *argv[])
         QObject::connect(checking_the_operation_button15, &QPushButton::clicked, handleButtonClick15);
         checking_the_operation->setItem(14, 0, new QTableWidgetItem(parameters[14]));
         checking_the_operation->setCellWidget(14, 1, checking_the_operation_button15);
-        checking_the_operation->setItem(14, 3, new QTableWidgetItem("Визуальный контроль по изображению"));
 
         // Подгоняем ширину столбцов под содержимое
         checking_the_operation->resizeColumnsToContents();

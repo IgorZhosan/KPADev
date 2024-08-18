@@ -25,6 +25,11 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         ${PROJECT_SOURCES}
         buttonhandlers.cpp
         buttonhandlers.h
+        intrfECE0206.h
+        ioctlECE0206.h
+        library02061.cpp
+        tvk02061.h
+        arinc429.h arinc429.cpp
     )
 # Define target properties for Android with Qt 6 as:
 #    set_property(TARGET KPA APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR

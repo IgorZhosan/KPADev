@@ -1,6 +1,11 @@
 #ifndef BUTTONHANDLERS_H
 #define BUTTONHANDLERS_H
 
+#include <QTextEdit>
+
+extern QTextEdit *terminal_down;
+
+void preparation();
 void handleButtonClick1();
 void handleButtonClick2();
 void handleButtonClick3();
