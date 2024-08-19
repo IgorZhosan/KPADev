@@ -20,6 +20,8 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     MainWindow w;
 
+    QCoreApplication::addLibraryPath(QCoreApplication::applicationDirPath() + "/plugins");
+
 
     // Доступ к таблице через класс MainWindow, объект интерфейса создается внутри MainWindow
     terminal_down = w.findChild<QTextEdit*>("terminal_down");
@@ -235,12 +237,13 @@ int main(int argc, char *argv[])
     QVBoxLayout *layout = widget_2->findChild<QVBoxLayout*>("verticalLayout_6");
 
     // Создаем кнопку и добавляем её в layout
-    QPushButton *handleStartButton = new QPushButton("Start", widget_2);
+    QPushButton *handleStartButton = new QPushButton("Старт", widget_2);
 
     // Добавляем кнопку в layout
     layout->addWidget(handleStartButton);
+    int size = 80;
 
-    handleStartButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+    handleStartButton->setFixedSize(size, size);
 
     // Устанавливаем кнопку растянутой во всю высоту и ширину
     layout->setStretchFactor(handleStartButton, 1); // Фактор растяжения для кнопки

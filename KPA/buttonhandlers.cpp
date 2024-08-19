@@ -27,9 +27,6 @@ DWORD Error = 0;
 
 void handleStartButtonClick()
 {
-
-    terminal_down->append("Тык");
-
     QString s;
     if (State_ECE0206_0 == false)
     {
@@ -95,12 +92,12 @@ void handleStartButtonClick()
     if ((State_ECE0206_1 == true) || (State_ECE0206_0 == true))
     {
         Timer->start();
-        terminal_down->append("Каналы открыты, таймер запущен.");
+       // terminal_down->append("Каналы открыты, таймер запущен.");
     }
     else
     {
         Timer->stop();
-        terminal_down->append("Каналы закрыты, таймер остановлен.");
+      //  terminal_down->append("Каналы закрыты, таймер остановлен.");
     }
 }
 

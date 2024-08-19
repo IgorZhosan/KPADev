@@ -1,0 +1,27 @@
+# ninja log v6
+5	473	7457578069776294	KPA_autogen/timestamp	656843702816cb46
+5	473	7457578069776294	KPA_autogen/mocs_compilation.cpp	656843702816cb46
+5	473	7457578069776294	C:/KPADev/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Release/KPA_autogen/timestamp	656843702816cb46
+5	473	7457578069776294	C:/KPADev/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Release/KPA_autogen/mocs_compilation.cpp	656843702816cb46
+486	1516	7457578070372295	CMakeFiles/KPA.dir/library02061.cpp.obj	2e298d3270fc6330
+488	1550	7457578070392872	CMakeFiles/KPA.dir/OpenECE0206byIndex.cpp.obj	8d7eda225341ba23
+476	1920	7457578070276394	CMakeFiles/KPA.dir/KPA_autogen/mocs_compilation.cpp.obj	740ef85ab54de080
+481	2469	7457578070331135	CMakeFiles/KPA.dir/mainwindow.cpp.obj	21eccdbdd46c31d7
+483	3103	7457578070349533	CMakeFiles/KPA.dir/buttonhandlers.cpp.obj	ebe3bd536a30ed5d
+479	3676	7457578070306678	CMakeFiles/KPA.dir/main.cpp.obj	12c03108c5041b06
+3676	3802	7457578102278109	KPA.exe	e128210f183d938e
+11	116	7457588465981459	KPA_autogen/timestamp	656843702816cb46
+11	116	7457588465981459	KPA_autogen/mocs_compilation.cpp	656843702816cb46
+11	116	7457588465981459	C:/KPADev/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Release/KPA_autogen/timestamp	656843702816cb46
+11	116	7457588465981459	C:/KPADev/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Release/KPA_autogen/mocs_compilation.cpp	656843702816cb46
+120	2056	7457588467083383	CMakeFiles/KPA.dir/mainwindow.cpp.obj	21eccdbdd46c31d7
+117	3358	7457588467045583	CMakeFiles/KPA.dir/main.cpp.obj	12c03108c5041b06
+3358	3505	7457588499457072	KPA.exe	e128210f183d938e
+11	762	7457650768416610	KPA_autogen/timestamp	656843702816cb46
+11	762	7457650768416610	KPA_autogen/mocs_compilation.cpp	656843702816cb46
+11	762	7457650768416610	C:/KPADev/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Release/KPA_autogen/timestamp	656843702816cb46
+11	762	7457650768416610	C:/KPADev/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Release/KPA_autogen/mocs_compilation.cpp	656843702816cb46
+766	4427	7457650775956658	CMakeFiles/KPA.dir/mainwindow.cpp.obj	21eccdbdd46c31d7
+781	4885	7457650776116228	CMakeFiles/KPA.dir/buttonhandlers.cpp.obj	ebe3bd536a30ed5d
+762	5671	7457650775927404	CMakeFiles/KPA.dir/main.cpp.obj	12c03108c5041b06
+5671	5793	7457650825018997	KPA.exe	e128210f183d938e

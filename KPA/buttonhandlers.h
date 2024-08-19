@@ -10,6 +10,7 @@ extern UCHAR bufOutput[10];
 extern DWORD Error;
 
 
+void Timer_TimerOut_Event_Slot();  // Объявление функции-слота для обработки события таймера
 void handleStartButtonClick();
 void preparation();
 void handleButtonClick1();
