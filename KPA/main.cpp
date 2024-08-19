@@ -12,12 +12,14 @@
 #include <QFile>
 #include <QDir>
 #include <QStringDecoder>
+#include <QVBoxLayout>
 
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
+
 
     // Доступ к таблице через класс MainWindow, объект интерфейса создается внутри MainWindow
     terminal_down = w.findChild<QTextEdit*>("terminal_down");
@@ -226,7 +228,25 @@ int main(int argc, char *argv[])
 
         // Автоматически растягиваем последний столбец на всю ширину
         checking_the_operation->horizontalHeader()->setStretchLastSection(true);
+
     }
+
+    QWidget *widget_2 = w.findChild<QWidget*>("widget_2");
+    QVBoxLayout *layout = widget_2->findChild<QVBoxLayout*>("verticalLayout_6");
+
+    // Создаем кнопку и добавляем её в layout
+    QPushButton *handleStartButton = new QPushButton("Start", widget_2);
+
+    // Добавляем кнопку в layout
+    layout->addWidget(handleStartButton);
+
+    handleStartButton->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Expanding);
+
+    // Устанавливаем кнопку растянутой во всю высоту и ширину
+    layout->setStretchFactor(handleStartButton, 1); // Фактор растяжения для кнопки
+
+    // Подключаем сигнал на слот handleStartButtonClick в MainWindow
+    QObject::connect(handleStartButton, &QPushButton::clicked, &w, &handleStartButtonClick);
 
     w.show();
     return a.exec();

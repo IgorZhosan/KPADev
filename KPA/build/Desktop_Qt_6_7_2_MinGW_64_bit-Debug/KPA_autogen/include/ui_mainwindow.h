@@ -52,7 +52,6 @@ public:
     QLabel *label_4;
     QComboBox *comboBox_4;
     QVBoxLayout *verticalLayout_6;
-    QPushButton *StartButton;
     QHBoxLayout *horizontalLayout_8;
     QToolButton *toolButton_14;
     QToolButton *toolButton_15;
@@ -170,12 +169,6 @@ public:
 
         verticalLayout_6 = new QVBoxLayout();
         verticalLayout_6->setObjectName("verticalLayout_6");
-        StartButton = new QPushButton(widget_2);
-        StartButton->setObjectName("StartButton");
-        StartButton->setMinimumSize(QSize(0, 60));
-
-        verticalLayout_6->addWidget(StartButton);
-
 
         horizontalLayout_5->addLayout(verticalLayout_6);
 
@@ -434,7 +427,6 @@ public:
         comboBox_4->setItemText(0, QCoreApplication::translate("MainWindow", "\320\240\321\203\321\207\320\275\320\276\320\271", nullptr));
         comboBox_4->setItemText(1, QCoreApplication::translate("MainWindow", "\320\220\320\262\321\202\320\276\320\274\320\260\321\202\320\270\321\207\320\265\321\201\320\272\320\270\320\271", nullptr));
 
-        StartButton->setText(QCoreApplication::translate("MainWindow", "\320\241\321\202\320\260\321\200\321\202", nullptr));
         toolButton_14->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
         toolButton_15->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
         toolButton_16->setText(QCoreApplication::translate("MainWindow", "...", nullptr));

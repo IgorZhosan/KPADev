@@ -28,6 +28,8 @@ DWORD Error = 0;
 void handleStartButtonClick()
 {
 
+    terminal_down->append("Тык");
+
     QString s;
     if (State_ECE0206_0 == false)
     {
