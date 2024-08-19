@@ -17,21 +17,7 @@ BOOL result;
 
 #pragma pack(1)
 
-
-
-
-UCHAR  bufOutput51;     // ����������, � ������� ������� ���������� ���
-    //������ :   1 - ��������� ����� ������
-    //                   0 - ��� ������
-
-
-
-
-
-//----------------------------------------------------------------------------------------
-//
-//		���� �������� ������
-//
+UCHAR  bufOutput51;
 
 void SI_pusk(UCHAR Device, UCHAR ChanNumber, UCHAR Mode, UCHAR Parity, UCHAR Freq)
 {
@@ -53,39 +39,31 @@ void SI_pusk(UCHAR Device, UCHAR ChanNumber, UCHAR Mode, UCHAR Parity, UCHAR Fre
     DWORD	tick = GetTickCount();
     while (( GetTickCount()- tick)<300) {};
 }
-//----------------------------------------------------------------------------------------
-//
-//		���� ��������� ������
-//
 
 void SO_pusk(UCHAR Device)
 {
     struct {
-        UCHAR  Err_en      =0; //= 0  - ������ 32-������ ����; =1 ������ 33-������ ����;  = 255 - ������ 31-������ ����
-        UCHAR  Parity      =1; //= 0  - ��� ������������ ����������; = 1 - ������������ ���� ����������
-        UCHAR  Freq        =1; //= 0 - 12,5���; =1 - 50���; =2 - 100 ���;
-        UCHAR  ArrayDim    =7; //������ ������� (1..255���� ��� 0 ��� ������� �������� 256 ����);
-        UCHAR  Delay       =0; //��� ������������ � ����������� ������: �������� ����� ��������� = 0, 1, 2, .., 255 (��� �������������  0  10,24  20,48  ..  2611,2��);  ��� ����������� ������ = 0
-        UCHAR  ArrayNumber =1; // ��� ����������� ������ = 1;    ��� ������������ ������ - ���������� ���������� �������� (2..255);
+        UCHAR  Err_en      =0;
+        UCHAR  Parity      =1;
+        UCHAR  Freq        =1;
+        UCHAR  ArrayDim    =7;
+        UCHAR  Delay       =0;
+        UCHAR  ArrayNumber =1;
     } bufInput_0;
 
     struct {
-        UCHAR  Err_en      =0; //= 0  - ������ 32-������ ����; =1 ������ 33-������ ����;  = 255 - ������ 31-������ ����
-        UCHAR  Parity      =1; //= 0  - ��� ������������ ����������; = 1 - ������������ ���� ����������
-        UCHAR  Freq        =1; //= 0 - 12,5���; =1 - 50���; =2 - 100 ���;
-        UCHAR  ArrayDim    =2; //������ ������� (1..255���� ��� 0 ��� ������� �������� 256 ����);
-        UCHAR  Delay       =0; //��� ������������ � ����������� ������: �������� ����� ��������� = 0, 1, 2, .., 255 (��� �������������  0  10,24  20,48  ..  2611,2��);  ��� ����������� ������ = 0
-        UCHAR  ArrayNumber =1; // ��� ����������� ������ = 1;    ��� ������������ ������ - ���������� ���������� �������� (2..255);
+        UCHAR  Err_en      =0;
+        UCHAR  Parity      =1;
+        UCHAR  Freq        =1;
+        UCHAR  ArrayDim    =2;
+        UCHAR  Delay       =0;
+        UCHAR  ArrayNumber =1;
     } bufInput_1;
 
 
     if (Device==0)  DeviceIoControl (hECE0206_0, ECE02061_XP_SO_PUSK1, &bufInput_0, 6, NULL, 0, &nOutput, NULL);
     else if (Device==1)  DeviceIoControl (hECE0206_1, ECE02061_XP_SO_PUSK1, &bufInput_1, 6, NULL, 0, &nOutput, NULL);
 }
-//----------------------------------------------------------------------------------------
-//
-//		��������� ������� ������.
-//
 
 void SI_clear_array(UCHAR Device, UCHAR ChanNumber)
 {
@@ -101,12 +79,6 @@ void SI_clear_array(UCHAR Device, UCHAR ChanNumber)
     while (( GetTickCount()- tick)<1000) {};//
 }
 
-
-//----------------------------------------------------------------------------------------
-//
-//		������� ������.
-//
-
 void SI_stop(UCHAR Device, UCHAR ChanNumber)
 {
 
@@ -119,10 +91,6 @@ void SI_stop(UCHAR Device, UCHAR ChanNumber)
     while (( GetTickCount()- tick)<300) {};
 
 }
-//----------------------------------------------------------------------------------------
-//
-//		������� ������.
-//
 
 void SO_stop(UCHAR Device)
 {
@@ -139,21 +107,21 @@ void BUF256x32_write(UCHAR Device, ULONG * paramArray, int Size)
     DWORD tick;
 
     struct {
-        UCHAR   paramAddress =0;	//����� ������ ������ BUF256x32
-        UCHAR   Comm= 0x80;	// = 0x80-������� ������ �������, 0�00 - ������ ������ 32� ���� �����
-        ULONG   param[7];	//������ �������� ����������, ����������� (ArrayDim) �� ����� 127
+        UCHAR   paramAddress =0;
+        UCHAR   Comm= 0x80;
+        ULONG   param[7];
     } outputParam;
 
     for (int i=0; i<Size; i++)
         outputParam.param[i]=*(paramArray+i);
 
-    DWORD nbufInputSize = sizeof (outputParam);	// ����� �������� ������( � ������).
+    DWORD nbufInputSize = sizeof (outputParam);
 
     if (Device==0)  DeviceIoControl (hECE0206_0, ECE02061_XP_WRITE_ARRAY_1, &outputParam, nbufInputSize, NULL, 0 ,&nOutput, NULL);
     else if (Device==1) DeviceIoControl (hECE0206_1, ECE02061_XP_WRITE_ARRAY_1, &outputParam, nbufInputSize, NULL, 0 ,&nOutput, NULL);
 
-    // �������� ����� �� �������, �.�. �������� � ��� 1 ��� � 40 ��.
-    tick = GetTickCount();  // ����� ��������� �������� >= ���-�� ���� (������ ������ ����� �������� 1 ����)
-    while (( GetTickCount()- tick)<11) {};// �������� �������
+
+    tick = GetTickCount();
+    while (( GetTickCount()- tick)<11) {};
 }
 

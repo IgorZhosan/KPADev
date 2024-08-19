@@ -52,7 +52,7 @@ public:
     QLabel *label_4;
     QComboBox *comboBox_4;
     QVBoxLayout *verticalLayout_6;
-    QPushButton *StartPushBtn;
+    QPushButton *StartButton;
     QHBoxLayout *horizontalLayout_8;
     QToolButton *toolButton_14;
     QToolButton *toolButton_15;
@@ -108,6 +108,11 @@ public:
         verticalLayout_10->setObjectName("verticalLayout_10");
         groupBox = new QGroupBox(centralwidget);
         groupBox->setObjectName("groupBox");
+        groupBox->setMaximumSize(QSize(16777215, 240));
+        QFont font;
+        font.setFamilies({QString::fromUtf8("Times New Roman")});
+        font.setPointSize(12);
+        groupBox->setFont(font);
         horizontalLayout_9 = new QHBoxLayout(groupBox);
         horizontalLayout_9->setObjectName("horizontalLayout_9");
         widget_2 = new QWidget(groupBox);
@@ -118,16 +123,23 @@ public:
         horizontalLayout_5->setObjectName("horizontalLayout_5");
         groupBox_2 = new QGroupBox(widget_2);
         groupBox_2->setObjectName("groupBox_2");
+        groupBox_2->setMaximumSize(QSize(300, 16777215));
+        QFont font1;
+        font1.setFamilies({QString::fromUtf8("Times New Roman")});
+        font1.setPointSize(14);
+        groupBox_2->setFont(font1);
         verticalLayout_5 = new QVBoxLayout(groupBox_2);
         verticalLayout_5->setObjectName("verticalLayout_5");
         horizontalLayout_6 = new QHBoxLayout();
         horizontalLayout_6->setObjectName("horizontalLayout_6");
         label_3 = new QLabel(groupBox_2);
         label_3->setObjectName("label_3");
+        label_3->setMaximumSize(QSize(100, 16777215));
 
         horizontalLayout_6->addWidget(label_3);
 
         comboBox_3 = new QComboBox(groupBox_2);
+        comboBox_3->addItem(QString());
         comboBox_3->setObjectName("comboBox_3");
 
         horizontalLayout_6->addWidget(comboBox_3);
@@ -139,10 +151,13 @@ public:
         horizontalLayout_7->setObjectName("horizontalLayout_7");
         label_4 = new QLabel(groupBox_2);
         label_4->setObjectName("label_4");
+        label_4->setMaximumSize(QSize(100, 16777215));
 
         horizontalLayout_7->addWidget(label_4);
 
         comboBox_4 = new QComboBox(groupBox_2);
+        comboBox_4->addItem(QString());
+        comboBox_4->addItem(QString());
         comboBox_4->setObjectName("comboBox_4");
 
         horizontalLayout_7->addWidget(comboBox_4);
@@ -155,11 +170,11 @@ public:
 
         verticalLayout_6 = new QVBoxLayout();
         verticalLayout_6->setObjectName("verticalLayout_6");
-        StartPushBtn = new QPushButton(widget_2);
-        StartPushBtn->setObjectName("StartPushBtn");
-        StartPushBtn->setMinimumSize(QSize(0, 60));
+        StartButton = new QPushButton(widget_2);
+        StartButton->setObjectName("StartButton");
+        StartButton->setMinimumSize(QSize(0, 60));
 
-        verticalLayout_6->addWidget(StartPushBtn);
+        verticalLayout_6->addWidget(StartButton);
 
 
         horizontalLayout_5->addLayout(verticalLayout_6);
@@ -244,9 +259,7 @@ public:
 
         groupBox_3 = new QGroupBox(centralwidget);
         groupBox_3->setObjectName("groupBox_3");
-        QFont font;
-        font.setFamilies({QString::fromUtf8("Times New Roman")});
-        font.setPointSize(14);
+        groupBox_3->setMaximumSize(QSize(16777215, 173));
         groupBox_3->setFont(font);
         gridLayout = new QGridLayout(groupBox_3);
         gridLayout->setObjectName("gridLayout");
@@ -268,6 +281,7 @@ public:
         __qtablewidgetitem3->setFont(font);
         turning_on_the_equipment->setVerticalHeaderItem(0, __qtablewidgetitem3);
         turning_on_the_equipment->setObjectName("turning_on_the_equipment");
+        turning_on_the_equipment->setMaximumSize(QSize(16777215, 173));
         turning_on_the_equipment->setAutoFillBackground(false);
         turning_on_the_equipment->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
 
@@ -278,17 +292,10 @@ public:
 
         groupBox_4 = new QGroupBox(centralwidget);
         groupBox_4->setObjectName("groupBox_4");
+        groupBox_4->setFont(font);
         gridLayout_2 = new QGridLayout(groupBox_4);
         gridLayout_2->setObjectName("gridLayout_2");
         checking_the_operation = new QTableWidget(groupBox_4);
-        if (checking_the_operation->columnCount() < 1)
-            checking_the_operation->setColumnCount(1);
-        QTableWidgetItem *__qtablewidgetitem4 = new QTableWidgetItem();
-        checking_the_operation->setHorizontalHeaderItem(0, __qtablewidgetitem4);
-        if (checking_the_operation->rowCount() < 1)
-            checking_the_operation->setRowCount(1);
-        QTableWidgetItem *__qtablewidgetitem5 = new QTableWidgetItem();
-        checking_the_operation->setVerticalHeaderItem(0, __qtablewidgetitem5);
         checking_the_operation->setObjectName("checking_the_operation");
         checking_the_operation->setAutoFillBackground(false);
         checking_the_operation->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
@@ -300,6 +307,8 @@ public:
 
         groupBox_7 = new QGroupBox(centralwidget);
         groupBox_7->setObjectName("groupBox_7");
+        groupBox_7->setMaximumSize(QSize(16777215, 265));
+        groupBox_7->setFont(font);
         horizontalLayout_11 = new QHBoxLayout(groupBox_7);
         horizontalLayout_11->setObjectName("horizontalLayout_11");
         terminal_down = new QTextEdit(groupBox_7);
@@ -387,7 +396,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 1593, 22));
+        menubar->setGeometry(QRect(0, 0, 1593, 26));
         menu = new QMenu(menubar);
         menu->setObjectName("menu");
         menu_2 = new QMenu(menubar);
@@ -419,8 +428,13 @@ public:
         groupBox->setTitle(QCoreApplication::translate("MainWindow", "\320\222\321\213\320\261\320\276\321\200 \321\200\320\265\320\266\320\270\320\274\320\260 \320\272\320\276\320\275\321\202\321\200\320\276\320\273\321\217", nullptr));
         groupBox_2->setTitle(QCoreApplication::translate("MainWindow", "\320\232\320\276\320\275\321\202\321\200\320\276\320\273\321\214", nullptr));
         label_3->setText(QCoreApplication::translate("MainWindow", "\320\242\320\270\320\277", nullptr));
+        comboBox_3->setItemText(0, QCoreApplication::translate("MainWindow", "\320\232\320\276\320\275\321\202\321\200\320\276\320\273\321\214 \320\2421\320\220-02", nullptr));
+
         label_4->setText(QCoreApplication::translate("MainWindow", "\320\240\320\265\320\266\320\270\320\274", nullptr));
-        StartPushBtn->setText(QCoreApplication::translate("MainWindow", "\320\241\321\202\320\260\321\200\321\202", nullptr));
+        comboBox_4->setItemText(0, QCoreApplication::translate("MainWindow", "\320\240\321\203\321\207\320\275\320\276\320\271", nullptr));
+        comboBox_4->setItemText(1, QCoreApplication::translate("MainWindow", "\320\220\320\262\321\202\320\276\320\274\320\260\321\202\320\270\321\207\320\265\321\201\320\272\320\270\320\271", nullptr));
+
+        StartButton->setText(QCoreApplication::translate("MainWindow", "\320\241\321\202\320\260\321\200\321\202", nullptr));
         toolButton_14->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
         toolButton_15->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
         toolButton_16->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
@@ -428,7 +442,7 @@ public:
         toolButton_18->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
         toolButton_19->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
         toolButton_20->setText(QCoreApplication::translate("MainWindow", "...", nullptr));
-        groupBox_3->setTitle(QCoreApplication::translate("MainWindow", "\320\222\320\272\320\273\321\216\321\207\320\265\320\275\320\270\320\265 \320\260\320\277\320\277\320\260\321\200\321\203\321\202\321\200\321\213 \320\2421\320\220-02", nullptr));
+        groupBox_3->setTitle(QCoreApplication::translate("MainWindow", "\320\222\320\272\320\273\321\216\321\207\320\265\320\275\320\270\320\265 \320\260\320\277\320\277\320\260\321\200\320\260\321\202\321\203\321\200\321\213 \320\2421\320\220-02", nullptr));
         QTableWidgetItem *___qtablewidgetitem = turning_on_the_equipment->horizontalHeaderItem(0);
         ___qtablewidgetitem->setText(QCoreApplication::translate("MainWindow", "\320\222\321\213\320\277\320\276\320\273\320\275\321\217\320\265\320\274\321\213\320\265 \320\276\320\277\320\265\321\200\320\260\321\206\320\270\320\270", nullptr));
         QTableWidgetItem *___qtablewidgetitem1 = turning_on_the_equipment->horizontalHeaderItem(1);
@@ -438,17 +452,13 @@ public:
         QTableWidgetItem *___qtablewidgetitem3 = turning_on_the_equipment->verticalHeaderItem(0);
         ___qtablewidgetitem3->setText(QCoreApplication::translate("MainWindow", "1", nullptr));
         groupBox_4->setTitle(QCoreApplication::translate("MainWindow", "\320\237\321\200\320\276\320\262\320\265\321\200\320\272\320\260 \321\204\321\203\320\275\320\272\321\206\320\270\320\276\320\275\320\270\321\200\320\276\320\262\320\260\320\275\320\270\321\217", nullptr));
-        QTableWidgetItem *___qtablewidgetitem4 = checking_the_operation->horizontalHeaderItem(0);
-        ___qtablewidgetitem4->setText(QCoreApplication::translate("MainWindow", "\320\235\320\276\320\262\321\213\320\271 \321\201\321\202\320\276\320\273\320\261\320\265\321\206", nullptr));
-        QTableWidgetItem *___qtablewidgetitem5 = checking_the_operation->verticalHeaderItem(0);
-        ___qtablewidgetitem5->setText(QCoreApplication::translate("MainWindow", "\320\235\320\276\320\262\320\260\321\217 \321\201\321\202\321\200\320\276\320\272\320\260", nullptr));
         groupBox_7->setTitle(QCoreApplication::translate("MainWindow", "\320\226\321\203\321\200\320\275\320\260\320\273", nullptr));
-        groupBox_6->setTitle(QCoreApplication::translate("MainWindow", "GroupBox", nullptr));
+        groupBox_6->setTitle(QString());
         TM->setText(QCoreApplication::translate("MainWindow", "\320\242\320\234", nullptr));
         KPA->setText(QCoreApplication::translate("MainWindow", "\320\232\320\237\320\220", nullptr));
         AD9M2->setText(QCoreApplication::translate("MainWindow", "\320\220\320\2249-\320\2342", nullptr));
         P9M->setText(QCoreApplication::translate("MainWindow", "\320\2379\320\234", nullptr));
-        groupBox_5->setTitle(QCoreApplication::translate("MainWindow", "GroupBox", nullptr));
+        groupBox_5->setTitle(QString());
         reception->setText(QCoreApplication::translate("MainWindow", "\320\237\321\200\320\270\321\221\320\274", nullptr));
         broadcast->setText(QCoreApplication::translate("MainWindow", "\320\237\320\265\321\200\320\265\320\264\320\260\321\207\320\260", nullptr));
         codes->setText(QCoreApplication::translate("MainWindow", "\320\232\320\276\320\264\321\213", nullptr));

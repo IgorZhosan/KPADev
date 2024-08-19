@@ -1,9 +1,0 @@
-C:/Users/zhosa/Documents/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Profile/CMakeFiles/KPA.dir
-C:/Users/zhosa/Documents/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Profile/CMakeFiles/edit_cache.dir
-C:/Users/zhosa/Documents/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Profile/CMakeFiles/rebuild_cache.dir
-C:/Users/zhosa/Documents/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Profile/CMakeFiles/list_install_components.dir
-C:/Users/zhosa/Documents/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Profile/CMakeFiles/install.dir
-C:/Users/zhosa/Documents/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Profile/CMakeFiles/install/local.dir
-C:/Users/zhosa/Documents/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Profile/CMakeFiles/install/strip.dir
-C:/Users/zhosa/Documents/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Profile/CMakeFiles/KPA_autogen_timestamp_deps.dir
-C:/Users/zhosa/Documents/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Profile/CMakeFiles/KPA_autogen.dir

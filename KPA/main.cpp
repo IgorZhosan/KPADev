@@ -65,7 +65,7 @@ int main(int argc, char *argv[])
         qDebug() << "Текущий каталог:" << QDir::currentPath();
 
         // Путь к файлу ControlInfo.rtf
-        QString filePath = "C:\\Users\\zhosa\\Desktop\\KPA\\KPA\\GUI\\Controlinfo.txt";  // Относительный путь из папки build
+        QString filePath = "C:\\KPADev\\KPA\\GUI\\Controlinfo.txt";  // Относительный путь из папки build
 
         QFile file(filePath);
 

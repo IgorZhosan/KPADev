@@ -1,9 +1,106 @@
 #include "buttonhandlers.h"
+#include "tvk02061.h"
+#include "intrfECE0206.h"
 #include <QDebug>
+#include <QTimer>
+#include <QTextEdit>
+
 
 // Пустые реализации функций-слотов для каждой кнопки
 
 QTextEdit *terminal_down = nullptr;
+extern HANDLE hECE0206_0;
+extern HANDLE hECE0206_1;
+extern DWORD nOutput;
+extern UCHAR bufOutput[10];
+extern DWORD Error;
+extern QTextEdit *terminal_down;
+extern QTimer *Timer;
+
+bool State_ECE0206_0 = false;
+bool State_ECE0206_1 = false;
+
+QTimer *Timer = new QTimer();
+UCHAR bufOutput[10] = {0};
+DWORD Error = 0;
+
+
+void handleStartButtonClick()
+{
+
+    QString s;
+    if (State_ECE0206_0 == false)
+    {
+        hECE0206_0  = OpenDeviceByIndex(0, &Error);
+        if (hECE0206_0 == INVALID_HANDLE_VALUE)
+        {
+            terminal_down->append("Состояние CH1: ОШИБКА ПОДКЛ. ECE-0206-1C-S");
+            State_ECE0206_0 = false;
+        }
+        else
+        {
+            DeviceIoControl(hECE0206_0, ECE02061_XP_SET_LONG_MODE, NULL, 0, NULL, 0, &nOutput, NULL);
+            DeviceIoControl(hECE0206_0, ECE02061_XP_GET_SERIAL_NUMBER, NULL, 0, &bufOutput, 10, &nOutput, NULL);
+            s = "ARINC429_CH1  S\\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
+            terminal_down->append(s);
+
+            SI_clear_array(0, 1);   // очистка буфера приемника 1 канала
+            SI_pusk(0, 1, 0, 1, 0); // канал 1, рабочий режим, контроль четности, прием на частотах 36-100КГц
+            terminal_down->append("Состояние CH1: ОЖИДАНИЕ");
+            State_ECE0206_0 = true;
+        }
+    }
+    else
+    {
+        SI_stop(0, 1);
+        SO_stop(0);
+        CloseHandle(hECE0206_0);
+        terminal_down->append("Состояние CH1: НЕ ПОДКЛЮЧЕН");
+        State_ECE0206_0 = false;
+    }
+
+    if (State_ECE0206_1 == false)
+    {
+        hECE0206_1 = OpenDeviceByIndex(1, &Error);
+        if (hECE0206_1 == INVALID_HANDLE_VALUE)
+        {
+            terminal_down->append("Состояние CH2: ОШИБКА ПОДКЛ. ECE-0206-1C-S");
+            State_ECE0206_1 = false;
+        }
+        else
+        {
+            DeviceIoControl(hECE0206_1, ECE02061_XP_SET_LONG_MODE, NULL, 0, NULL, 0, &nOutput, NULL);
+            DeviceIoControl(hECE0206_1, ECE02061_XP_GET_SERIAL_NUMBER, NULL, 0, &bufOutput, 10, &nOutput, NULL);
+            s = "ARINC429_CH2  S\\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
+
+            terminal_down->append(s);
+
+            SI_clear_array(1, 2);   // очистка буфера приемника 2 канала
+            SI_pusk(1, 2, 0, 1, 0); // канал 2, рабочий режим, контроль четности, прием на частотах 36-100КГц
+            terminal_down->append("Состояние CH2: ОЖИДАНИЕ");
+            State_ECE0206_1 = true;
+        }
+    }
+    else
+    {
+        SI_stop(1, 2);
+        SO_stop(1);
+        CloseHandle(hECE0206_1);
+        terminal_down->append("Состояние CH2: НЕ ПОДКЛЮЧЕН");
+        State_ECE0206_1 = false;
+    }
+
+    if ((State_ECE0206_1 == true) || (State_ECE0206_0 == true))
+    {
+        Timer->start();
+        terminal_down->append("Каналы открыты, таймер запущен.");
+    }
+    else
+    {
+        Timer->stop();
+        terminal_down->append("Каналы закрыты, таймер остановлен.");
+    }
+}
 
 void preparation() {
 
@@ -14,7 +111,7 @@ void handleButtonClick1() {
 }
 
 void handleButtonClick2() {
-    qDebug() << "Кнопка 2 нажата";
+    terminal_down -> append("Кнопка 2 нажата");
 }
 
 void handleButtonClick3() {

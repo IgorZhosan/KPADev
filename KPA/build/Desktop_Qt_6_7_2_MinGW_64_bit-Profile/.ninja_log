@@ -1,9 +1,0 @@
-# ninja log v6
-7	545	7455429603266136	KPA_autogen/timestamp	2a50559cf62aadc2
-7	545	7455429603266136	KPA_autogen/mocs_compilation.cpp	2a50559cf62aadc2
-7	545	7455429603266136	C:/Users/zhosa/Documents/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Profile/KPA_autogen/timestamp	2a50559cf62aadc2
-7	545	7455429603266136	C:/Users/zhosa/Documents/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Profile/KPA_autogen/mocs_compilation.cpp	2a50559cf62aadc2
-549	2354	7455429603874507	CMakeFiles/KPA.dir/KPA_autogen/mocs_compilation.cpp.obj	db281348f5ee9fa
-551	2399	7455429603894454	CMakeFiles/KPA.dir/main.cpp.obj	ba8a3cc3e25f368f
-554	3358	7455429603914404	CMakeFiles/KPA.dir/mainwindow.cpp.obj	c5263b4a7a8d8fd9
-3358	3544	7455429631959359	KPA.exe	d076915739463f39

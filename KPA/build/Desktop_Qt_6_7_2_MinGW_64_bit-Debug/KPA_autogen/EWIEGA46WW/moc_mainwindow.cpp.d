@@ -1,5 +1,5 @@
-C:/Users/zhosa/Documents/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/KPA_autogen/EWIEGA46WW/moc_mainwindow.cpp: C:/Users/zhosa/Documents/KPA/mainwindow.h \
-  C:/Users/zhosa/Documents/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/KPA_autogen/moc_predefs.h \
+C:/KPADev/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/KPA_autogen/EWIEGA46WW/moc_mainwindow.cpp: C:/KPADev/KPA/mainwindow.h \
+  C:/KPADev/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/KPA_autogen/moc_predefs.h \
   C:/Qt/6.7.2/mingw_64/include/QtCore/q20functional.h \
   C:/Qt/6.7.2/mingw_64/include/QtCore/q20memory.h \
   C:/Qt/6.7.2/mingw_64/include/QtCore/q20type_traits.h \
