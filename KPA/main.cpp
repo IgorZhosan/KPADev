@@ -13,7 +13,80 @@
 #include <QDir>
 #include <QStringDecoder>
 #include <QVBoxLayout>
+#include <QCheckBox>
+#include <QMenu>
+#include <QWidgetAction>
+#include <QDebug>
+#include <QGroupBox>
 
+// Функция для создания группы чекбоксов с именами
+QGroupBox* createCheckboxGroup(const QString& title, const QStringList& labels, const QStringList& objectNames) {
+    QGroupBox* groupBox = new QGroupBox(title);  // Создаем группу с заголовком
+    QHBoxLayout* hbox = new QHBoxLayout;  // Горизонтальный layout для чекбоксов
+
+    // Создаем чекбоксы с названиями из списка labels и присваиваем им objectName
+    for (int i = 0; i < labels.size(); ++i) {
+        QCheckBox* checkbox = new QCheckBox(labels[i]);  // Чекбокс с текстом
+        checkbox->setObjectName(objectNames[i]);  // Устанавливаем уникальное имя для каждого чекбокса
+        hbox->addWidget(checkbox);  // Добавляем чекбокс в layout
+    }
+
+    groupBox->setLayout(hbox);  // Устанавливаем layout в группу
+    return groupBox;
+}
+
+// Функция для создания общей группы для ЛТ, ЛК, КК
+QWidget* createGroupedLT_LK_KK() {
+    QWidget* container = new QWidget;  // Контейнер для всех трех групп
+    QHBoxLayout* hbox = new QHBoxLayout(container);  // Горизонтальный layout
+
+    // Создаем группы чекбоксов для ЛТ, ЛК и КК без текстов (пустые чекбоксы)
+    QGroupBox* ltGroup = createCheckboxGroup("ЛТ [7:1]", QStringList(7, ""), QStringList(7, ""));  // 7 пустых чекбоксов
+    QGroupBox* lkGroup = createCheckboxGroup("ЛК [4:1]", QStringList(4, ""), QStringList(4, ""));  // 4 пустых чекбокса
+    QGroupBox* kkGroup = createCheckboxGroup("КК [8:1]", QStringList(8, ""), QStringList(8, ""));  // 8 пустых чекбоксов
+
+    // Добавляем группы в горизонтальный layout, чтобы они были рядом
+    hbox->addWidget(ltGroup);
+    hbox->addWidget(lkGroup);
+    hbox->addWidget(kkGroup);
+
+    return container;
+}
+
+QMenu* createCheckboxMenu(QWidget* parent) {
+    QMenu* menu = new QMenu(parent);
+
+    // Создаем контейнер для ЛТ, ЛК и КК
+    QWidget* lt_lk_kk_container = createGroupedLT_LK_KK();
+
+    // Создаем группы для остальных чекбоксов с нужными именами
+    QStringList otherCheckboxLabels = {"Отказ канала", "ПО", "K0", "ТК", "КВС", "ТСН", "НКК", "МГн", "ПП", "ППП", "НК", "ИТП", "ПР"};
+    QStringList otherCheckboxNames = {"OTKAZ", "PO", "k0", "TK", "KVS", "TCH", "NKK", "MGN", "USPP", "PPP", "NK", "ITP", "PR"};
+
+    // Создаем группу с этими чекбоксами и их именами
+    QGroupBox* otherGroup = createCheckboxGroup("Прочие", otherCheckboxLabels, otherCheckboxNames);
+
+    // Упаковываем группы в действия меню
+    QWidgetAction* lt_lk_kk_Action = new QWidgetAction(menu);
+    lt_lk_kk_Action->setDefaultWidget(lt_lk_kk_container);
+    menu->addAction(lt_lk_kk_Action);
+
+    // Добавляем группу с остальными чекбоксами
+    QWidgetAction* otherAction = new QWidgetAction(menu);
+    otherAction->setDefaultWidget(otherGroup);
+    menu->addAction(otherAction);
+
+    return menu;
+}
+
+// Функция для проверки состояния чекбоксов
+void checkCheckboxStates(QWidget* parent) {
+    // Пример: поиск по имени и вывод состояния чекбоксов
+    QCheckBox* checkbox = parent->findChild<QCheckBox*>("checkbox_LT");
+    if (checkbox && checkbox->isChecked()) {
+        qDebug() << "Чекбокс ЛТ[7:1] нажат";
+    }
+}
 
 int main(int argc, char *argv[])
 {
@@ -59,8 +132,6 @@ int main(int argc, char *argv[])
         turning_on_the_equipment->setMinimumHeight(totalHeight);
         turning_on_the_equipment->setMaximumHeight(totalHeight);
     }
-
-
 
     QTextEdit *terminal = w.findChild<QTextEdit*>("terminal_up");
 
@@ -251,6 +322,29 @@ int main(int argc, char *argv[])
     // Подключаем сигнал на слот handleStartButtonClick в MainWindow
     QObject::connect(handleStartButton, &QPushButton::clicked, &w, &handleStartButtonClick);
 
+    QHBoxLayout* horizontalLayout_8 = w.findChild<QHBoxLayout*>("horizontalLayout_8");
+
+    // Создаем кнопку
+    QPushButton* button = new QPushButton("Выбор литеры");
+
+    // Создаем меню с чекбоксами
+    QMenu* checkboxMenu = createCheckboxMenu(&w);
+    button->setMenu(checkboxMenu);  // Привязываем меню к кнопке
+
+    // Добавляем кнопку в горизонтальный layout
+    if (horizontalLayout_8) {
+        horizontalLayout_8->addWidget(button);
+    }
+
+    // Пример: Проверка состояния чекбоксов
+    // Например, проверка состояния после нажатия кнопки
+    QObject::connect(button, &QPushButton::clicked, [&]() {
+        checkCheckboxStates(&w);
+    });
+
+
     w.show();
     return a.exec();
 }
+
+

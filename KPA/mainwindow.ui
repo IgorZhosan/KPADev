@@ -23,10 +23,16 @@
    <layout class="QVBoxLayout" name="verticalLayout_10">
     <item>
      <widget class="QGroupBox" name="groupBox">
+      <property name="minimumSize">
+       <size>
+        <width>0</width>
+        <height>220</height>
+       </size>
+      </property>
       <property name="maximumSize">
        <size>
         <width>16777215</width>
-        <height>240</height>
+        <height>220</height>
        </size>
       </property>
       <property name="font">
@@ -46,10 +52,16 @@
            <layout class="QHBoxLayout" name="horizontalLayout_5">
             <item>
              <widget class="QGroupBox" name="groupBox_2">
+              <property name="minimumSize">
+               <size>
+                <width>250</width>
+                <height>105</height>
+               </size>
+              </property>
               <property name="maximumSize">
                <size>
-                <width>300</width>
-                <height>16777215</height>
+                <width>250</width>
+                <height>105</height>
                </size>
               </property>
               <property name="font">
@@ -154,8 +166,14 @@
               </property>
               <property name="minimumSize">
                <size>
-                <width>60</width>
-                <height>60</height>
+                <width>35</width>
+                <height>35</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
                </size>
               </property>
               <property name="text">
@@ -173,8 +191,14 @@
               </property>
               <property name="minimumSize">
                <size>
-                <width>60</width>
-                <height>60</height>
+                <width>35</width>
+                <height>35</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
                </size>
               </property>
               <property name="text">
@@ -192,8 +216,14 @@
               </property>
               <property name="minimumSize">
                <size>
-                <width>60</width>
-                <height>60</height>
+                <width>35</width>
+                <height>35</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
                </size>
               </property>
               <property name="text">
@@ -211,8 +241,14 @@
               </property>
               <property name="minimumSize">
                <size>
-                <width>60</width>
-                <height>60</height>
+                <width>35</width>
+                <height>35</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
                </size>
               </property>
               <property name="text">
@@ -230,8 +266,14 @@
               </property>
               <property name="minimumSize">
                <size>
-                <width>60</width>
-                <height>60</height>
+                <width>35</width>
+                <height>35</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
                </size>
               </property>
               <property name="text">
@@ -249,8 +291,14 @@
               </property>
               <property name="minimumSize">
                <size>
-                <width>60</width>
-                <height>60</height>
+                <width>35</width>
+                <height>35</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
                </size>
               </property>
               <property name="text">
@@ -268,8 +316,14 @@
               </property>
               <property name="minimumSize">
                <size>
-                <width>60</width>
-                <height>60</height>
+                <width>35</width>
+                <height>35</height>
+               </size>
+              </property>
+              <property name="maximumSize">
+               <size>
+                <width>30</width>
+                <height>30</height>
                </size>
               </property>
               <property name="text">
@@ -286,7 +340,20 @@
         </widget>
        </item>
        <item>
-        <widget class="QTextEdit" name="terminal_up"/>
+        <widget class="QTextEdit" name="terminal_up">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>100</height>
+          </size>
+         </property>
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>150</height>
+          </size>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -388,6 +455,12 @@
       <layout class="QGridLayout" name="gridLayout_2">
        <item row="0" column="0">
         <widget class="QTableWidget" name="checking_the_operation">
+         <property name="maximumSize">
+          <size>
+           <width>16777215</width>
+           <height>500</height>
+          </size>
+         </property>
          <property name="autoFillBackground">
           <bool>false</bool>
          </property>
@@ -527,7 +600,7 @@
      <x>0</x>
      <y>0</y>
      <width>1593</width>
-     <height>26</height>
+     <height>22</height>
     </rect>
    </property>
    <widget class="QMenu" name="menu">

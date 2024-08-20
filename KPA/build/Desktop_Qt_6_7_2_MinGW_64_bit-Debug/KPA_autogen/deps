@@ -8,6 +8,8 @@ KPA_autogen/timestamp: \
 	C:/KPADev/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/KPA_autogen/moc_predefs.h \
 	C:/KPADev/KPA/buttonhandlers.cpp \
 	C:/KPADev/KPA/buttonhandlers.h \
+	C:/KPADev/KPA/data_receiver.cpp \
+	C:/KPADev/KPA/data_receiver.h \
 	C:/KPADev/KPA/intrfECE0206.h \
 	C:/KPADev/KPA/ioctlECE0206.h \
 	C:/KPADev/KPA/library02061.cpp \

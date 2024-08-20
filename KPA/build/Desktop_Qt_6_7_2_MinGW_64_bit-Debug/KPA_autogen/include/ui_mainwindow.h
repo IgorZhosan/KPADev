@@ -107,7 +107,8 @@ public:
         verticalLayout_10->setObjectName("verticalLayout_10");
         groupBox = new QGroupBox(centralwidget);
         groupBox->setObjectName("groupBox");
-        groupBox->setMaximumSize(QSize(16777215, 240));
+        groupBox->setMinimumSize(QSize(0, 220));
+        groupBox->setMaximumSize(QSize(16777215, 220));
         QFont font;
         font.setFamilies({QString::fromUtf8("Times New Roman")});
         font.setPointSize(12);
@@ -122,7 +123,8 @@ public:
         horizontalLayout_5->setObjectName("horizontalLayout_5");
         groupBox_2 = new QGroupBox(widget_2);
         groupBox_2->setObjectName("groupBox_2");
-        groupBox_2->setMaximumSize(QSize(300, 16777215));
+        groupBox_2->setMinimumSize(QSize(250, 105));
+        groupBox_2->setMaximumSize(QSize(250, 105));
         QFont font1;
         font1.setFamilies({QString::fromUtf8("Times New Roman")});
         font1.setPointSize(14);
@@ -183,7 +185,8 @@ public:
         toolButton_14 = new QToolButton(widget_2);
         toolButton_14->setObjectName("toolButton_14");
         toolButton_14->setEnabled(false);
-        toolButton_14->setMinimumSize(QSize(60, 60));
+        toolButton_14->setMinimumSize(QSize(35, 35));
+        toolButton_14->setMaximumSize(QSize(30, 30));
         toolButton_14->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
 
         horizontalLayout_8->addWidget(toolButton_14);
@@ -191,7 +194,8 @@ public:
         toolButton_15 = new QToolButton(widget_2);
         toolButton_15->setObjectName("toolButton_15");
         toolButton_15->setEnabled(false);
-        toolButton_15->setMinimumSize(QSize(60, 60));
+        toolButton_15->setMinimumSize(QSize(35, 35));
+        toolButton_15->setMaximumSize(QSize(30, 30));
         toolButton_15->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
 
         horizontalLayout_8->addWidget(toolButton_15);
@@ -199,7 +203,8 @@ public:
         toolButton_16 = new QToolButton(widget_2);
         toolButton_16->setObjectName("toolButton_16");
         toolButton_16->setEnabled(false);
-        toolButton_16->setMinimumSize(QSize(60, 60));
+        toolButton_16->setMinimumSize(QSize(35, 35));
+        toolButton_16->setMaximumSize(QSize(30, 30));
         toolButton_16->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
 
         horizontalLayout_8->addWidget(toolButton_16);
@@ -207,7 +212,8 @@ public:
         toolButton_17 = new QToolButton(widget_2);
         toolButton_17->setObjectName("toolButton_17");
         toolButton_17->setEnabled(false);
-        toolButton_17->setMinimumSize(QSize(60, 60));
+        toolButton_17->setMinimumSize(QSize(35, 35));
+        toolButton_17->setMaximumSize(QSize(30, 30));
         toolButton_17->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
 
         horizontalLayout_8->addWidget(toolButton_17);
@@ -215,7 +221,8 @@ public:
         toolButton_18 = new QToolButton(widget_2);
         toolButton_18->setObjectName("toolButton_18");
         toolButton_18->setEnabled(false);
-        toolButton_18->setMinimumSize(QSize(60, 60));
+        toolButton_18->setMinimumSize(QSize(35, 35));
+        toolButton_18->setMaximumSize(QSize(30, 30));
         toolButton_18->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
 
         horizontalLayout_8->addWidget(toolButton_18);
@@ -223,7 +230,8 @@ public:
         toolButton_19 = new QToolButton(widget_2);
         toolButton_19->setObjectName("toolButton_19");
         toolButton_19->setEnabled(false);
-        toolButton_19->setMinimumSize(QSize(60, 60));
+        toolButton_19->setMinimumSize(QSize(35, 35));
+        toolButton_19->setMaximumSize(QSize(30, 30));
         toolButton_19->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
 
         horizontalLayout_8->addWidget(toolButton_19);
@@ -231,7 +239,8 @@ public:
         toolButton_20 = new QToolButton(widget_2);
         toolButton_20->setObjectName("toolButton_20");
         toolButton_20->setEnabled(false);
-        toolButton_20->setMinimumSize(QSize(60, 60));
+        toolButton_20->setMinimumSize(QSize(35, 35));
+        toolButton_20->setMaximumSize(QSize(30, 30));
         toolButton_20->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
 
         horizontalLayout_8->addWidget(toolButton_20);
@@ -244,6 +253,8 @@ public:
 
         terminal_up = new QTextEdit(groupBox);
         terminal_up->setObjectName("terminal_up");
+        terminal_up->setMinimumSize(QSize(0, 100));
+        terminal_up->setMaximumSize(QSize(16777215, 150));
 
         horizontalLayout_9->addWidget(terminal_up);
 
@@ -290,6 +301,7 @@ public:
         gridLayout_2->setObjectName("gridLayout_2");
         checking_the_operation = new QTableWidget(groupBox_4);
         checking_the_operation->setObjectName("checking_the_operation");
+        checking_the_operation->setMaximumSize(QSize(16777215, 500));
         checking_the_operation->setAutoFillBackground(false);
         checking_the_operation->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
 
@@ -389,7 +401,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 1593, 26));
+        menubar->setGeometry(QRect(0, 0, 1593, 22));
         menu = new QMenu(menubar);
         menu->setObjectName("menu");
         menu_2 = new QMenu(menubar);

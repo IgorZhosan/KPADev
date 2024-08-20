@@ -263,6 +263,12 @@
 			null
 		],
 		[
+			"C:/KPADev/KPA/data_receiver.h",
+			"MU",
+			"EWIEGA46WW/moc_data_receiver.cpp",
+			null
+		],
+		[
 			"C:/KPADev/KPA/intrfECE0206.h",
 			"MU",
 			"EWIEGA46WW/moc_intrfECE0206.cpp",
@@ -355,6 +361,7 @@
 	[
 		[ "C:/KPADev/KPA/OpenECE0206byIndex.cpp", "MU", null ],
 		[ "C:/KPADev/KPA/buttonhandlers.cpp", "MU", null ],
+		[ "C:/KPADev/KPA/data_receiver.cpp", "MU", null ],
 		[ "C:/KPADev/KPA/library02061.cpp", "MU", null ],
 		[ "C:/KPADev/KPA/main.cpp", "MU", null ],
 		[ "C:/KPADev/KPA/mainwindow.cpp", "MU", null ]
