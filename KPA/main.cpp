@@ -18,6 +18,7 @@
 #include <QWidgetAction>
 #include <QDebug>
 #include <QGroupBox>
+#include <QLabel>
 
 // Функция для создания группы чекбоксов с именами
 QGroupBox* createCheckboxGroup(const QString& title, const QStringList& labels, const QStringList& objectNames) {
@@ -35,15 +36,41 @@ QGroupBox* createCheckboxGroup(const QString& title, const QStringList& labels, 
     return groupBox;
 }
 
-// Функция для создания общей группы для ЛТ, ЛК, КК
-QWidget* createGroupedLT_LK_KK() {
+// Функция для создания общей группы для ЛТ, ЛК, КК с названиями и заголовком
+QWidget* createGroupedLT_LK_KK(const QString& prefix, const QString& title) {
     QWidget* container = new QWidget;  // Контейнер для всех трех групп
-    QHBoxLayout* hbox = new QHBoxLayout(container);  // Горизонтальный layout
+    QVBoxLayout* vbox = new QVBoxLayout(container);  // Вертикальный layout
 
-    // Создаем группы чекбоксов для ЛТ, ЛК и КК без текстов (пустые чекбоксы)
-    QGroupBox* ltGroup = createCheckboxGroup("ЛТ [7:1]", QStringList(7, ""), QStringList(7, ""));  // 7 пустых чекбоксов
-    QGroupBox* lkGroup = createCheckboxGroup("ЛК [4:1]", QStringList(4, ""), QStringList(4, ""));  // 4 пустых чекбокса
-    QGroupBox* kkGroup = createCheckboxGroup("КК [8:1]", QStringList(8, ""), QStringList(8, ""));  // 8 пустых чекбоксов
+    QLabel* label = new QLabel(title);  // Заголовок для групп ЛТ, ЛК, КК
+    vbox->addWidget(label);
+
+    QHBoxLayout* hbox = new QHBoxLayout;  // Горизонтальный layout для групп ЛТ, ЛК, КК
+    vbox->addLayout(hbox);
+
+    // Создаем названия для ЛТ, ЛК и КК с префиксом для имен
+    QStringList ltLabels = {"ЛТ1", "ЛТ2", "ЛТ3", "ЛТ4", "ЛТ5", "ЛТ6", "ЛТ7"};
+    QStringList lkLabels = {"ЛК1", "ЛК2", "ЛК3", "ЛК4"};
+    QStringList kkLabels = {"КК1", "КК2", "КК3", "КК4", "КК5", "КК6", "КК7", "КК8"};
+
+    QStringList ltObjectNames;
+    QStringList lkObjectNames;
+    QStringList kkObjectNames;
+
+    // Генерируем имена чекбоксов с префиксом
+    for (int i = 1; i <= 7; ++i) {
+        ltObjectNames << prefix + "lt" + QString::number(i);
+    }
+    for (int i = 1; i <= 4; ++i) {
+        lkObjectNames << prefix + "lk" + QString::number(i);
+    }
+    for (int i = 1; i <= 8; ++i) {
+        kkObjectNames << prefix + "kk" + QString::number(i);
+    }
+
+    // Создаем группы чекбоксов с названиями
+    QGroupBox* ltGroup = createCheckboxGroup("ЛТ [7:1]", ltLabels, ltObjectNames);  // 7 чекбоксов с названиями
+    QGroupBox* lkGroup = createCheckboxGroup("ЛК [4:1]", lkLabels, lkObjectNames);  // 4 чекбокса с названиями
+    QGroupBox* kkGroup = createCheckboxGroup("КК [8:1]", kkLabels, kkObjectNames);  // 8 чекбоксов с названиями
 
     // Добавляем группы в горизонтальный layout, чтобы они были рядом
     hbox->addWidget(ltGroup);
@@ -56,29 +83,43 @@ QWidget* createGroupedLT_LK_KK() {
 QMenu* createCheckboxMenu(QWidget* parent) {
     QMenu* menu = new QMenu(parent);
 
-    // Создаем контейнер для ЛТ, ЛК и КК
-    QWidget* lt_lk_kk_container = createGroupedLT_LK_KK();
+    // Создаем контейнер для ЛТ, ЛК и КК для принимаемых данных
+    QWidget* lt_lk_kk_in = createGroupedLT_LK_KK("in_", "ЛТ, ЛК, КК (принимаемые)");  // Префикс "in_"
+
+    // Создаем контейнер для ЛТ, ЛК и КК для отправляемых данных
+    QWidget* lt_lk_kk_out = createGroupedLT_LK_KK("out_", "ЛТ, ЛК, КК (отправляемые)");  // Префикс "out_"
 
     // Создаем группы для остальных чекбоксов с нужными именами
     QStringList otherCheckboxLabels = {"Отказ канала", "ПО", "K0", "ТК", "КВС", "ТСН", "НКК", "МГн", "ПП", "ППП", "НК", "ИТП", "ПР"};
-    QStringList otherCheckboxNames = {"OTKAZ", "PO", "k0", "TK", "KVS", "TCH", "NKK", "MGN", "USPP", "PPP", "NK", "ITP", "PR"};
+    QStringList otherCheckboxNamesIn = {"in_otkaz", "in_po", "in_k0", "in_tk", "in_kvs", "in_tsn", "in_nkk", "in_mgn", "in_uspp", "in_ppp", "in_nk", "in_itp", "in_pr"};
+    QStringList otherCheckboxNamesOut = {"out_otkaz", "out_po", "out_k0", "out_tk", "out_kvs", "out_tsn", "out_nkk", "out_mgn", "out_uspp", "out_ppp", "out_nk", "out_itp", "out_pr"};
 
-    // Создаем группу с этими чекбоксами и их именами
-    QGroupBox* otherGroup = createCheckboxGroup("Прочие", otherCheckboxLabels, otherCheckboxNames);
+    // Создаем группу для принимаемых данных
+    QGroupBox* inGroup = createCheckboxGroup("Прочие (принимаемые)", otherCheckboxLabels, otherCheckboxNamesIn);
+
+    // Создаем группу для отправляемых данных
+    QGroupBox* outGroup = createCheckboxGroup("Прочие (отправляемые)", otherCheckboxLabels, otherCheckboxNamesOut);
 
     // Упаковываем группы в действия меню
-    QWidgetAction* lt_lk_kk_Action = new QWidgetAction(menu);
-    lt_lk_kk_Action->setDefaultWidget(lt_lk_kk_container);
-    menu->addAction(lt_lk_kk_Action);
+    QWidgetAction* lt_lk_kk_in_Action = new QWidgetAction(menu);
+    lt_lk_kk_in_Action->setDefaultWidget(lt_lk_kk_in);
+    menu->addAction(lt_lk_kk_in_Action);
 
-    // Добавляем группу с остальными чекбоксами
-    QWidgetAction* otherAction = new QWidgetAction(menu);
-    otherAction->setDefaultWidget(otherGroup);
-    menu->addAction(otherAction);
+    QWidgetAction* lt_lk_kk_out_Action = new QWidgetAction(menu);
+    lt_lk_kk_out_Action->setDefaultWidget(lt_lk_kk_out);
+    menu->addAction(lt_lk_kk_out_Action);
+
+    // Добавляем группы с прочими чекбоксами
+    QWidgetAction* inAction = new QWidgetAction(menu);
+    inAction->setDefaultWidget(inGroup);
+    menu->addAction(inAction);
+
+    QWidgetAction* outAction = new QWidgetAction(menu);
+    outAction->setDefaultWidget(outGroup);
+    menu->addAction(outAction);
 
     return menu;
 }
-
 // Функция для проверки состояния чекбоксов
 void checkCheckboxStates(QWidget* parent) {
     // Пример: поиск по имени и вывод состояния чекбоксов
