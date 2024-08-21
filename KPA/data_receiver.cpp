@@ -15,6 +15,7 @@ extern DWORD nOutput;
 
 // Массив для сохранения посылки
 ULONG IN_KPA[11] = {0};
+ULONG OUT_AD9M2[7] = {0};
 
 // Структура для получения данных
 typedef struct {
@@ -52,6 +53,7 @@ void receiveDataAndDisplay()
     strout = "IN : ";
     for (int i = 0; i < 11; i++) {
         QString str = QString("%1 ").arg((DWORD)IN_KPA[i], 8, 16, QChar('0')).toUpper();
+        str.resize(6);
         strout += str + " ";
     }
 
@@ -60,3 +62,9 @@ void receiveDataAndDisplay()
         terminal_down->append(strout);  // Выводим в текстовый виджет
     }
 }
+
+//функция отправки данных по 1-му каналу в AD9M2
+
+
+
+
