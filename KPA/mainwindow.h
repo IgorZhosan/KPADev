@@ -2,6 +2,11 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
+#include <QCheckBox>
+
+extern QCheckBox *kpaCheckBox;
+extern QCheckBox *priemCheckBox;
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {

@@ -7,8 +7,6 @@
 #include <QTextEdit>
 
 
-// Пустые реализации функций-слотов для каждой кнопки
-
 QTextEdit *terminal_down = nullptr;
 extern HANDLE hECE0206_0;
 extern HANDLE hECE0206_1;
@@ -80,8 +78,8 @@ void handleStartButtonClick()
 
         // Если хотя бы одно устройство подключено, начинаем отправку данных
         if (State_ECE0206_0 == true || State_ECE0206_1 == true) {
-            Timer->start(1000);  // Запуск таймера с интервалом в 1000 мс (1 секунда)
-            QObject::connect(Timer, &QTimer::timeout, &receiveDataAndDisplay);  // Подключаем к таймеру функцию receiveDataAndDisplay
+            Timer->start(40);  // Запуск таймера с интервалом в 1000 мс (1 секунда)
+            QObject::connect(Timer, &QTimer::timeout, &ifCheckBoxesIsTrue);  // Подключаем к таймеру функцию ifCheckBoxesIsTrue
             terminal_down->append("Данные отправляются...");
             isReceivingData = true;
         }

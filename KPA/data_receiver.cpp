@@ -3,11 +3,15 @@
 #include <windows.h>
 #include <QTextEdit>
 #include <QString>
+#include <QCheckBox>
 
 // Определяем extern для объектов, которые уже есть в других файлах
 extern HANDLE hECE0206_1;
+extern QCheckBox *kpaCheckBox;
+extern QCheckBox *priemCheckBox;
 extern QTextEdit* terminal_down;
 extern DWORD nOutput;
+
 
 // Массив для сохранения посылки
 ULONG IN_KPA[11] = {0};
@@ -20,6 +24,13 @@ typedef struct {
 } INPUTPARAM;
 
 INPUTPARAM ParamCod;  // Переменная для получения данных
+
+//Функция проверка нажатия чекбоксов
+void ifCheckBoxesIsTrue() {
+    if (kpaCheckBox->isChecked() && priemCheckBox->isChecked()) {
+        receiveDataAndDisplay();
+    }
+}
 
 // Функция для получения посылки и вывода её в терминал
 void receiveDataAndDisplay()
