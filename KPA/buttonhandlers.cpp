@@ -1,13 +1,12 @@
 #include "buttonhandlers.h"
 #include "data_receiver.h"
-#include "tvk02061.h"
+#include "library02061.h"
 #include "intrfECE0206.h"
 #include <QDebug>
 #include <QTimer>
 #include <QTextEdit>
 
 
-QTextEdit *terminal_down = nullptr;
 extern HANDLE hECE0206_0;
 extern HANDLE hECE0206_1;
 extern DWORD nOutput;

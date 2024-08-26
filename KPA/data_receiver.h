@@ -8,5 +8,7 @@ extern QCheckBox *priemCheckBox;
 // Объявление функции
 void receiveDataAndDisplay();
 void ifCheckBoxesIsTrue();
+void coder_ch1();
+void checkAndSendAD9M2Broadcast();
 
 #endif // DATA_RECEIVER_H

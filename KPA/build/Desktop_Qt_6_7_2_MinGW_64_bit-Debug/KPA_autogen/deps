@@ -13,10 +13,10 @@ KPA_autogen/timestamp: \
 	C:/KPADev/KPA/intrfECE0206.h \
 	C:/KPADev/KPA/ioctlECE0206.h \
 	C:/KPADev/KPA/library02061.cpp \
+	C:/KPADev/KPA/library02061.h \
 	C:/KPADev/KPA/main.cpp \
 	C:/KPADev/KPA/mainwindow.cpp \
 	C:/KPADev/KPA/mainwindow.h \
-	C:/KPADev/KPA/tvk02061.h \
 	C:/Qt/6.7.2/mingw_64/include/QtCore/q20functional.h \
 	C:/Qt/6.7.2/mingw_64/include/QtCore/q20memory.h \
 	C:/Qt/6.7.2/mingw_64/include/QtCore/q20type_traits.h \

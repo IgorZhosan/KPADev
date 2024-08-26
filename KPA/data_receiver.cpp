@@ -1,21 +1,52 @@
-#include "tvk02061.h"
+#include "library02061.h"
 #include "data_receiver.h"
 #include <windows.h>
 #include <QTextEdit>
 #include <QString>
 #include <QCheckBox>
 
+
 // Определяем extern для объектов, которые уже есть в других файлах
 extern HANDLE hECE0206_1;
 extern QCheckBox *kpaCheckBox;
 extern QCheckBox *priemCheckBox;
+extern QCheckBox *AD9M2;
+extern QCheckBox *broadcast;
 extern QTextEdit* terminal_down;
 extern DWORD nOutput;
+extern QCheckBox *out_otkaz_checkbox;
+extern QCheckBox *out_po_checkbox;
+extern QCheckBox *out_k0_checkbox;
+extern QCheckBox *out_tk_checkbox;
+extern QCheckBox *out_kvs_checkbox;
+extern QCheckBox *out_tsn_checkbox;
+extern QCheckBox *out_nkk_checkbox;
+extern QCheckBox *out_mgn_checkbox;
+extern QCheckBox *out_pp_checkbox;
+extern QCheckBox *out_ppp_checkbox;
+extern QCheckBox *out_nk_checkbox;
+extern QCheckBox *out_itp_checkbox;
+extern QCheckBox *out_pr_checkbox;
+
+extern QCheckBox *out_lk1_checkbox;
+extern QCheckBox *out_lk2_checkbox;
+extern QCheckBox *out_lk3_checkbox;
+extern QCheckBox *out_lk4_checkbox;
+
+extern QCheckBox *out_kk1_checkbox;
+extern QCheckBox *out_kk2_checkbox;
+extern QCheckBox *out_kk3_checkbox;
+extern QCheckBox *out_kk4_checkbox;
+extern QCheckBox *out_kk5_checkbox;
+extern QCheckBox *out_kk6_checkbox;
+extern QCheckBox *out_kk7_checkbox;
+extern QCheckBox *out_kk8_checkbox;
 
 
 // Массив для сохранения посылки
 ULONG IN_KPA[11] = {0};
 ULONG OUT_AD9M2[7] = {0};
+
 
 // Структура для получения данных
 typedef struct {
@@ -63,8 +94,92 @@ void receiveDataAndDisplay()
     }
 }
 
-//функция отправки данных по 1-му каналу в AD9M2
 
+
+void coder_CH1(void) {
+    ULONG sum = 0;
+
+    // Инициализация первого элемента массива OUT_AD9M2
+    OUT_AD9M2[0] = 0x80;  // Базовое значение
+
+    // Формирование первого элемента массива OUT_AD9M2 на основе состояния чекбоксов
+    OUT_AD9M2[0] |= ((0x1 & (out_otkaz_checkbox->isChecked())) << 8) |
+                    ((0x1 & (out_po_checkbox->isChecked())) << 10) |
+                    ((0x1 & (out_k0_checkbox->isChecked())) << 11) |
+                    ((0x1 & (out_tk_checkbox->isChecked())) << 12) |
+                    ((0x1 & (out_kvs_checkbox->isChecked())) << 14) |
+                    ((0x1 & (out_tsn_checkbox->isChecked())) << 15) |
+                    ((0x1 & (out_nkk_checkbox->isChecked())) << 16) |
+                    ((0x1 & (out_mgn_checkbox->isChecked())) << 17) |
+                    ((0x1 & (out_pp_checkbox->isChecked())) << 18) |
+                    ((0x1 & (out_ppp_checkbox->isChecked())) << 19) |
+                    ((0x1 & (out_nk_checkbox->isChecked())) << 20) |
+                    ((0x1 & (out_itp_checkbox->isChecked())) << 21) |
+                    ((0x1 & (out_pr_checkbox->isChecked())) << 22);
+
+    // Если чекбокс НМО (некоторый функционал на основе nkk_checkbox) активирован, устанавливаем 13-й бит
+    if (out_nkk_checkbox->isChecked()) {
+        OUT_AD9M2[0] |= 1 << 13;
+    }
+
+    // Формирование второго элемента массива OUT_AD9M2 на основе состояния чекбоксов ЛК
+    OUT_AD9M2[1] = 0x40;  // Базовое значение
+    OUT_AD9M2[1] |= ((0x1 & (out_lk1_checkbox->isChecked())) << 16) |
+                    ((0x1 & (out_lk2_checkbox->isChecked())) << 17) |
+                    ((0x1 & (out_lk3_checkbox->isChecked())) << 18) |
+                    ((0x1 & (out_lk4_checkbox->isChecked())) << 19);
+
+    // Добавление состояния чекбоксов КК в третий элемент массива
+    OUT_AD9M2[1] |= ((0x1 & (out_kk1_checkbox->isChecked())) << 20) |
+                    ((0x1 & (out_kk2_checkbox->isChecked())) << 21) |
+                    ((0x1 & (out_kk3_checkbox->isChecked())) << 22) |
+                    ((0x1 & (out_kk4_checkbox->isChecked())) << 23) |
+                    ((0x1 & (out_kk5_checkbox->isChecked())) << 24) |
+                    ((0x1 & (out_kk6_checkbox->isChecked())) << 25) |
+                    ((0x1 & (out_kk7_checkbox->isChecked())) << 26) |
+                    ((0x1 & (out_kk8_checkbox->isChecked())) << 27);
+
+    // Инициализация остальных элементов массива
+    OUT_AD9M2[2] = 0xC0;
+    OUT_AD9M2[3] = 0x20;
+    OUT_AD9M2[4] = 0xA0;
+    OUT_AD9M2[5] = 0x60;
+
+    // Пример расчета контрольной суммы (нужно добавить или изменить функцию KS)
+    // sum = KS(OUT_AD9M2, 6);  // Функция расчета контрольной суммы для элементов массива
+
+    // Устанавливаем контрольную сумму в шестой элемент массива
+    OUT_AD9M2[6] = 0xE5;
+    OUT_AD9M2[6] |= ((sum & 0xFFFF) << 8);
+}
+
+void checkAndSendAD9M2Broadcast() {
+    if (AD9M2->isChecked() && broadcast->isChecked()) {
+        // Формируем посылку
+        coder_CH1();  // Используем существующую функцию для формирования посылки
+
+        // Отправляем данные через канал (здесь `BUF256x32_write` и `SO_pusk` - ваши функции для работы с каналом)
+        BUF256x32_write(0, OUT_AD9M2, 7);  // Отправляем данные, 7 - это количество элементов массива
+
+        // Выводим данные в textEdit, если чекбокс для вывода активирован
+        if (terminal_down) {
+            QString strout = "OUT: ";
+            QString str;
+
+            // Формируем строку для вывода в терминал
+            for (int i = 0; i < 7; i++) {
+                str = QString("%1 ").arg((DWORD)OUT_AD9M2[i], 8, 16, QChar('0')).toUpper();
+                str.resize(6);
+                strout += str + "   ";
+            }
+
+            terminal_down->append(strout);  // Выводим строку в текстовый виджет
+        }
+
+        // Отправка данных на канал
+        SO_pusk(0);  // 0 - это номер канала
+    }
+}
 
 
 

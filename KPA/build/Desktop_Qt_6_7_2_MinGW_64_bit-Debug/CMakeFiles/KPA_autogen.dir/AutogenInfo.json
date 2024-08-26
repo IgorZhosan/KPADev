@@ -281,12 +281,17 @@
 			null
 		],
 		[
+			"C:/KPADev/KPA/library02061.h",
+			"MU",
+			"EWIEGA46WW/moc_library02061.cpp",
+			null
+		],
+		[
 			"C:/KPADev/KPA/mainwindow.h",
 			"MU",
 			"EWIEGA46WW/moc_mainwindow.cpp",
 			null
-		],
-		[ "C:/KPADev/KPA/tvk02061.h", "MU", "EWIEGA46WW/moc_tvk02061.cpp", null ]
+		]
 	],
 	"HEADER_EXTENSIONS" : [ "h", "hh", "h++", "hm", "hpp", "hxx", "in", "txx" ],
 	"INCLUDE_DIR" : "C:/KPADev/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/KPA_autogen/include",

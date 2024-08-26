@@ -22,7 +22,7 @@ set(PROJECT_SOURCES
     intrfECE0206.h
     ioctlECE0206.h
     library02061.cpp
-    tvk02061.h
+    library02061.h
     OpenECE0206byIndex.cpp
 )
 
