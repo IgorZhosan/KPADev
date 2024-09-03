@@ -29,7 +29,16 @@ QMenu *checkboxMenu = nullptr;
 QPushButton *handleStartButton = nullptr;
 QPushButton *button = nullptr;
 
-// Объявляем глобальные переменные для чекбоксов
+// Добавляем глобальные переменные для чекбоксов ЛТ
+QCheckBox *out_lt1_checkbox = nullptr;
+QCheckBox *out_lt2_checkbox = nullptr;
+QCheckBox *out_lt3_checkbox = nullptr;
+QCheckBox *out_lt4_checkbox = nullptr;
+QCheckBox *out_lt5_checkbox = nullptr;
+QCheckBox *out_lt6_checkbox = nullptr;
+QCheckBox *out_lt7_checkbox = nullptr;
+
+// Объявляем глобальные переменные для других чекбоксов
 QCheckBox *out_otkaz_checkbox = nullptr;
 QCheckBox *out_po_checkbox = nullptr;
 QCheckBox *out_k0_checkbox = nullptr;
@@ -56,7 +65,7 @@ QCheckBox *out_kk6_checkbox = nullptr;
 QCheckBox *out_kk7_checkbox = nullptr;
 QCheckBox *out_kk8_checkbox = nullptr;
 
-// Функция для создания группы чекбоксов с именами
+// Функция для создания группы чекбоксов с именами и горизонтальным расположением
 QGroupBox* createCheckboxGroup(const QString& title, const QStringList& labels, const QStringList& objectNames, QList<QCheckBox*>& checkboxes) {
     QGroupBox* groupBox = new QGroupBox(title);  // Создаем группу с заголовком
     QHBoxLayout* hbox = new QHBoxLayout;  // Горизонтальный layout для чекбоксов
@@ -66,7 +75,7 @@ QGroupBox* createCheckboxGroup(const QString& title, const QStringList& labels, 
         QCheckBox* checkbox = new QCheckBox(labels[i]);  // Чекбокс с текстом
         checkbox->setObjectName(objectNames[i]);  // Устанавливаем уникальное имя для каждого чекбокса
         checkboxes.append(checkbox);  // Добавляем чекбокс в список
-        hbox->addWidget(checkbox);  // Добавляем чекбокс в layout
+        hbox->addWidget(checkbox);  // Добавляем чекбокс в горизонтальный layout
     }
 
     groupBox->setLayout(hbox);  // Устанавливаем layout в группу
@@ -77,59 +86,83 @@ QGroupBox* createCheckboxGroup(const QString& title, const QStringList& labels, 
 QMenu* createCheckboxMenu(QWidget* parent) {
     QMenu* menu = new QMenu(parent);
 
-    // Создаем группы чекбоксов для остальных чекбоксов с нужными именами
-    QStringList otherCheckboxLabels = {"Отказ канала", "ПО", "K0", "ТК", "КВС", "ТСН", "НКК", "МГн", "ПП", "ППП", "НК", "ИТП", "ПР"};
-    QStringList otherCheckboxNamesOut = {"out_otkaz", "out_po", "out_k0", "out_tk", "out_kvs", "out_tsn", "out_nkk", "out_mgn", "out_pp", "out_ppp", "out_nk", "out_itp", "out_pr"};
+    // Группа ЛТ [7:1]
+    QStringList ltCheckboxLabels = {"ЛТ7", "ЛТ6", "ЛТ5", "ЛТ4", "ЛТ3", "ЛТ2", "ЛТ1"};
+    QStringList ltCheckboxNamesOut = {"out_lt7", "out_lt6", "out_lt5", "out_lt4", "out_lt3", "out_lt2", "out_lt1"};
+    QList<QCheckBox*> ltCheckboxes;
+    QGroupBox* ltGroup = createCheckboxGroup("ЛТ [7:1]", ltCheckboxLabels, ltCheckboxNamesOut, ltCheckboxes);
 
-    // Листы для чекбоксов
-    QList<QCheckBox*> outCheckboxes;
+    // Группа ЛК [4:1]
+    QStringList lkCheckboxLabels = {"ЛК4", "ЛК3", "ЛК2", "ЛК1"};
+    QStringList lkCheckboxNamesOut = {"out_lk4", "out_lk3", "out_lk2", "out_lk1"};
+    QList<QCheckBox*> lkCheckboxes;
+    QGroupBox* lkGroup = createCheckboxGroup("ЛК [4:1]", lkCheckboxLabels, lkCheckboxNamesOut, lkCheckboxes);
 
-    // Создаем группу для отправляемых данных
-    QGroupBox* outGroup = createCheckboxGroup("Прочие (отправляемые)", otherCheckboxLabels, otherCheckboxNamesOut, outCheckboxes);
+    // Группа КК [8:1]
+    QStringList kkCheckboxLabels = {"КК8", "КК7", "КК6", "КК5", "КК4", "КК3", "КК2", "КК1"};
+    QStringList kkCheckboxNamesOut = {"out_kk8", "out_kk7", "out_kk6", "out_kk5", "out_kk4", "out_kk3", "out_kk2", "out_kk1"};
+    QList<QCheckBox*> kkCheckboxes;
+    QGroupBox* kkGroup = createCheckboxGroup("КК [8:1]", kkCheckboxLabels, kkCheckboxNamesOut, kkCheckboxes);
 
     // Сохраняем ссылки на чекбоксы в глобальные переменные
-    out_otkaz_checkbox = outCheckboxes[0];
-    out_po_checkbox = outCheckboxes[1];
-    out_k0_checkbox = outCheckboxes[2];
-    out_tk_checkbox = outCheckboxes[3];
-    out_kvs_checkbox = outCheckboxes[4];
-    out_tsn_checkbox = outCheckboxes[5];
-    out_nkk_checkbox = outCheckboxes[6];
-    out_mgn_checkbox = outCheckboxes[7];
-    out_pp_checkbox = outCheckboxes[8];
-    out_ppp_checkbox = outCheckboxes[9];
-    out_nk_checkbox = outCheckboxes[10];
-    out_itp_checkbox = outCheckboxes[11];
-    out_pr_checkbox = outCheckboxes[12];
+    out_lt1_checkbox = ltCheckboxes[6];
+    out_lt2_checkbox = ltCheckboxes[5];
+    out_lt3_checkbox = ltCheckboxes[4];
+    out_lt4_checkbox = ltCheckboxes[3];
+    out_lt5_checkbox = ltCheckboxes[2];
+    out_lt6_checkbox = ltCheckboxes[1];
+    out_lt7_checkbox = ltCheckboxes[0];
 
-    // Упаковываем группы в действия меню
-    QWidgetAction* outAction = new QWidgetAction(menu);
-    outAction->setDefaultWidget(outGroup);
-    menu->addAction(outAction);
+    out_lk1_checkbox = lkCheckboxes[3];
+    out_lk2_checkbox = lkCheckboxes[2];
+    out_lk3_checkbox = lkCheckboxes[1];
+    out_lk4_checkbox = lkCheckboxes[0];
+
+    out_kk1_checkbox = kkCheckboxes[7];
+    out_kk2_checkbox = kkCheckboxes[6];
+    out_kk3_checkbox = kkCheckboxes[5];
+    out_kk4_checkbox = kkCheckboxes[4];
+    out_kk5_checkbox = kkCheckboxes[3];
+    out_kk6_checkbox = kkCheckboxes[2];
+    out_kk7_checkbox = kkCheckboxes[1];
+    out_kk8_checkbox = kkCheckboxes[0];
+
+    // Упаковываем группы в горизонтальный layout
+    QWidget* widget = new QWidget(menu);
+    QHBoxLayout* layout = new QHBoxLayout(widget);
+    layout->addWidget(ltGroup);
+    layout->addWidget(lkGroup);
+    layout->addWidget(kkGroup);
+
+    widget->setLayout(layout);
+
+    // Упаковываем layout в меню
+    QWidgetAction* widgetAction = new QWidgetAction(menu);
+    widgetAction->setDefaultWidget(widget);
+    menu->addAction(widgetAction);
 
     return menu;
 }
 
-// Функция для обработки изменения состояния чекбокса
-void setupOutNkkCheckboxBehavior() {
-    if (out_nkk_checkbox) {
-        QObject::connect(out_nkk_checkbox, &QCheckBox::stateChanged, [](int state) {
-            if (state == Qt::Checked) {
-                if (terminal_up) {
-                    terminal_up->append("Чекбокс out_nkk нажат");
-                } else {
-                    qDebug() << "Чекбокс out_nkk нажат";
-                }
-            } else {
-                if (terminal_up) {
-                    terminal_up->append("Чекбокс out_nkk снят");
-                } else {
-                    qDebug() << "Чекбокс out_nkk снят";
-                }
-            }
-        });
-    } else {
-        qDebug() << "Чекбокс out_nkk не найден";
+void setupCheckboxSignals() {
+        // Список всех чекбоксов
+        QList<QCheckBox*> checkboxes = {
+            out_otkaz_checkbox, out_po_checkbox, out_k0_checkbox, out_tk_checkbox,
+            out_kvs_checkbox, out_tsn_checkbox, out_nkk_checkbox, out_mgn_checkbox,
+            out_pp_checkbox, out_ppp_checkbox, out_nk_checkbox, out_itp_checkbox, out_pr_checkbox,
+            out_lk1_checkbox, out_lk2_checkbox, out_lk3_checkbox, out_lk4_checkbox,
+            out_kk1_checkbox, out_kk2_checkbox, out_kk3_checkbox, out_kk4_checkbox,
+            out_kk5_checkbox, out_kk6_checkbox, out_kk7_checkbox, out_kk8_checkbox
+        };
+        for (auto* checkbox : checkboxes) {
+            if (checkbox) {
+                QObject::connect(checkbox, &QCheckBox::stateChanged, [checkbox](int state) {
+                    QString stateStr = (state == Qt::Checked) ? "checked" : "unchecked";
+                    if (terminal_down) {
+                        terminal_down->append(checkbox->objectName() + " is " + stateStr);
+                    }
+                });
+        }
     }
 }
 
@@ -231,7 +264,7 @@ int main(int argc, char *argv[])
     handleStartButton->setFixedSize(80, 80);
     layout->setStretchFactor(handleStartButton, 1);
 
-    QObject::connect(handleStartButton, &QPushButton::clicked, &w, &handleStartButtonClick);
+
 
     QHBoxLayout* horizontalLayout_8 = w.findChild<QHBoxLayout*>("horizontalLayout_8");
 
@@ -242,7 +275,11 @@ int main(int argc, char *argv[])
     if (horizontalLayout_8) {
         horizontalLayout_8->addWidget(button);
     }
+    setupCheckboxSignals();
+    QObject::connect(handleStartButton, &QPushButton::clicked, &w, &handleStartButtonClick);
+
 
     w.show();
+
     return a.exec();
 }

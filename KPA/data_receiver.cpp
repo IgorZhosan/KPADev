@@ -5,42 +5,11 @@
 #include <QString>
 #include <QCheckBox>
 
-
-// Определяем extern для объектов, которые уже есть в других файлах
 extern HANDLE hECE0206_1;
-extern QCheckBox *kpaCheckBox;
-extern QCheckBox *priemCheckBox;
-extern QCheckBox *AD9M2;
-extern QCheckBox *broadcast;
 extern QTextEdit* terminal_down;
 extern DWORD nOutput;
-extern QCheckBox *out_otkaz_checkbox;
-extern QCheckBox *out_po_checkbox;
-extern QCheckBox *out_k0_checkbox;
-extern QCheckBox *out_tk_checkbox;
-extern QCheckBox *out_kvs_checkbox;
-extern QCheckBox *out_tsn_checkbox;
-extern QCheckBox *out_nkk_checkbox;
-extern QCheckBox *out_mgn_checkbox;
-extern QCheckBox *out_pp_checkbox;
-extern QCheckBox *out_ppp_checkbox;
-extern QCheckBox *out_nk_checkbox;
-extern QCheckBox *out_itp_checkbox;
-extern QCheckBox *out_pr_checkbox;
 
-extern QCheckBox *out_lk1_checkbox;
-extern QCheckBox *out_lk2_checkbox;
-extern QCheckBox *out_lk3_checkbox;
-extern QCheckBox *out_lk4_checkbox;
-
-extern QCheckBox *out_kk1_checkbox;
-extern QCheckBox *out_kk2_checkbox;
-extern QCheckBox *out_kk3_checkbox;
-extern QCheckBox *out_kk4_checkbox;
-extern QCheckBox *out_kk5_checkbox;
-extern QCheckBox *out_kk6_checkbox;
-extern QCheckBox *out_kk7_checkbox;
-extern QCheckBox *out_kk8_checkbox;
+ULONG KS(ULONG *array, int size);
 
 
 // Массив для сохранения посылки
@@ -56,13 +25,6 @@ typedef struct {
 } INPUTPARAM;
 
 INPUTPARAM ParamCod;  // Переменная для получения данных
-
-//Функция проверка нажатия чекбоксов
-void ifCheckBoxesIsTrue() {
-    if (kpaCheckBox->isChecked() && priemCheckBox->isChecked()) {
-        receiveDataAndDisplay();
-    }
-}
 
 // Функция для получения посылки и вывода её в терминал
 void receiveDataAndDisplay()
@@ -95,7 +57,6 @@ void receiveDataAndDisplay()
 }
 
 
-
 void coder_CH1(void) {
     ULONG sum = 0;
 
@@ -103,7 +64,7 @@ void coder_CH1(void) {
     OUT_AD9M2[0] = 0x80;  // Базовое значение
 
     // Формирование первого элемента массива OUT_AD9M2 на основе состояния чекбоксов
-    OUT_AD9M2[0] |= ((0x1 & (out_otkaz_checkbox->isChecked())) << 8) |
+ /*  OUT_AD9M2[0] |= ((0x1 & (out_otkaz_checkbox->isChecked())) << 8) |
                     ((0x1 & (out_po_checkbox->isChecked())) << 10) |
                     ((0x1 & (out_k0_checkbox->isChecked())) << 11) |
                     ((0x1 & (out_tk_checkbox->isChecked())) << 12) |
@@ -116,14 +77,23 @@ void coder_CH1(void) {
                     ((0x1 & (out_nk_checkbox->isChecked())) << 20) |
                     ((0x1 & (out_itp_checkbox->isChecked())) << 21) |
                     ((0x1 & (out_pr_checkbox->isChecked())) << 22);
-
-    // Если чекбокс НМО (некоторый функционал на основе nkk_checkbox) активирован, устанавливаем 13-й бит
-    if (out_nkk_checkbox->isChecked()) {
-        OUT_AD9M2[0] |= 1 << 13;
-    }
+*/
+  //  if (out_nkk_checkbox->isChecked()) {
+  //      OUT_AD9M2[0] |= 1 << 13;
+  //  }
 
     // Формирование второго элемента массива OUT_AD9M2 на основе состояния чекбоксов ЛК
     OUT_AD9M2[1] = 0x40;  // Базовое значение
+
+    OUT_AD9M2[1] |= ((0x1 & (out_lt1_checkbox->isChecked())) << 9) |
+                    ((0x1 & (out_lt2_checkbox->isChecked())) << 10) |
+                    ((0x1 & (out_lt3_checkbox->isChecked())) << 11) |
+                    ((0x1 & (out_lt4_checkbox->isChecked())) << 12) |
+                    ((0x1 & (out_lt5_checkbox->isChecked())) << 13) |
+                    ((0x1 & (out_lt6_checkbox->isChecked())) << 14) |
+                    ((0x1 & (out_lt7_checkbox->isChecked())) << 15);
+
+
     OUT_AD9M2[1] |= ((0x1 & (out_lk1_checkbox->isChecked())) << 16) |
                     ((0x1 & (out_lk2_checkbox->isChecked())) << 17) |
                     ((0x1 & (out_lk3_checkbox->isChecked())) << 18) |
@@ -145,39 +115,59 @@ void coder_CH1(void) {
     OUT_AD9M2[4] = 0xA0;
     OUT_AD9M2[5] = 0x60;
 
-    // Пример расчета контрольной суммы (нужно добавить или изменить функцию KS)
-    // sum = KS(OUT_AD9M2, 6);  // Функция расчета контрольной суммы для элементов массива
+     sum = KS(OUT_AD9M2, 6);
 
-    // Устанавливаем контрольную сумму в шестой элемент массива
     OUT_AD9M2[6] = 0xE5;
     OUT_AD9M2[6] |= ((sum & 0xFFFF) << 8);
 }
 
 void checkAndSendAD9M2Broadcast() {
-    if (AD9M2->isChecked() && broadcast->isChecked()) {
         // Формируем посылку
-        coder_CH1();  // Используем существующую функцию для формирования посылки
+        coder_CH1();  //функцию для формирования посылки
 
-        // Отправляем данные через канал (здесь `BUF256x32_write` и `SO_pusk` - ваши функции для работы с каналом)
+        // Отправляем данные через канал (здесь `BUF256x32_write` и `SO_pusk` - функции для работы с каналом)
         BUF256x32_write(0, OUT_AD9M2, 7);  // Отправляем данные, 7 - это количество элементов массива
 
         // Выводим данные в textEdit, если чекбокс для вывода активирован
         if (terminal_down) {
             QString strout = "OUT: ";
             QString str;
-
             // Формируем строку для вывода в терминал
             for (int i = 0; i < 7; i++) {
                 str = QString("%1 ").arg((DWORD)OUT_AD9M2[i], 8, 16, QChar('0')).toUpper();
                 str.resize(6);
                 strout += str + "   ";
             }
-
             terminal_down->append(strout);  // Выводим строку в текстовый виджет
         }
-
         // Отправка данных на канал
         SO_pusk(0);  // 0 - это номер канала
+    }
+
+ULONG KS(ULONG *array, int size) // функция подсчета КС/ size - число ячеек массива, для которых нужно посчитать КС
+{
+    int i;
+    ULONG summ=0;
+
+    for (i=0; i<size; i++)
+    {
+        summ+=((*(array+i)>>16)&0x7FFF); // старшие 16 раз без 32 разряда
+        summ+=(summ>>16) & 0x1;          // если вышла 1 за 16 разрядов, прибавляем ее в мл. разр
+        summ&=0xFFFF;                    // обнуляем вышедшую 1.
+
+        summ+=((*(array+i)&0xFF00)|((i+1)&0xFF));   // аналогично младшие 16 разрядов , но адрес при этом считается прямой, хотя отправляется\принимается перевернутый
+        summ+=(summ>>16) & 0x1;
+        summ&=0xFFFF;
+    }
+    return summ;
+}
+
+void Timer_Event() {
+    if (kpaCheckBox->isChecked() && priemCheckBox->isChecked()) {
+        receiveDataAndDisplay();
+    }
+    if (AD9M2->isChecked() && broadcast->isChecked()) {
+        checkAndSendAD9M2Broadcast();
     }
 }
 

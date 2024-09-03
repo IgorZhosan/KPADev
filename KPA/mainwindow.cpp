@@ -6,7 +6,6 @@ QCheckBox* priemCheckBox = nullptr;
 QCheckBox* AD9M2 = nullptr;
 QCheckBox* broadcast = nullptr;
 
-
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)

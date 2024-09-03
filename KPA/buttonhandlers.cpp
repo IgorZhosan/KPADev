@@ -12,7 +12,7 @@ extern HANDLE hECE0206_1;
 extern DWORD nOutput;
 extern UCHAR bufOutput[10];
 extern DWORD Error;
-extern QTextEdit *terminal_down;
+//extern QTextEdit *terminal_down;
 extern QTimer *Timer;
 
 bool State_ECE0206_0 = false;
@@ -65,20 +65,17 @@ void handleStartButtonClick()
                 DeviceIoControl(hECE0206_1, ECE02061_XP_SET_LONG_MODE, NULL, 0, NULL, 0, &nOutput, NULL);
                 DeviceIoControl(hECE0206_1, ECE02061_XP_GET_SERIAL_NUMBER, NULL, 0, &bufOutput, 10, &nOutput, NULL);
                 s = "ARINC429_CH2  S\\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
-
                 terminal_down->append(s);
-
                 SI_clear_array(1, 2);   // очистка буфера приемника 2 канала
                 SI_pusk(1, 2, 0, 1, 0); // канал 2, рабочий режим, контроль четности, прием на частотах 36-100КГц
                 terminal_down->append("Состояние CH2: ОЖИДАНИЕ");
                 State_ECE0206_1 = true;
             }
         }
-
         // Если хотя бы одно устройство подключено, начинаем отправку данных
         if (State_ECE0206_0 == true || State_ECE0206_1 == true) {
             Timer->start(40);  // Запуск таймера с интервалом в 1000 мс (1 секунда)
-            QObject::connect(Timer, &QTimer::timeout, &ifCheckBoxesIsTrue);  // Подключаем к таймеру функцию ifCheckBoxesIsTrue
+            QObject::connect(Timer, &QTimer::timeout, &Timer_Event);  // Подключаем к таймеру функцию ifCheckBoxesIsTrue
             terminal_down->append("Данные отправляются...");
             isReceivingData = true;
         }
