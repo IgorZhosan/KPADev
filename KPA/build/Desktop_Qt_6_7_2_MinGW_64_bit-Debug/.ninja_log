@@ -35,3 +35,11 @@
 110	2250	7470672799532017	CMakeFiles/KPA.dir/mainwindow.cpp.obj	c0e63c242f78465d
 107	3501	7470672799509186	CMakeFiles/KPA.dir/main.cpp.obj	b8cbdcee5594fbfa
 3501	3758	7470672833450157	KPA.exe	c60b9a37044d0fae
+40	174	7471316338074220	KPA_autogen/timestamp	4d2190246f4e283
+40	174	7471316338074220	KPA_autogen/mocs_compilation.cpp	4d2190246f4e283
+40	174	7471316338074220	C:/KPADev/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/KPA_autogen/timestamp	4d2190246f4e283
+40	174	7471316338074220	C:/KPADev/KPA/build/Desktop_Qt_6_7_2_MinGW_64_bit-Debug/KPA_autogen/mocs_compilation.cpp	4d2190246f4e283
+177	3044	7471316339449432	CMakeFiles/KPA.dir/mainwindow.cpp.obj	c0e63c242f78465d
+180	3384	7471316339476436	CMakeFiles/KPA.dir/data_receiver.cpp.obj	44098e86533eba3a
+175	4203	7471316339420496	CMakeFiles/KPA.dir/main.cpp.obj	b8cbdcee5594fbfa
+4203	4640	7471316379701657	KPA.exe	c60b9a37044d0fae
