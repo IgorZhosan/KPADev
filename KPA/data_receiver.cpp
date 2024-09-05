@@ -63,6 +63,8 @@ void coder_CH1(void) {
     // Инициализация первого элемента массива OUT_AD9M2
     OUT_AD9M2[0] = 0x80;  // Базовое значение
 
+    OUT_AD9M2[0] |= 0x1 << 20;
+
     // Формирование первого элемента массива OUT_AD9M2 на основе состояния чекбоксов
  /*  OUT_AD9M2[0] |= ((0x1 & (out_otkaz_checkbox->isChecked())) << 8) |
                     ((0x1 & (out_po_checkbox->isChecked())) << 10) |

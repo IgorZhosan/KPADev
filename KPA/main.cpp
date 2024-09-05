@@ -65,6 +65,17 @@ QCheckBox *out_kk6_checkbox = nullptr;
 QCheckBox *out_kk7_checkbox = nullptr;
 QCheckBox *out_kk8_checkbox = nullptr;
 
+
+// Функция для обработки изменения состояния чекбоксов
+void handleCheckboxStateChange(QList<QCheckBox*> checkboxes, QCheckBox* selectedCheckbox) {
+    // Проходим по всем чекбоксам и снимаем отметку с тех, которые не были выбраны
+    for (QCheckBox* checkbox : checkboxes) {
+        if (checkbox != selectedCheckbox) {
+            checkbox->setChecked(false);
+        }
+    }
+}
+
 // Функция для создания группы чекбоксов с именами и горизонтальным расположением
 QGroupBox* createCheckboxGroup(const QString& title, const QStringList& labels, const QStringList& objectNames, QList<QCheckBox*>& checkboxes) {
     QGroupBox* groupBox = new QGroupBox(title);  // Создаем группу с заголовком
@@ -127,6 +138,32 @@ QMenu* createCheckboxMenu(QWidget* parent) {
     out_kk7_checkbox = kkCheckboxes[1];
     out_kk8_checkbox = kkCheckboxes[0];
 
+    // Устанавливаем начальное состояние по умолчанию
+    out_lt4_checkbox->setChecked(true);  // ЛТ4
+    out_lk2_checkbox->setChecked(true);  // ЛК2
+    out_kk4_checkbox->setChecked(true);  // КК4
+
+    // Добавляем обработчики для группы ЛТ
+    for (QCheckBox* checkbox : ltCheckboxes) {
+        QObject::connect(checkbox, &QCheckBox::clicked, [=]() {
+            handleCheckboxStateChange(ltCheckboxes, checkbox);
+        });
+    }
+
+    // Добавляем обработчики для группы ЛК
+    for (QCheckBox* checkbox : lkCheckboxes) {
+        QObject::connect(checkbox, &QCheckBox::clicked, [=]() {
+            handleCheckboxStateChange(lkCheckboxes, checkbox);
+        });
+    }
+
+    // Добавляем обработчики для группы КК
+    for (QCheckBox* checkbox : kkCheckboxes) {
+        QObject::connect(checkbox, &QCheckBox::clicked, [=]() {
+            handleCheckboxStateChange(kkCheckboxes, checkbox);
+        });
+    }
+
     // Упаковываем группы в горизонтальный layout
     QWidget* widget = new QWidget(menu);
     QHBoxLayout* layout = new QHBoxLayout(widget);
@@ -143,7 +180,6 @@ QMenu* createCheckboxMenu(QWidget* parent) {
 
     return menu;
 }
-
 void setupCheckboxSignals() {
         // Список всех чекбоксов
         QList<QCheckBox*> checkboxes = {
@@ -259,7 +295,7 @@ int main(int argc, char *argv[])
     QWidget *widget_2 = w.findChild<QWidget*>("widget_2");
     QVBoxLayout *layout = widget_2->findChild<QVBoxLayout*>("verticalLayout_6");
 
-    QPushButton *handleStartButton = new QPushButton("Старт", widget_2);
+    handleStartButton = new QPushButton("Старт", widget_2);
     layout->addWidget(handleStartButton);
     handleStartButton->setFixedSize(80, 80);
     layout->setStretchFactor(handleStartButton, 1);

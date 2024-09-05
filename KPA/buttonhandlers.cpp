@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QTimer>
 #include <QTextEdit>
+#include <QPushButton>
 
 
 extern HANDLE hECE0206_0;
@@ -14,6 +15,7 @@ extern UCHAR bufOutput[10];
 extern DWORD Error;
 //extern QTextEdit *terminal_down;
 extern QTimer *Timer;
+extern QPushButton *handleStartButton;
 
 bool State_ECE0206_0 = false;
 bool State_ECE0206_1 = false;
@@ -27,6 +29,9 @@ DWORD Error = 0;
 void handleStartButtonClick()
 {
     QString s;
+
+    handleStartButton->setText("Стоп");
+
     if (!isReceivingData) {  // Если данные еще не отправляются
         // Проверка подключения к устройству ARINC429 для CH1
         if (State_ECE0206_0 == false)
@@ -101,7 +106,9 @@ void handleStartButtonClick()
             terminal_down->append("Состояние CH2: НЕ ПОДКЛЮЧЕН");
             State_ECE0206_1 = false;
         }
+handleStartButton -> setText("Старт");
     }
+
 }
 
 void preparation() {
