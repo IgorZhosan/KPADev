@@ -13,13 +13,14 @@ extern HANDLE hECE0206_1;
 extern DWORD nOutput;
 extern UCHAR bufOutput[10];
 extern DWORD Error;
-//extern QTextEdit *terminal_down;
 extern QTimer *Timer;
 extern QPushButton *handleStartButton;
+extern QPushButton *pushButton_3;
 
 bool State_ECE0206_0 = false;
 bool State_ECE0206_1 = false;
 bool isReceivingData = false;
+bool isTerminalPause = false;
 
 QTimer *Timer = new QTimer();
 UCHAR bufOutput[10] = {0};
@@ -29,8 +30,8 @@ DWORD Error = 0;
 void handleStartButtonClick()
 {
     QString s;
-
     handleStartButton->setText("Стоп");
+
 
     if (!isReceivingData) {  // Если данные еще не отправляются
         // Проверка подключения к устройству ARINC429 для CH1
@@ -79,8 +80,8 @@ void handleStartButtonClick()
         }
         // Если хотя бы одно устройство подключено, начинаем отправку данных
         if (State_ECE0206_0 == true || State_ECE0206_1 == true) {
-            Timer->start(40);  // Запуск таймера с интервалом в 1000 мс (1 секунда)
-            QObject::connect(Timer, &QTimer::timeout, &Timer_Event);  // Подключаем к таймеру функцию ifCheckBoxesIsTrue
+            Timer->start(40);
+            QObject::connect(Timer, &QTimer::timeout, &Timer_Event);
             terminal_down->append("Данные отправляются...");
             isReceivingData = true;
         }
@@ -106,9 +107,8 @@ void handleStartButtonClick()
             terminal_down->append("Состояние CH2: НЕ ПОДКЛЮЧЕН");
             State_ECE0206_1 = false;
         }
-handleStartButton -> setText("Старт");
+    handleStartButton -> setText("Старт");
     }
-
 }
 
 void preparation() {
@@ -173,4 +173,8 @@ void handleButtonClick14() {
 
 void handleButtonClick15() {
     qDebug() << "Кнопка 15 нажата";
+}
+
+void on_pushButton_3_clicked() {
+    isTerminalPause = !isTerminalPause;
 }

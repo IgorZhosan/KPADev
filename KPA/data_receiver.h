@@ -43,6 +43,7 @@ extern QCheckBox *out_kk5_checkbox;
 extern QCheckBox *out_kk6_checkbox;
 extern QCheckBox *out_kk7_checkbox;
 extern QCheckBox *out_kk8_checkbox;
+extern bool isStatePause;
 
 // Объявление функции
 void receiveDataAndDisplay();

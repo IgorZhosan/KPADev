@@ -28,6 +28,7 @@ QTableWidget *checking_the_operation = nullptr;
 QMenu *checkboxMenu = nullptr;
 QPushButton *handleStartButton = nullptr;
 QPushButton *button = nullptr;
+QPushButton *pushButton_3 = nullptr;
 
 // Добавляем глобальные переменные для чекбоксов ЛТ
 QCheckBox *out_lt1_checkbox = nullptr;
@@ -312,9 +313,10 @@ int main(int argc, char *argv[])
         horizontalLayout_8->addWidget(button);
     }
     setupCheckboxSignals();
+
     QObject::connect(handleStartButton, &QPushButton::clicked, &w, &handleStartButtonClick);
-
-
+    pushButton_3 = w.findChild<QPushButton*>("pushButton_3");
+    QObject::connect(pushButton_3, &QPushButton::clicked, &on_pushButton_3_clicked);
     w.show();
 
     return a.exec();

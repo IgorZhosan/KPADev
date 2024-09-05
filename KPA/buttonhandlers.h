@@ -9,9 +9,6 @@ extern QTimer *Timer;
 extern UCHAR bufOutput[10];
 extern DWORD Error;
 
-
-
-void Timer_TimerOut_Event_Slot();  // Объявление функции-слота для обработки события таймера
 void handleStartButtonClick();
 void preparation();
 void handleButtonClick1();
@@ -29,6 +26,7 @@ void handleButtonClick12();
 void handleButtonClick13();
 void handleButtonClick14();
 void handleButtonClick15();
+void on_pushButton_3_clicked();
 
 HANDLE OpenDeviceByIndex(DWORD Index, PDWORD pError);
 void SI_clear_array(UCHAR Device, UCHAR ChanNumber);

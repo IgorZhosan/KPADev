@@ -1,5 +1,6 @@
 #include "library02061.h"
 #include "data_receiver.h"
+#include "buttonhandlers.h"
 #include <windows.h>
 #include <QTextEdit>
 #include <QString>
@@ -8,6 +9,7 @@
 extern HANDLE hECE0206_1;
 extern QTextEdit* terminal_down;
 extern DWORD nOutput;
+extern bool isTerminalPause;
 
 ULONG KS(ULONG *array, int size);
 
@@ -51,7 +53,7 @@ void receiveDataAndDisplay()
     }
 
     // Выводим строку в terminal_down
-    if (terminal_down && kpaCheckBox->isChecked() && priemCheckBox->isChecked()) {
+    if (!isTerminalPause && terminal_down && kpaCheckBox->isChecked() && priemCheckBox->isChecked()) {
         terminal_down->append(strout);  // Выводим в текстовый виджет
     }
 }
@@ -131,7 +133,7 @@ void checkAndSendAD9M2Broadcast() {
         BUF256x32_write(0, OUT_AD9M2, 7);  // Отправляем данные, 7 - это количество элементов массива
 
         // Выводим данные в textEdit, если чекбокс для вывода активирован
-        if (terminal_down && AD9M2->isChecked() && broadcast->isChecked()) {
+        if (!isTerminalPause && terminal_down && AD9M2->isChecked() && broadcast->isChecked()) {
             QString strout = "OUT: ";
             QString str;
             // Формируем строку для вывода в терминал
@@ -164,7 +166,6 @@ ULONG KS(ULONG *array, int size) // функция подсчета КС/ size -
     return summ;
 }
 
-//переделать функцию таймера
 void Timer_Event() {
         receiveDataAndDisplay();
         checkAndSendAD9M2Broadcast();

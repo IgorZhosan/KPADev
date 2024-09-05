@@ -381,6 +381,7 @@ public:
         horizontalLayout_10->setObjectName("horizontalLayout_10");
         pushButton_3 = new QPushButton(groupBox_7);
         pushButton_3->setObjectName("pushButton_3");
+        pushButton_3->setCheckable(false);
 
         horizontalLayout_10->addWidget(pushButton_3);
 
@@ -401,7 +402,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 1593, 22));
+        menubar->setGeometry(QRect(0, 0, 1593, 26));
         menu = new QMenu(menubar);
         menu->setObjectName("menu");
         menu_2 = new QMenu(menubar);
