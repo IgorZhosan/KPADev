@@ -194,10 +194,10 @@ void setupCheckboxSignals() {
         for (auto* checkbox : checkboxes) {
             if (checkbox) {
                 QObject::connect(checkbox, &QCheckBox::stateChanged, [checkbox](int state) {
-                    QString stateStr = (state == Qt::Checked) ? "checked" : "unchecked";
-                    if (terminal_down) {
-                        terminal_down->append(checkbox->objectName() + " is " + stateStr);
-                    }
+                  //  QString stateStr = (state == Qt::Checked) ? "checked" : "unchecked";
+                  //  if (terminal_down) {
+                  //      terminal_down->append(checkbox->objectName() + " is " + stateStr);
+                 //   }
                 });
         }
     }

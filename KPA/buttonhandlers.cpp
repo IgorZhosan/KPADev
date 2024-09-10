@@ -32,7 +32,6 @@ void handleStartButtonClick()
     QString s;
     handleStartButton->setText("Стоп");
 
-
     if (!isReceivingData) {  // Если данные еще не отправляются
         // Проверка подключения к устройству ARINC429 для CH1
         if (State_ECE0206_0 == false)
@@ -40,7 +39,7 @@ void handleStartButtonClick()
             hECE0206_0 = OpenDeviceByIndex(0, &Error);
             if (hECE0206_0 == INVALID_HANDLE_VALUE)
             {
-                terminal_down->append("Состояние CH1: ОШИБКА ПОДКЛ. ECE-0206-1C-S");
+              //  terminal_down->append("Состояние CH1: ОШИБКА ПОДКЛ. ECE-0206-1C-S");
                 State_ECE0206_0 = false;
             }
             else
@@ -48,11 +47,11 @@ void handleStartButtonClick()
                 DeviceIoControl(hECE0206_0, ECE02061_XP_SET_LONG_MODE, NULL, 0, NULL, 0, &nOutput, NULL);
                 DeviceIoControl(hECE0206_0, ECE02061_XP_GET_SERIAL_NUMBER, NULL, 0, &bufOutput, 10, &nOutput, NULL);
                 s = "ARINC429_CH1  S\\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
-                terminal_down->append(s);
+              //  terminal_down->append(s);
 
                 SI_clear_array(0, 1);   // очистка буфера приемника 1 канала
                 SI_pusk(0, 1, 0, 1, 0); // канал 1, рабочий режим, контроль четности, прием на частотах 36-100КГц
-                terminal_down->append("Состояние CH1: ОЖИДАНИЕ");
+              //  terminal_down->append("Состояние CH1: ОЖИДАНИЕ");
                 State_ECE0206_0 = true;
             }
         }
@@ -63,7 +62,7 @@ void handleStartButtonClick()
             hECE0206_1 = OpenDeviceByIndex(1, &Error);
             if (hECE0206_1 == INVALID_HANDLE_VALUE)
             {
-                terminal_down->append("Состояние CH2: ОШИБКА ПОДКЛ. ECE-0206-1C-S");
+              //  terminal_down->append("Состояние CH2: ОШИБКА ПОДКЛ. ECE-0206-1C-S");
                 State_ECE0206_1 = false;
             }
             else
@@ -71,10 +70,10 @@ void handleStartButtonClick()
                 DeviceIoControl(hECE0206_1, ECE02061_XP_SET_LONG_MODE, NULL, 0, NULL, 0, &nOutput, NULL);
                 DeviceIoControl(hECE0206_1, ECE02061_XP_GET_SERIAL_NUMBER, NULL, 0, &bufOutput, 10, &nOutput, NULL);
                 s = "ARINC429_CH2  S\\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
-                terminal_down->append(s);
+              //  terminal_down->append(s);
                 SI_clear_array(1, 2);   // очистка буфера приемника 2 канала
                 SI_pusk(1, 2, 0, 1, 0); // канал 2, рабочий режим, контроль четности, прием на частотах 36-100КГц
-                terminal_down->append("Состояние CH2: ОЖИДАНИЕ");
+              //  terminal_down->append("Состояние CH2: ОЖИДАНИЕ");
                 State_ECE0206_1 = true;
             }
         }
@@ -82,7 +81,7 @@ void handleStartButtonClick()
         if (State_ECE0206_0 == true || State_ECE0206_1 == true) {
             Timer->start(40);
             QObject::connect(Timer, &QTimer::timeout, &Timer_Event);
-            terminal_down->append("Данные отправляются...");
+           // terminal_down->append("Данные отправляются...");
             isReceivingData = true;
         }
     }
@@ -96,7 +95,7 @@ void handleStartButtonClick()
             SI_stop(0, 1);
             SO_stop(0);
             CloseHandle(hECE0206_0);
-            terminal_down->append("Состояние CH1: НЕ ПОДКЛЮЧЕН");
+           // terminal_down->append("Состояние CH1: НЕ ПОДКЛЮЧЕН");
             State_ECE0206_0 = false;
         }
 
@@ -104,7 +103,7 @@ void handleStartButtonClick()
             SI_stop(1, 2);
             SO_stop(1);
             CloseHandle(hECE0206_1);
-            terminal_down->append("Состояние CH2: НЕ ПОДКЛЮЧЕН");
+           // terminal_down->append("Состояние CH2: НЕ ПОДКЛЮЧЕН");
             State_ECE0206_1 = false;
         }
     handleStartButton -> setText("Старт");

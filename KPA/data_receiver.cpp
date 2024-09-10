@@ -17,6 +17,8 @@ ULONG KS(ULONG *array, int size);
 // Массив для сохранения посылки
 ULONG IN_KPA[11] = {0};
 ULONG OUT_AD9M2[7] = {0};
+ULONG OUT_KPA[2] = {0};
+ULONG IN_AD9M2[5] = {0};
 
 
 // Структура для получения данных
@@ -166,9 +168,68 @@ ULONG KS(ULONG *array, int size) // функция подсчета КС/ size -
     return summ;
 }
 
+void coder_CH2() {
+    OUT_KPA[0] = 0x0;
+    OUT_KPA[0] |= (0x40 << 8);  // было & (0xFF)
+    OUT_KPA[0] |= (0x40 << 16); // было & (0x7F)
+   // OUT_KPA[0] |= ((0x1 << 28));
+   // OUT_KPA[0] |= ((0x1 << 29));
+   // OUT_KPA[0] |= ((0x1 << 30));
+    OUT_KPA[1] = (0x80 | (OUT_KPA[0] & 0xFFFFFF00));
+}
+
+void checkAndSendBroadcastKPA() {
+
+    coder_CH2();
+    BUF256x32_write(1, OUT_KPA, 2);
+        if (!isTerminalPause && terminal_down && kpaCheckBox->isChecked() && broadcast->isChecked()) {
+        QString strout = "OUT: ";
+        QString str;
+            strout="OUT: ";
+            for (int i=0; i < 2; i++)
+            {
+                str=(QString("%1 ").arg((DWORD)OUT_KPA[i], 8, 16, QChar('0'))).toUpper();
+                str.resize(6);
+                strout+=str + "   ";
+            }
+            terminal_down->append(strout);
+        }
+    SO_pusk(1);  // отправка данных на канал 2
+}
+
+void receiveDataIN_KPA() {
+    int temp;
+    QString strout;
+    QString str;
+    for (int i = 0; i < 5; i++) {
+        if (i!=4) temp=i+1; else temp=0x37;
+
+        // переворот адреса
+        temp= (temp & 0x0F)<<4 | (temp>>4) & 0x0F;
+        temp= (temp & 0x33)<<2 | (temp>>2) & 0x33;
+        temp= (temp & 0x55)<<1 | (temp>>1) & 0x55;
+
+        DeviceIoControl(hECE0206_0, ECE02061_XP_READ_PARAM_AP1, &temp, 1, &ParamCod, 9, &nOutput, NULL);
+        IN_AD9M2[i]=ParamCod.param;
+    }
+
+        if (!isTerminalPause && terminal_down && AD9M2->isChecked() && priemCheckBox->isChecked()) {
+            strout="IN:  ";
+            for (int i = 0; i < 5; i++)
+            {
+                str=(QString("%1 ").arg((DWORD)IN_AD9M2[i], 8, 16, QChar('0'))).toUpper();
+                str.resize(6);
+                strout+=str + "   ";
+            }
+            terminal_down->append(strout);
+        }
+}
+
 void Timer_Event() {
         receiveDataAndDisplay();
         checkAndSendAD9M2Broadcast();
+        checkAndSendBroadcastKPA();
+        receiveDataIN_KPA();
 }
 
 
