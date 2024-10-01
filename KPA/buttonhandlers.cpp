@@ -7,7 +7,6 @@
 #include <QTextEdit>
 #include <QPushButton>
 
-
 extern HANDLE hECE0206_0;
 extern HANDLE hECE0206_1;
 extern DWORD nOutput;
@@ -16,15 +15,20 @@ extern DWORD Error;
 extern QTimer *Timer;
 extern QPushButton *handleStartButton;
 extern QPushButton *pushButton_3;
+extern ULONG OUT_AD9M2[7];
+extern QPushButton* preparationButton;
 
 bool State_ECE0206_0 = false;
 bool State_ECE0206_1 = false;
 bool isReceivingData = false;
 bool isTerminalPause = false;
+bool clickedPreparation = false;
 
 QTimer *Timer = new QTimer();
+QTimer *timerPreparation = new QTimer();
 UCHAR bufOutput[10] = {0};
 DWORD Error = 0;
+
 
 
 void handleStartButtonClick()
@@ -83,10 +87,18 @@ void handleStartButtonClick()
             QObject::connect(Timer, &QTimer::timeout, &Timer_Event);
            // terminal_down->append("Данные отправляются...");
             isReceivingData = true;
+
+            timerPreparation->setInterval(150000);
+            timerPreparation->start();
+            QObject::connect(timerPreparation, &QTimer::timeout, []() {
+                preparationButton->setEnabled(true);
+                timerPreparation->stop();
+            });
         }
     }
     else {  // Если данные уже отправляются, остановить процесс
         Timer->stop();
+        timerPreparation->stop();
         terminal_down->append("Процесс получения данных остановлен.");
         isReceivingData = false;
 
@@ -111,7 +123,8 @@ void handleStartButtonClick()
 }
 
 void preparation() {
-
+    clickedPreparation = !clickedPreparation;
+    terminal_down -> append("Жмяк");
 }
 
 void handleButtonClick1() {

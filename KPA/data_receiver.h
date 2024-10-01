@@ -7,6 +7,7 @@ extern QCheckBox *kpaCheckBox;
 extern QCheckBox *priemCheckBox;
 extern QCheckBox *AD9M2;
 extern QCheckBox *broadcast;
+extern QCheckBox *TM;
 
 extern QCheckBox *out_otkaz_checkbox;
 extern QCheckBox *out_po_checkbox;
@@ -45,10 +46,14 @@ extern QCheckBox *out_kk7_checkbox;
 extern QCheckBox *out_kk8_checkbox;
 extern bool isStatePause;
 
+
+
 // Объявление функции
 void receiveDataAndDisplay();
 void coder_ch1();
 void checkAndSendAD9M2Broadcast();
+void initSerialPort(const wchar_t* portName);
+void  readFromSerialPort();
 void Timer_Event();
 
 #endif // DATA_RECEIVER_H

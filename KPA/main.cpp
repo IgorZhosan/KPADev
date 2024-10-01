@@ -1,5 +1,6 @@
 #include "mainwindow.h"  // Подключаем заголовочный файл MainWindow
 #include "buttonhandlers.h"
+#include "data_receiver.h"
 #include <QApplication>
 #include <QMainWindow>
 #include <QTableWidget>
@@ -20,6 +21,7 @@
 #include <QGroupBox>
 #include <QLabel>
 
+
 // Глобальные переменные для всех элементов интерфейса
 QTextEdit *terminal_down = nullptr;
 QTextEdit *terminal_up = nullptr;
@@ -29,6 +31,7 @@ QMenu *checkboxMenu = nullptr;
 QPushButton *handleStartButton = nullptr;
 QPushButton *button = nullptr;
 QPushButton *pushButton_3 = nullptr;
+QPushButton *preparationButton;
 
 // Добавляем глобальные переменные для чекбоксов ЛТ
 QCheckBox *out_lt1_checkbox = nullptr;
@@ -226,8 +229,10 @@ int main(int argc, char *argv[])
         turning_on_the_equipment->setItem(1, 1, new QTableWidgetItem("СПС"));
         turning_on_the_equipment->setItem(1, 2, new QTableWidgetItem("Тспс = (Допуск (2±0.2) мин)"));
 
-        QPushButton *preparation = new QPushButton("Подготовка");
-        turning_on_the_equipment->setCellWidget(2, 0, preparation);
+        preparationButton = new QPushButton("Подготовка");
+        preparationButton ->setEnabled(false);
+        turning_on_the_equipment->setCellWidget(2, 0, preparationButton);
+
 
         turning_on_the_equipment->setItem(2, 1, new QTableWidgetItem("Т1А ГОТ"));
         turning_on_the_equipment->setItem(2, 2, new QTableWidgetItem("Тгот = (Допуск (0-15)с)"));
@@ -314,7 +319,9 @@ int main(int argc, char *argv[])
     }
     setupCheckboxSignals();
 
+
     QObject::connect(handleStartButton, &QPushButton::clicked, &w, &handleStartButtonClick);
+    QObject::connect(preparationButton, &QPushButton::clicked, &w, &preparation);
     pushButton_3 = w.findChild<QPushButton*>("pushButton_3");
     QObject::connect(pushButton_3, &QPushButton::clicked, &on_pushButton_3_clicked);
     w.show();

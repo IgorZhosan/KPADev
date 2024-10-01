@@ -5,6 +5,7 @@ QCheckBox* kpaCheckBox = nullptr;
 QCheckBox* priemCheckBox = nullptr;
 QCheckBox* AD9M2 = nullptr;
 QCheckBox* broadcast = nullptr;
+QCheckBox* TM = nullptr;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -15,6 +16,7 @@ MainWindow::MainWindow(QWidget *parent)
     priemCheckBox = ui->reception;
     AD9M2 = ui ->AD9M2;
     broadcast = ui ->broadcast;
+    TM = ui -> TM;
 }
 
 MainWindow::~MainWindow()

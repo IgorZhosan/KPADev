@@ -10,6 +10,7 @@ extern HANDLE hECE0206_1;
 extern QTextEdit* terminal_down;
 extern DWORD nOutput;
 extern bool isTerminalPause;
+extern bool clickedPreparation;
 
 ULONG KS(ULONG *array, int size);
 
@@ -20,6 +21,7 @@ ULONG OUT_AD9M2[7] = {0};
 ULONG OUT_KPA[2] = {0};
 ULONG IN_AD9M2[5] = {0};
 
+HANDLE hSerialPort = INVALID_HANDLE_VALUE;
 
 // Структура для получения данных
 typedef struct {
@@ -29,6 +31,73 @@ typedef struct {
 } INPUTPARAM;
 
 INPUTPARAM ParamCod;  // Переменная для получения данных
+
+void initSerialPort(const wchar_t* portName) {
+    hSerialPort = CreateFile(portName, GENERIC_READ | GENERIC_WRITE,
+                             0,NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+    if (hSerialPort == INVALID_HANDLE_VALUE) {
+        terminal_down -> append("Не удалось открыть порт");
+        return;
+    }
+
+    DCB dcbSerialParams = {0};
+    dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
+
+    if(!GetCommState(hSerialPort, &dcbSerialParams)) {
+        terminal_down->append("Не удалось получить состояние порта");
+        CloseHandle(hSerialPort);
+        hSerialPort = INVALID_HANDLE_VALUE;
+        return;
+    }
+
+    dcbSerialParams.BaudRate = CBR_115200;
+    dcbSerialParams.ByteSize = 8;
+    dcbSerialParams.StopBits = ONESTOPBIT;
+    dcbSerialParams.Parity = NOPARITY;
+
+    if (!SetCommState(hSerialPort, &dcbSerialParams)) {
+        terminal_down->append("Не удалось настроить порт");
+        CloseHandle(hSerialPort);
+        hSerialPort = INVALID_HANDLE_VALUE;
+        return;
+    }
+
+    COMMTIMEOUTS timeouts = {0};
+    timeouts.ReadIntervalTimeout = 50;
+    timeouts.ReadTotalTimeoutConstant = 50;
+    timeouts.ReadTotalTimeoutMultiplier = 10;
+    timeouts.WriteTotalTimeoutConstant = 50;
+    timeouts.WriteTotalTimeoutMultiplier = 10;
+
+    if (!SetCommTimeouts(hSerialPort, &timeouts)) {
+        terminal_down -> append("Не удалось настроить таймауты порта");
+        CloseHandle(hSerialPort);
+        hSerialPort = INVALID_HANDLE_VALUE;
+        return;
+    }
+}
+
+void readFromSerialPort() {
+
+    DWORD bytesRead;
+    char buffer[256];
+    BOOL result = ReadFile(hSerialPort, buffer, sizeof(buffer) - 1, &bytesRead, NULL);
+
+    if (!result) {
+        initSerialPort(L"COM5");
+        terminal_down->append("Ошибка чтения порта, функция readFromSerialPort");
+        return;
+    }
+
+    if (bytesRead > 0) {
+        buffer[bytesRead] = '\0';
+        QString data = QString::fromLocal8Bit(buffer);
+
+        if (!isTerminalPause && terminal_down && priemCheckBox -> isChecked() && TM -> isChecked()) {
+            terminal_down->append(data);
+        }
+    }
+}
 
 // Функция для получения посылки и вывода её в терминал
 void receiveDataAndDisplay()
@@ -68,8 +137,9 @@ void coder_CH1(void) {
     OUT_AD9M2[0] = 0x80;  // Базовое значение
 
     OUT_AD9M2[0] |= 0x1 << 20;
+    OUT_AD9M2[0] |= (0x1 & clickedPreparation) << 9;
 
-    // Формирование первого элемента массива OUT_AD9M2 на основе состояния чекбоксов
+    // Формирование перв ого элемента массива OUT_AD9M2 на основе состояния чекбоксов
  /*  OUT_AD9M2[0] |= ((0x1 & (out_otkaz_checkbox->isChecked())) << 8) |
                     ((0x1 & (out_po_checkbox->isChecked())) << 10) |
                     ((0x1 & (out_k0_checkbox->isChecked())) << 11) |
@@ -230,6 +300,7 @@ void Timer_Event() {
         checkAndSendAD9M2Broadcast();
         checkAndSendBroadcastKPA();
         receiveDataIN_KPA();
+       // readFromSerialPort();
 }
 
 
