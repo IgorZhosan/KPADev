@@ -97,8 +97,11 @@ public:
     {
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
-        MainWindow->resize(1593, 1221);
-        MainWindow->setMinimumSize(QSize(0, 300));
+        MainWindow->setEnabled(true);
+        MainWindow->resize(1680, 1050);
+        MainWindow->setMinimumSize(QSize(0, 0));
+        MainWindow->setMaximumSize(QSize(25000, 25000));
+        MainWindow->setDocumentMode(true);
         action = new QAction(MainWindow);
         action->setObjectName("action");
         centralwidget = new QWidget(MainWindow);
@@ -107,7 +110,7 @@ public:
         verticalLayout_10->setObjectName("verticalLayout_10");
         groupBox = new QGroupBox(centralwidget);
         groupBox->setObjectName("groupBox");
-        groupBox->setMinimumSize(QSize(0, 220));
+        groupBox->setMinimumSize(QSize(0, 200));
         groupBox->setMaximumSize(QSize(16777215, 220));
         QFont font;
         font.setFamilies({QString::fromUtf8("Times New Roman")});
@@ -301,7 +304,9 @@ public:
         gridLayout_2->setObjectName("gridLayout_2");
         checking_the_operation = new QTableWidget(groupBox_4);
         checking_the_operation->setObjectName("checking_the_operation");
-        checking_the_operation->setMaximumSize(QSize(16777215, 500));
+        checking_the_operation->setMaximumSize(QSize(16777215, 400));
+        checking_the_operation->setMouseTracking(true);
+        checking_the_operation->setContextMenuPolicy(Qt::ContextMenuPolicy::DefaultContextMenu);
         checking_the_operation->setAutoFillBackground(false);
         checking_the_operation->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
 
@@ -312,12 +317,15 @@ public:
 
         groupBox_7 = new QGroupBox(centralwidget);
         groupBox_7->setObjectName("groupBox_7");
-        groupBox_7->setMaximumSize(QSize(16777215, 265));
+        groupBox_7->setMaximumSize(QSize(16777215, 270));
         groupBox_7->setFont(font);
         horizontalLayout_11 = new QHBoxLayout(groupBox_7);
         horizontalLayout_11->setObjectName("horizontalLayout_11");
         terminal_down = new QTextEdit(groupBox_7);
         terminal_down->setObjectName("terminal_down");
+        terminal_down->setMaximumSize(QSize(16777215, 200));
+        terminal_down->setAcceptDrops(false);
+        terminal_down->setReadOnly(true);
 
         horizontalLayout_11->addWidget(terminal_down);
 
@@ -381,7 +389,7 @@ public:
         horizontalLayout_10->setObjectName("horizontalLayout_10");
         pushButton_3 = new QPushButton(groupBox_7);
         pushButton_3->setObjectName("pushButton_3");
-        pushButton_3->setCheckable(false);
+        pushButton_3->setCheckable(true);
 
         horizontalLayout_10->addWidget(pushButton_3);
 
@@ -402,7 +410,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 1593, 26));
+        menubar->setGeometry(QRect(0, 0, 1680, 26));
         menu = new QMenu(menubar);
         menu->setObjectName("menu");
         menu_2 = new QMenu(menubar);

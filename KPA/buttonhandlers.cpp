@@ -17,12 +17,46 @@ extern QPushButton *handleStartButton;
 extern QPushButton *pushButton_3;
 extern ULONG OUT_AD9M2[7];
 extern QPushButton* preparationButton;
+extern QPushButton* button1;
+extern QPushButton* button2;
+extern QPushButton* button3;
+extern QPushButton* button4;
+extern QPushButton* button5;
+extern QPushButton* button6;
+extern QPushButton* button7;
+extern QPushButton* button8;
+extern QPushButton* button9;
+extern QPushButton* button10;
+extern QPushButton* button11;
+extern QPushButton* button12;
+extern QPushButton* button13;
+extern QPushButton* button14;
+extern QPushButton* button15;
+
 
 bool State_ECE0206_0 = false;
 bool State_ECE0206_1 = false;
 bool isReceivingData = false;
 bool isTerminalPause = false;
 bool clickedPreparation = false;
+
+bool clicledStartbutton = false;
+bool clickedButton1 = false;
+bool clickedButton2 = false;
+bool clickedButton3 = false;
+bool clickedButton4 = false;
+bool clickedButton5 = false;
+bool clickedButton6 = false;
+bool clickedButton7 = false;
+bool clickedButton8 = false;
+bool clickedButton9 = false;
+bool clickedButton10 = false;
+bool clickedButton11 = false;
+bool clickedButton12 = false;
+bool clickedButton13 = false;
+bool clickedButton14 = false;
+bool clickedButton15 = false;
+
 
 QTimer *Timer = new QTimer();
 QTimer *timerPreparation = new QTimer();
@@ -31,9 +65,11 @@ DWORD Error = 0;
 
 
 
-void handleStartButtonClick()
-{
+void handleStartButtonClick() {
     QString s;
+    clicledStartbutton = !clicledStartbutton;
+    handleStartButton->setCheckable(true);
+    handleStartButton->setChecked(clicledStartbutton);
     handleStartButton->setText("Стоп");
 
     if (!isReceivingData) {  // Если данные еще не отправляются
@@ -88,7 +124,7 @@ void handleStartButtonClick()
            // terminal_down->append("Данные отправляются...");
             isReceivingData = true;
 
-            timerPreparation->setInterval(150000);
+            timerPreparation->setInterval(30000);
             timerPreparation->start();
             QObject::connect(timerPreparation, &QTimer::timeout, []() {
                 preparationButton->setEnabled(true);
@@ -124,69 +160,102 @@ void handleStartButtonClick()
 
 void preparation() {
     clickedPreparation = !clickedPreparation;
-    terminal_down -> append("Жмяк");
+    preparationButton->setCheckable(true);
+    preparationButton->setChecked(clickedPreparation);
 }
 
 void handleButtonClick1() {
-
+    clickedButton1 = !clickedButton1;
+    button1->setCheckable(true);
+    button1->setChecked(clickedButton1);
 }
 
 void handleButtonClick2() {
-    terminal_down -> append("Кнопка 2 нажата");
+    clickedButton2 = !clickedButton2;
+    button2->setCheckable(true);
+    button2->setChecked(clickedButton2);
 }
 
 void handleButtonClick3() {
-    qDebug() << "Кнопка 3 нажата";
+    clickedButton3 = !clickedButton3;
+    button3->setCheckable(true);
+    button3->setChecked(clickedButton3);
 }
 
 void handleButtonClick4() {
-    qDebug() << "Кнопка 4 нажата";
+    clickedButton4 = !clickedButton4;
+    button4->setCheckable(true);
+    button4->setChecked(clickedButton4);
 }
 
 void handleButtonClick5() {
-    qDebug() << "Кнопка 5 нажата";
+    clickedButton5 = !clickedButton5;
+    button5->setCheckable(true);
+    button5->setChecked(clickedButton5);
 }
 
 void handleButtonClick6() {
-    qDebug() << "Кнопка 6 нажата";
+    clickedButton6 = !clickedButton6;
+    button6->setCheckable(true);
+    button6->setChecked(clickedButton6);
 }
 
 void handleButtonClick7() {
-    qDebug() << "Кнопка 7 нажата";
+    clickedButton7 = !clickedButton7;
+    button7->setCheckable(true);
+    button7->setChecked(clickedButton7);
 }
 
 void handleButtonClick8() {
-    qDebug() << "Кнопка 8 нажата";
+    clickedButton8 = !clickedButton8;
+    button8->setCheckable(true);
+    button8->setChecked(clickedButton8);
 }
 
 void handleButtonClick9() {
-    qDebug() << "Кнопка 9 нажата";
+    clickedButton9 = !clickedButton9;
+    button9->setCheckable(true);
+    button9->setChecked(clickedButton9);
 }
 
 void handleButtonClick10() {
-    qDebug() << "Кнопка 10 нажата";
+    clickedButton10 = !clickedButton10;
+    button10->setCheckable(true);
+    button10->setChecked(clickedButton10);
 }
 
 void handleButtonClick11() {
-    qDebug() << "Кнопка 11 нажата";
+    clickedButton11 = !clickedButton11;
+    button11->setCheckable(true);
+    button11->setChecked(clickedButton11);
 }
 
 void handleButtonClick12() {
-    qDebug() << "Кнопка 12 нажата";
+    clickedButton12 = !clickedButton12;
+    button12->setCheckable(true);
+    button12->setChecked(clickedButton12);
 }
 
 void handleButtonClick13() {
-    qDebug() << "Кнопка 13 нажата";
+    clickedButton13 = !clickedButton13;
+    button13->setCheckable(true);
+    button13->setChecked(clickedButton13);
 }
 
 void handleButtonClick14() {
-    qDebug() << "Кнопка 14 нажата";
+    clickedButton14 = !clickedButton14;
+    button14->setCheckable(true);
+    button14->setChecked(clickedButton14);
 }
 
 void handleButtonClick15() {
-    qDebug() << "Кнопка 15 нажата";
+    clickedButton15 = !clickedButton15;
+    button15->setCheckable(true);
+    button15->setChecked(clickedButton15);
 }
 
 void on_pushButton_3_clicked() {
     isTerminalPause = !isTerminalPause;
+    pushButton_3->setCheckable(true);
+    pushButton_3->setChecked(isTerminalPause);
 }

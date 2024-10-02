@@ -5,15 +5,30 @@
 #include <QTextEdit>
 #include <QString>
 #include <QCheckBox>
+#include <QTimer>
 
 extern HANDLE hECE0206_1;
 extern QTextEdit* terminal_down;
 extern DWORD nOutput;
 extern bool isTerminalPause;
 extern bool clickedPreparation;
+extern bool clickedButton1;
+extern bool clickedButton2;
+extern bool clickedButton3;
+extern bool clickedButton4;
+extern bool clickedButton5;
+extern bool clickedButton6;
+extern bool clickedButton7;
+extern bool clickedButton8;
+extern bool clickedButton9;
+extern bool clickedButton10;
+extern bool clickedButton11;
+extern bool clickedButton12;
+extern bool clickedButton13;
+extern bool clickedButton14;
+extern bool clickedButton15;
 
 ULONG KS(ULONG *array, int size);
-
 
 // Массив для сохранения посылки
 ULONG IN_KPA[11] = {0};
@@ -31,73 +46,6 @@ typedef struct {
 } INPUTPARAM;
 
 INPUTPARAM ParamCod;  // Переменная для получения данных
-
-void initSerialPort(const wchar_t* portName) {
-    hSerialPort = CreateFile(portName, GENERIC_READ | GENERIC_WRITE,
-                             0,NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-    if (hSerialPort == INVALID_HANDLE_VALUE) {
-        terminal_down -> append("Не удалось открыть порт");
-        return;
-    }
-
-    DCB dcbSerialParams = {0};
-    dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
-
-    if(!GetCommState(hSerialPort, &dcbSerialParams)) {
-        terminal_down->append("Не удалось получить состояние порта");
-        CloseHandle(hSerialPort);
-        hSerialPort = INVALID_HANDLE_VALUE;
-        return;
-    }
-
-    dcbSerialParams.BaudRate = CBR_115200;
-    dcbSerialParams.ByteSize = 8;
-    dcbSerialParams.StopBits = ONESTOPBIT;
-    dcbSerialParams.Parity = NOPARITY;
-
-    if (!SetCommState(hSerialPort, &dcbSerialParams)) {
-        terminal_down->append("Не удалось настроить порт");
-        CloseHandle(hSerialPort);
-        hSerialPort = INVALID_HANDLE_VALUE;
-        return;
-    }
-
-    COMMTIMEOUTS timeouts = {0};
-    timeouts.ReadIntervalTimeout = 50;
-    timeouts.ReadTotalTimeoutConstant = 50;
-    timeouts.ReadTotalTimeoutMultiplier = 10;
-    timeouts.WriteTotalTimeoutConstant = 50;
-    timeouts.WriteTotalTimeoutMultiplier = 10;
-
-    if (!SetCommTimeouts(hSerialPort, &timeouts)) {
-        terminal_down -> append("Не удалось настроить таймауты порта");
-        CloseHandle(hSerialPort);
-        hSerialPort = INVALID_HANDLE_VALUE;
-        return;
-    }
-}
-
-void readFromSerialPort() {
-
-    DWORD bytesRead;
-    char buffer[256];
-    BOOL result = ReadFile(hSerialPort, buffer, sizeof(buffer) - 1, &bytesRead, NULL);
-
-    if (!result) {
-        initSerialPort(L"COM5");
-        terminal_down->append("Ошибка чтения порта, функция readFromSerialPort");
-        return;
-    }
-
-    if (bytesRead > 0) {
-        buffer[bytesRead] = '\0';
-        QString data = QString::fromLocal8Bit(buffer);
-
-        if (!isTerminalPause && terminal_down && priemCheckBox -> isChecked() && TM -> isChecked()) {
-            terminal_down->append(data);
-        }
-    }
-}
 
 // Функция для получения посылки и вывода её в терминал
 void receiveDataAndDisplay()
@@ -129,7 +77,6 @@ void receiveDataAndDisplay()
     }
 }
 
-
 void coder_CH1(void) {
     ULONG sum = 0;
 
@@ -138,25 +85,32 @@ void coder_CH1(void) {
 
     OUT_AD9M2[0] |= 0x1 << 20;
     OUT_AD9M2[0] |= (0x1 & clickedPreparation) << 9;
-
-    // Формирование перв ого элемента массива OUT_AD9M2 на основе состояния чекбоксов
- /*  OUT_AD9M2[0] |= ((0x1 & (out_otkaz_checkbox->isChecked())) << 8) |
-                    ((0x1 & (out_po_checkbox->isChecked())) << 10) |
-                    ((0x1 & (out_k0_checkbox->isChecked())) << 11) |
-                    ((0x1 & (out_tk_checkbox->isChecked())) << 12) |
-                    ((0x1 & (out_kvs_checkbox->isChecked())) << 14) |
-                    ((0x1 & (out_tsn_checkbox->isChecked())) << 15) |
-                    ((0x1 & (out_nkk_checkbox->isChecked())) << 16) |
-                    ((0x1 & (out_mgn_checkbox->isChecked())) << 17) |
-                    ((0x1 & (out_pp_checkbox->isChecked())) << 18) |
-                    ((0x1 & (out_ppp_checkbox->isChecked())) << 19) |
-                    ((0x1 & (out_nk_checkbox->isChecked())) << 20) |
-                    ((0x1 & (out_itp_checkbox->isChecked())) << 21) |
-                    ((0x1 & (out_pr_checkbox->isChecked())) << 22);
-*/
-  //  if (out_nkk_checkbox->isChecked()) {
-  //      OUT_AD9M2[0] |= 1 << 13;
-  //  }
+    OUT_AD9M2[0] |= (0x1 & clickedButton1 & clickedPreparation) << 16; // 1 ПРОВЕРКА
+    OUT_AD9M2[0] |= (0x1 & clickedButton2 & clickedPreparation) << 16; // 2 ПРОВЕРКА
+    // 3 ПРОВЕРКА пока не работает
+    if (clickedButton3) {
+        OUT_AD9M2[0] |= (0x0 << 9);
+        QTimer* timerButton3 = new QTimer();
+        timerButton3->setSingleShot(true);
+        timerButton3->setInterval(3000);
+        QObject::connect(timerButton3, &QTimer::timeout, [timerButton3]() {
+            timerButton3 -> deleteLater();
+        });
+        timerButton3 -> start();
+        OUT_AD9M2[0] |= (0x1 << 9);
+}
+    OUT_AD9M2[0] |= (0x1 & clickedButton4 & clickedPreparation) << 16; // 4 ПРОВЕРКА
+    OUT_AD9M2[0] |= (0x1 & clickedButton5 & clickedPreparation) << 16; // 5 ПРОВЕРКА
+    OUT_AD9M2[0] |= (0x1 & clickedButton6 & clickedPreparation) << 16; // 6 ПРОВЕРКА
+    OUT_AD9M2[0] |= (0x1 & clickedButton7 & clickedPreparation) << 16; // 7 ПРОВЕРКА
+    OUT_AD9M2[0] |= (0x0 & clickedButton8 & clickedPreparation) << 16; // 8 ПРОВЕРКА
+    OUT_AD9M2[0] |= (0x1 & clickedButton8 & clickedPreparation) << 27; // 8 ПРОВЕРКА
+    // добавить 9 проверку
+    OUT_AD9M2[0] |= (0x1 & clickedButton10 & clickedPreparation) << 27; // 10 ПРОВЕРКА
+    OUT_AD9M2[0] |= (0x1 & clickedButton11 & clickedPreparation) << 16; // 11 ПРОВЕРКА
+    OUT_AD9M2[0] |= (0x1 & clickedButton12 & clickedPreparation) << 30; // 12 ПРОВЕРКА
+    OUT_AD9M2[0] |= (0x1 & clickedButton12 & clickedPreparation) << 27; // 12 ПРОВЕРКА
+    OUT_AD9M2[0] |= (0x0 & clickedButton12 & clickedPreparation) << 27; // 12 ПРОВЕРКА
 
     // Формирование второго элемента массива OUT_AD9M2 на основе состояния чекбоксов ЛК
     OUT_AD9M2[1] = 0x40;  // Базовое значение

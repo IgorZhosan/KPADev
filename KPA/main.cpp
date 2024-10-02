@@ -31,7 +31,23 @@ QMenu *checkboxMenu = nullptr;
 QPushButton *handleStartButton = nullptr;
 QPushButton *button = nullptr;
 QPushButton *pushButton_3 = nullptr;
-QPushButton *preparationButton;
+QPushButton *preparationButton = nullptr;
+QPushButton *button1 = nullptr;
+QPushButton *button2 = nullptr;
+QPushButton *button3 = nullptr;
+QPushButton *button4 = nullptr;
+QPushButton *button5 = nullptr;
+QPushButton *button6 = nullptr;
+QPushButton *button7 = nullptr;
+QPushButton *button8 = nullptr;
+QPushButton *button9 = nullptr;
+QPushButton *button10 = nullptr;
+QPushButton *button11 = nullptr;
+QPushButton *button12 = nullptr;
+QPushButton *button13 = nullptr;
+QPushButton *button14 = nullptr;
+QPushButton *button15 = nullptr;
+
 
 // Добавляем глобальные переменные для чекбоксов ЛТ
 QCheckBox *out_lt1_checkbox = nullptr;
@@ -285,14 +301,57 @@ int main(int argc, char *argv[])
         };
 
         for (int i = 0; i < parameters.size(); ++i) {
-            QPushButton *button = new QPushButton("Запуск");
-            button->setObjectName(QString("checking_the_operation_button%1").arg(i + 1));
+           // button->setObjectName(QString("checking_the_operation_button%1").arg(i + 1));
             checking_the_operation->setItem(i, 0, new QTableWidgetItem(parameters[i]));
-            checking_the_operation->setCellWidget(i, 1, button);
-            if (i % 2 == 0) {
-                checking_the_operation->setItem(i, 3, new QTableWidgetItem("Визуальный контроль по изображению"));
-            }
+            //if (i % 2 == 0) {
+            //    checking_the_operation->setItem(i, 3, new QTableWidgetItem("Визуальный контроль по изображению"));
+           // }
         }
+
+         button1 = new QPushButton("Запуск");
+         checking_the_operation->setCellWidget(0, 1, button1);
+
+         button2 = new QPushButton("Запуск");
+         checking_the_operation->setCellWidget(1, 1, button2);
+
+         button3 = new QPushButton("Запуск");
+         checking_the_operation->setCellWidget(2, 1, button3);
+
+         button4 = new QPushButton("Запуск");
+         checking_the_operation->setCellWidget(3, 1, button4);
+
+         button5 = new QPushButton("Запуск");
+         checking_the_operation->setCellWidget(4, 1, button5);
+
+         button6 = new QPushButton("Запуск");
+         checking_the_operation->setCellWidget(5, 1, button6);
+
+         button7 = new QPushButton("Запуск");
+         checking_the_operation->setCellWidget(6, 1, button7);
+
+         button8 = new QPushButton("Запуск");
+         checking_the_operation->setCellWidget(7, 1, button8);
+
+         button9 = new QPushButton("Запуск");
+         checking_the_operation->setCellWidget(8, 1, button9);
+
+         button10 = new QPushButton("Запуск");
+         checking_the_operation->setCellWidget(9, 1, button10);
+
+         button11 = new QPushButton("Запуск");
+         checking_the_operation->setCellWidget(10, 1, button11);
+
+         button12 = new QPushButton("Запуск");
+         checking_the_operation->setCellWidget(11, 1, button12);
+
+         button13 = new QPushButton("Запуск");
+         checking_the_operation->setCellWidget(12, 1, button13);
+
+         button14 = new QPushButton("Запуск");
+         checking_the_operation->setCellWidget(13, 1, button14);
+
+         button15 = new QPushButton("Запуск");
+         checking_the_operation->setCellWidget(14, 1, button15);
 
         checking_the_operation->resizeColumnsToContents();
         checking_the_operation->horizontalHeader()->setStretchLastSection(true);
@@ -322,6 +381,22 @@ int main(int argc, char *argv[])
 
     QObject::connect(handleStartButton, &QPushButton::clicked, &w, &handleStartButtonClick);
     QObject::connect(preparationButton, &QPushButton::clicked, &w, &preparation);
+    QObject::connect(button1, &QPushButton::clicked, &w, &handleButtonClick1);
+    QObject::connect(button2, &QPushButton::clicked, &w, &handleButtonClick2);
+    QObject::connect(button3, &QPushButton::clicked, &w, &handleButtonClick3);
+    QObject::connect(button4, &QPushButton::clicked, &w, &handleButtonClick4);
+    QObject::connect(button5, &QPushButton::clicked, &w, &handleButtonClick5);
+    QObject::connect(button6, &QPushButton::clicked, &w, &handleButtonClick6);
+    QObject::connect(button7, &QPushButton::clicked, &w, &handleButtonClick7);
+    QObject::connect(button8, &QPushButton::clicked, &w, &handleButtonClick8);
+    QObject::connect(button9, &QPushButton::clicked, &w, &handleButtonClick9);
+    QObject::connect(button10, &QPushButton::clicked, &w, &handleButtonClick10);
+    QObject::connect(button11, &QPushButton::clicked, &w, &handleButtonClick11);
+    QObject::connect(button12, &QPushButton::clicked, &w, &handleButtonClick12);
+    QObject::connect(button13, &QPushButton::clicked, &w, &handleButtonClick13);
+    QObject::connect(button14, &QPushButton::clicked, &w, &handleButtonClick14);
+    QObject::connect(button15, &QPushButton::clicked, &w, &handleButtonClick15);
+
     pushButton_3 = w.findChild<QPushButton*>("pushButton_3");
     QObject::connect(pushButton_3, &QPushButton::clicked, &on_pushButton_3_clicked);
     w.show();
