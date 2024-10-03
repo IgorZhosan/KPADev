@@ -89,15 +89,17 @@ void coder_CH1(void) {
     OUT_AD9M2[0] |= (0x1 & clickedButton2 & clickedPreparation) << 16; // 2 ПРОВЕРКА
     // 3 ПРОВЕРКА пока не работает
     if (clickedButton3) {
-        OUT_AD9M2[0] |= (0x0 << 9);
+        clickedPreparation = false;
+        OUT_AD9M2[0] |= (0x1 & clickedPreparation) << 9;
         QTimer* timerButton3 = new QTimer();
         timerButton3->setSingleShot(true);
         timerButton3->setInterval(3000);
-        QObject::connect(timerButton3, &QTimer::timeout, [timerButton3]() {
-            timerButton3 -> deleteLater();
-        });
         timerButton3 -> start();
-        OUT_AD9M2[0] |= (0x1 << 9);
+        QObject::connect(timerButton3, &QTimer::timeout, [timerButton3]() {
+            timerButton3 -> stop();
+        });
+        clickedPreparation = true;
+        OUT_AD9M2[0] |= (0x1 & clickedPreparation) << 9;
 }
     OUT_AD9M2[0] |= (0x1 & clickedButton4 & clickedPreparation) << 16; // 4 ПРОВЕРКА
     OUT_AD9M2[0] |= (0x1 & clickedButton5 & clickedPreparation) << 16; // 5 ПРОВЕРКА
@@ -203,7 +205,6 @@ void coder_CH2() {
 }
 
 void checkAndSendBroadcastKPA() {
-
     coder_CH2();
     BUF256x32_write(1, OUT_KPA, 2);
         if (!isTerminalPause && terminal_down && kpaCheckBox->isChecked() && broadcast->isChecked()) {
@@ -254,7 +255,6 @@ void Timer_Event() {
         checkAndSendAD9M2Broadcast();
         checkAndSendBroadcastKPA();
         receiveDataIN_KPA();
-       // readFromSerialPort();
 }
 
 

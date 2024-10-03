@@ -57,13 +57,10 @@ bool clickedButton13 = false;
 bool clickedButton14 = false;
 bool clickedButton15 = false;
 
-
 QTimer *Timer = new QTimer();
 QTimer *timerPreparation = new QTimer();
 UCHAR bufOutput[10] = {0};
 DWORD Error = 0;
-
-
 
 void handleStartButtonClick() {
     QString s;
@@ -124,7 +121,7 @@ void handleStartButtonClick() {
            // terminal_down->append("Данные отправляются...");
             isReceivingData = true;
 
-            timerPreparation->setInterval(30000);
+            timerPreparation->setInterval(120000);
             timerPreparation->start();
             QObject::connect(timerPreparation, &QTimer::timeout, []() {
                 preparationButton->setEnabled(true);

@@ -362,7 +362,7 @@ int main(int argc, char *argv[])
 
     handleStartButton = new QPushButton("Старт", widget_2);
     layout->addWidget(handleStartButton);
-    handleStartButton->setFixedSize(80, 80);
+    handleStartButton->setFixedSize(65, 50);
     layout->setStretchFactor(handleStartButton, 1);
 
 
@@ -371,6 +371,7 @@ int main(int argc, char *argv[])
 
     QPushButton* button = new QPushButton("Выбор литеры");
     QMenu* checkboxMenu = createCheckboxMenu(&w);
+    button->setFixedSize(100,20);
     button->setMenu(checkboxMenu);
 
     if (horizontalLayout_8) {

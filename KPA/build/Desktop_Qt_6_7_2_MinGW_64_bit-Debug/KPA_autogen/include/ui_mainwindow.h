@@ -98,9 +98,9 @@ public:
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
         MainWindow->setEnabled(true);
-        MainWindow->resize(1680, 1050);
+        MainWindow->resize(1413, 856);
         MainWindow->setMinimumSize(QSize(0, 0));
-        MainWindow->setMaximumSize(QSize(25000, 25000));
+        MainWindow->setMaximumSize(QSize(1920, 1080));
         MainWindow->setDocumentMode(true);
         action = new QAction(MainWindow);
         action->setObjectName("action");
@@ -110,28 +110,27 @@ public:
         verticalLayout_10->setObjectName("verticalLayout_10");
         groupBox = new QGroupBox(centralwidget);
         groupBox->setObjectName("groupBox");
-        groupBox->setMinimumSize(QSize(0, 200));
-        groupBox->setMaximumSize(QSize(16777215, 220));
+        groupBox->setMinimumSize(QSize(0, 160));
+        groupBox->setMaximumSize(QSize(16777215, 160));
         QFont font;
         font.setFamilies({QString::fromUtf8("Times New Roman")});
-        font.setPointSize(12);
+        font.setPointSize(10);
         groupBox->setFont(font);
         horizontalLayout_9 = new QHBoxLayout(groupBox);
         horizontalLayout_9->setObjectName("horizontalLayout_9");
         widget_2 = new QWidget(groupBox);
         widget_2->setObjectName("widget_2");
+        widget_2->setMinimumSize(QSize(0, 150));
+        widget_2->setMaximumSize(QSize(16777215, 150));
         verticalLayout_4 = new QVBoxLayout(widget_2);
         verticalLayout_4->setObjectName("verticalLayout_4");
         horizontalLayout_5 = new QHBoxLayout();
         horizontalLayout_5->setObjectName("horizontalLayout_5");
         groupBox_2 = new QGroupBox(widget_2);
         groupBox_2->setObjectName("groupBox_2");
-        groupBox_2->setMinimumSize(QSize(250, 105));
-        groupBox_2->setMaximumSize(QSize(250, 105));
-        QFont font1;
-        font1.setFamilies({QString::fromUtf8("Times New Roman")});
-        font1.setPointSize(14);
-        groupBox_2->setFont(font1);
+        groupBox_2->setMinimumSize(QSize(195, 75));
+        groupBox_2->setMaximumSize(QSize(240, 75));
+        groupBox_2->setFont(font);
         verticalLayout_5 = new QVBoxLayout(groupBox_2);
         verticalLayout_5->setObjectName("verticalLayout_5");
         horizontalLayout_6 = new QHBoxLayout();
@@ -145,6 +144,11 @@ public:
         comboBox_3 = new QComboBox(groupBox_2);
         comboBox_3->addItem(QString());
         comboBox_3->setObjectName("comboBox_3");
+        QFont font1;
+        font1.setFamilies({QString::fromUtf8("Times New Roman")});
+        font1.setPointSize(10);
+        font1.setBold(false);
+        comboBox_3->setFont(font1);
 
         horizontalLayout_6->addWidget(comboBox_3);
 
@@ -188,8 +192,8 @@ public:
         toolButton_14 = new QToolButton(widget_2);
         toolButton_14->setObjectName("toolButton_14");
         toolButton_14->setEnabled(false);
-        toolButton_14->setMinimumSize(QSize(35, 35));
-        toolButton_14->setMaximumSize(QSize(30, 30));
+        toolButton_14->setMinimumSize(QSize(20, 20));
+        toolButton_14->setMaximumSize(QSize(20, 20));
         toolButton_14->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
 
         horizontalLayout_8->addWidget(toolButton_14);
@@ -197,8 +201,8 @@ public:
         toolButton_15 = new QToolButton(widget_2);
         toolButton_15->setObjectName("toolButton_15");
         toolButton_15->setEnabled(false);
-        toolButton_15->setMinimumSize(QSize(35, 35));
-        toolButton_15->setMaximumSize(QSize(30, 30));
+        toolButton_15->setMinimumSize(QSize(20, 20));
+        toolButton_15->setMaximumSize(QSize(20, 20));
         toolButton_15->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
 
         horizontalLayout_8->addWidget(toolButton_15);
@@ -206,8 +210,8 @@ public:
         toolButton_16 = new QToolButton(widget_2);
         toolButton_16->setObjectName("toolButton_16");
         toolButton_16->setEnabled(false);
-        toolButton_16->setMinimumSize(QSize(35, 35));
-        toolButton_16->setMaximumSize(QSize(30, 30));
+        toolButton_16->setMinimumSize(QSize(20, 20));
+        toolButton_16->setMaximumSize(QSize(20, 20));
         toolButton_16->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
 
         horizontalLayout_8->addWidget(toolButton_16);
@@ -215,8 +219,8 @@ public:
         toolButton_17 = new QToolButton(widget_2);
         toolButton_17->setObjectName("toolButton_17");
         toolButton_17->setEnabled(false);
-        toolButton_17->setMinimumSize(QSize(35, 35));
-        toolButton_17->setMaximumSize(QSize(30, 30));
+        toolButton_17->setMinimumSize(QSize(20, 20));
+        toolButton_17->setMaximumSize(QSize(20, 20));
         toolButton_17->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
 
         horizontalLayout_8->addWidget(toolButton_17);
@@ -224,8 +228,8 @@ public:
         toolButton_18 = new QToolButton(widget_2);
         toolButton_18->setObjectName("toolButton_18");
         toolButton_18->setEnabled(false);
-        toolButton_18->setMinimumSize(QSize(35, 35));
-        toolButton_18->setMaximumSize(QSize(30, 30));
+        toolButton_18->setMinimumSize(QSize(20, 20));
+        toolButton_18->setMaximumSize(QSize(20, 20));
         toolButton_18->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
 
         horizontalLayout_8->addWidget(toolButton_18);
@@ -233,8 +237,8 @@ public:
         toolButton_19 = new QToolButton(widget_2);
         toolButton_19->setObjectName("toolButton_19");
         toolButton_19->setEnabled(false);
-        toolButton_19->setMinimumSize(QSize(35, 35));
-        toolButton_19->setMaximumSize(QSize(30, 30));
+        toolButton_19->setMinimumSize(QSize(20, 20));
+        toolButton_19->setMaximumSize(QSize(20, 20));
         toolButton_19->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
 
         horizontalLayout_8->addWidget(toolButton_19);
@@ -242,8 +246,8 @@ public:
         toolButton_20 = new QToolButton(widget_2);
         toolButton_20->setObjectName("toolButton_20");
         toolButton_20->setEnabled(false);
-        toolButton_20->setMinimumSize(QSize(35, 35));
-        toolButton_20->setMaximumSize(QSize(30, 30));
+        toolButton_20->setMinimumSize(QSize(20, 20));
+        toolButton_20->setMaximumSize(QSize(20, 20));
         toolButton_20->setToolButtonStyle(Qt::ToolButtonStyle::ToolButtonIconOnly);
 
         horizontalLayout_8->addWidget(toolButton_20);
@@ -256,8 +260,9 @@ public:
 
         terminal_up = new QTextEdit(groupBox);
         terminal_up->setObjectName("terminal_up");
-        terminal_up->setMinimumSize(QSize(0, 100));
-        terminal_up->setMaximumSize(QSize(16777215, 150));
+        terminal_up->setMinimumSize(QSize(0, 120));
+        terminal_up->setMaximumSize(QSize(16777215, 120));
+        terminal_up->setFont(font);
 
         horizontalLayout_9->addWidget(terminal_up);
 
@@ -268,6 +273,9 @@ public:
         groupBox_3->setObjectName("groupBox_3");
         groupBox_3->setMaximumSize(QSize(16777215, 173));
         groupBox_3->setFont(font);
+        groupBox_3->setFlat(false);
+        groupBox_3->setCheckable(true);
+        groupBox_3->setChecked(true);
         gridLayout = new QGridLayout(groupBox_3);
         gridLayout->setObjectName("gridLayout");
         turning_on_the_equipment = new QTableWidget(groupBox_3);
@@ -287,8 +295,33 @@ public:
         QTableWidgetItem *__qtablewidgetitem3 = new QTableWidgetItem();
         __qtablewidgetitem3->setFont(font);
         turning_on_the_equipment->setVerticalHeaderItem(0, __qtablewidgetitem3);
+        QFont font2;
+        font2.setStyleStrategy(QFont::PreferAntialias);
+        QTableWidgetItem *__qtablewidgetitem4 = new QTableWidgetItem();
+        __qtablewidgetitem4->setFont(font2);
+        __qtablewidgetitem4->setFlags(Qt::ItemIsSelectable|Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
+        turning_on_the_equipment->setItem(0, 0, __qtablewidgetitem4);
+        QTableWidgetItem *__qtablewidgetitem5 = new QTableWidgetItem();
+        __qtablewidgetitem5->setFont(font2);
+        __qtablewidgetitem5->setFlags(Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
+        turning_on_the_equipment->setItem(0, 1, __qtablewidgetitem5);
+        QTableWidgetItem *__qtablewidgetitem6 = new QTableWidgetItem();
+        __qtablewidgetitem6->setFont(font2);
+        __qtablewidgetitem6->setFlags(Qt::ItemIsDragEnabled|Qt::ItemIsDropEnabled|Qt::ItemIsUserCheckable|Qt::ItemIsEnabled);
+        turning_on_the_equipment->setItem(0, 2, __qtablewidgetitem6);
+        QFont font3;
+        font3.setPointSize(9);
+        font3.setStyleStrategy(QFont::PreferAntialias);
+        QTableWidgetItem *__qtablewidgetitem7 = new QTableWidgetItem();
+        __qtablewidgetitem7->setFont(font3);
+        turning_on_the_equipment->setItem(1, 1, __qtablewidgetitem7);
         turning_on_the_equipment->setObjectName("turning_on_the_equipment");
         turning_on_the_equipment->setMaximumSize(QSize(16777215, 173));
+        QFont font4;
+        font4.setFamilies({QString::fromUtf8("Times New Roman")});
+        font4.setPointSize(10);
+        font4.setKerning(false);
+        turning_on_the_equipment->setFont(font4);
         turning_on_the_equipment->setAutoFillBackground(false);
         turning_on_the_equipment->setEditTriggers(QAbstractItemView::EditTrigger::NoEditTriggers);
 
@@ -317,7 +350,7 @@ public:
 
         groupBox_7 = new QGroupBox(centralwidget);
         groupBox_7->setObjectName("groupBox_7");
-        groupBox_7->setMaximumSize(QSize(16777215, 270));
+        groupBox_7->setMaximumSize(QSize(16777215, 230));
         groupBox_7->setFont(font);
         horizontalLayout_11 = new QHBoxLayout(groupBox_7);
         horizontalLayout_11->setObjectName("horizontalLayout_11");
@@ -333,25 +366,37 @@ public:
         verticalLayout_9->setObjectName("verticalLayout_9");
         groupBox_6 = new QGroupBox(groupBox_7);
         groupBox_6->setObjectName("groupBox_6");
+        groupBox_6->setMaximumSize(QSize(150, 100));
         verticalLayout_8 = new QVBoxLayout(groupBox_6);
         verticalLayout_8->setObjectName("verticalLayout_8");
         TM = new QCheckBox(groupBox_6);
         TM->setObjectName("TM");
+        TM->setMaximumSize(QSize(16777215, 21));
+        QFont font5;
+        font5.setFamilies({QString::fromUtf8("Times New Roman")});
+        font5.setPointSize(8);
+        TM->setFont(font5);
 
         verticalLayout_8->addWidget(TM);
 
         KPA = new QCheckBox(groupBox_6);
         KPA->setObjectName("KPA");
+        KPA->setMaximumSize(QSize(16777215, 21));
+        KPA->setFont(font5);
 
         verticalLayout_8->addWidget(KPA);
 
         AD9M2 = new QCheckBox(groupBox_6);
         AD9M2->setObjectName("AD9M2");
+        AD9M2->setMaximumSize(QSize(16777215, 21));
+        AD9M2->setFont(font5);
 
         verticalLayout_8->addWidget(AD9M2);
 
         P9M = new QCheckBox(groupBox_6);
         P9M->setObjectName("P9M");
+        P9M->setMaximumSize(QSize(16777215, 21));
+        P9M->setFont(font5);
 
         verticalLayout_8->addWidget(P9M);
 
@@ -360,15 +405,19 @@ public:
 
         groupBox_5 = new QGroupBox(groupBox_7);
         groupBox_5->setObjectName("groupBox_5");
+        groupBox_5->setMaximumSize(QSize(150, 100));
+        groupBox_5->setFont(font);
         verticalLayout_7 = new QVBoxLayout(groupBox_5);
         verticalLayout_7->setObjectName("verticalLayout_7");
         reception = new QCheckBox(groupBox_5);
         reception->setObjectName("reception");
+        reception->setFont(font);
 
         verticalLayout_7->addWidget(reception);
 
         broadcast = new QCheckBox(groupBox_5);
         broadcast->setObjectName("broadcast");
+        broadcast->setFont(font);
 
         verticalLayout_7->addWidget(broadcast);
 
@@ -389,12 +438,16 @@ public:
         horizontalLayout_10->setObjectName("horizontalLayout_10");
         pushButton_3 = new QPushButton(groupBox_7);
         pushButton_3->setObjectName("pushButton_3");
+        pushButton_3->setMaximumSize(QSize(16777215, 19));
+        pushButton_3->setFont(font);
         pushButton_3->setCheckable(true);
 
         horizontalLayout_10->addWidget(pushButton_3);
 
         pushButton_4 = new QPushButton(groupBox_7);
         pushButton_4->setObjectName("pushButton_4");
+        pushButton_4->setMaximumSize(QSize(16777215, 19));
+        pushButton_4->setFont(font);
 
         horizontalLayout_10->addWidget(pushButton_4);
 
@@ -410,7 +463,7 @@ public:
         MainWindow->setCentralWidget(centralwidget);
         menubar = new QMenuBar(MainWindow);
         menubar->setObjectName("menubar");
-        menubar->setGeometry(QRect(0, 0, 1680, 26));
+        menubar->setGeometry(QRect(0, 0, 1413, 22));
         menu = new QMenu(menubar);
         menu->setObjectName("menu");
         menu_2 = new QMenu(menubar);
@@ -464,6 +517,11 @@ public:
         ___qtablewidgetitem2->setText(QCoreApplication::translate("MainWindow", "\320\224\320\276\320\277\320\276\320\273\320\275\320\270\321\202\320\265\320\273\321\214\320\275\320\260\321\217 \320\270\320\275\321\204\320\276\321\200\320\274\320\260\321\206\320\270\321\217", nullptr));
         QTableWidgetItem *___qtablewidgetitem3 = turning_on_the_equipment->verticalHeaderItem(0);
         ___qtablewidgetitem3->setText(QCoreApplication::translate("MainWindow", "1", nullptr));
+
+        const bool __sortingEnabled = turning_on_the_equipment->isSortingEnabled();
+        turning_on_the_equipment->setSortingEnabled(false);
+        turning_on_the_equipment->setSortingEnabled(__sortingEnabled);
+
         groupBox_4->setTitle(QCoreApplication::translate("MainWindow", "\320\237\321\200\320\276\320\262\320\265\321\200\320\272\320\260 \321\204\321\203\320\275\320\272\321\206\320\270\320\276\320\275\320\270\321\200\320\276\320\262\320\260\320\275\320\270\321\217", nullptr));
         groupBox_7->setTitle(QCoreApplication::translate("MainWindow", "\320\226\321\203\321\200\320\275\320\260\320\273", nullptr));
         groupBox_6->setTitle(QString());
