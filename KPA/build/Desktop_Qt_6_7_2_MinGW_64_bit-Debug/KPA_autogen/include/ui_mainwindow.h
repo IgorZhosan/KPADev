@@ -99,7 +99,7 @@ public:
         if (MainWindow->objectName().isEmpty())
             MainWindow->setObjectName("MainWindow");
         MainWindow->setEnabled(true);
-        MainWindow->resize(1413, 856);
+        MainWindow->resize(1413, 779);
         MainWindow->setMinimumSize(QSize(0, 0));
         MainWindow->setMaximumSize(QSize(1920, 1080));
         MainWindow->setDocumentMode(true);
