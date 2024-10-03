@@ -271,7 +271,7 @@ public:
 
         groupBox_3 = new QGroupBox(centralwidget);
         groupBox_3->setObjectName("groupBox_3");
-        groupBox_3->setMaximumSize(QSize(16777215, 173));
+        groupBox_3->setMaximumSize(QSize(16777215, 138));
         groupBox_3->setFont(font);
         groupBox_3->setFlat(false);
         groupBox_3->setCheckable(true);

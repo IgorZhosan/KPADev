@@ -245,6 +245,13 @@ int main(int argc, char *argv[])
         turning_on_the_equipment->setItem(1, 1, new QTableWidgetItem("СПС"));
         turning_on_the_equipment->setItem(1, 2, new QTableWidgetItem("Тспс = (Допуск (2±0.2) мин)"));
 
+        turning_on_the_equipment->setRowHeight(0,20);
+        turning_on_the_equipment->setRowHeight(1,20);
+        turning_on_the_equipment->setRowHeight(2,20);
+        turning_on_the_equipment->setColumnWidth(0,120);
+        turning_on_the_equipment->setColumnWidth(1,120);
+        turning_on_the_equipment->setColumnWidth(2,120);
+
         preparationButton = new QPushButton("Подготовка");
         preparationButton ->setEnabled(false);
         turning_on_the_equipment->setCellWidget(2, 0, preparationButton);
@@ -300,8 +307,12 @@ int main(int argc, char *argv[])
             "Прием команды по КРЛ", "Передача видео по ТРЛ", "Внешнее управление антенной", "Уход антенны", "Зона захвата антенны"
         };
 
+
+
         for (int i = 0; i < parameters.size(); ++i) {
            // button->setObjectName(QString("checking_the_operation_button%1").arg(i + 1));
+            checking_the_operation->setRowHeight(i,20);
+            checking_the_operation->setColumnWidth(i,120);
             checking_the_operation->setItem(i, 0, new QTableWidgetItem(parameters[i]));
             //if (i % 2 == 0) {
             //    checking_the_operation->setItem(i, 3, new QTableWidgetItem("Визуальный контроль по изображению"));
