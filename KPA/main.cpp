@@ -379,6 +379,54 @@ int main(int argc, char *argv[])
     }
     setupCheckboxSignals();
 
+    QGroupBox* groupBox_3 = w.findChild<QGroupBox*>("groupBox_3");
+    if (groupBox_3) {
+        groupBox_3->setCheckable(true);
+        groupBox_3->setChecked(true);
+
+        QObject::connect(groupBox_3, &QGroupBox::toggled, &w, [groupBox_3](bool checked) {
+            for (auto child: groupBox_3->findChildren<QWidget *>()) {
+                child->setVisible(checked);
+            }
+        });
+    }
+
+    QGroupBox* groupBox = w.findChild<QGroupBox*>("groupBox");
+    if (groupBox) {
+        groupBox->setCheckable(true);
+        groupBox->setChecked(true);
+
+        QObject::connect(groupBox, &QGroupBox::toggled, &w, [groupBox](bool checked) {
+            for (auto child: groupBox->findChildren<QWidget *>()) {
+                child->setVisible(checked);
+            }
+        });
+    }
+
+    QGroupBox* groupBox_4 = w.findChild<QGroupBox*>("groupBox_4");
+    if (groupBox_4) {
+        groupBox_4->setCheckable(true);
+        groupBox_4->setChecked(true);
+
+        QObject::connect(groupBox_4, &QGroupBox::toggled, &w, [groupBox_4](bool checked) {
+            for (auto child: groupBox_4->findChildren<QWidget *>()) {
+                child->setVisible(checked);
+            }
+        });
+    }
+
+    QGroupBox* groupBox_7 = w.findChild<QGroupBox*>("groupBox_7");
+    if (groupBox_7) {
+        groupBox_7->setCheckable(true);
+        groupBox_7->setChecked(true);
+
+        QObject::connect(groupBox_7, &QGroupBox::toggled, &w, [groupBox_7](bool checked) {
+            for (auto child: groupBox_7->findChildren<QWidget *>()) {
+                child->setVisible(checked);
+            }
+        });
+    }
+
 
     QObject::connect(handleStartButton, &QPushButton::clicked, &w, &handleStartButtonClick);
     QObject::connect(preparationButton, &QPushButton::clicked, &w, &preparation);

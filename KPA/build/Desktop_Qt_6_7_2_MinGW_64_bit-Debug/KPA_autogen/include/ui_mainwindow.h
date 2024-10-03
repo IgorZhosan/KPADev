@@ -110,7 +110,7 @@ public:
         verticalLayout_10->setObjectName("verticalLayout_10");
         groupBox = new QGroupBox(centralwidget);
         groupBox->setObjectName("groupBox");
-        groupBox->setMinimumSize(QSize(0, 160));
+        groupBox->setMinimumSize(QSize(0, 0));
         groupBox->setMaximumSize(QSize(16777215, 160));
         QFont font;
         font.setFamilies({QString::fromUtf8("Times New Roman")});
