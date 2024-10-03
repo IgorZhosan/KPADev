@@ -47,6 +47,7 @@ QPushButton *button12 = nullptr;
 QPushButton *button13 = nullptr;
 QPushButton *button14 = nullptr;
 QPushButton *button15 = nullptr;
+QPushButton *clearButton = nullptr;
 
 
 // Добавляем глобальные переменные для чекбоксов ЛТ
@@ -456,6 +457,9 @@ int main(int argc, char *argv[])
     QObject::connect(button13, &QPushButton::clicked, &w, &handleButtonClick13);
     QObject::connect(button14, &QPushButton::clicked, &w, &handleButtonClick14);
     QObject::connect(button15, &QPushButton::clicked, &w, &handleButtonClick15);
+
+    clearButton = w.findChild<QPushButton*>("clearButton");
+    QObject::connect(clearButton, &QPushButton::clicked, &w, &handleClearButton);
 
     pushButton_3 = w.findChild<QPushButton*>("pushButton_3");
     QObject::connect(pushButton_3, &QPushButton::clicked, &on_pushButton_3_clicked);

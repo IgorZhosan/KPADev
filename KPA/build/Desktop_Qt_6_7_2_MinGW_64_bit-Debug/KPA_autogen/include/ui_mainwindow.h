@@ -84,6 +84,7 @@ public:
     QCheckBox *codes;
     QCheckBox *parameters;
     QHBoxLayout *horizontalLayout_10;
+    QPushButton *clearButton;
     QPushButton *pushButton_3;
     QPushButton *pushButton_4;
     QMenuBar *menubar;
@@ -383,6 +384,7 @@ public:
         KPA->setObjectName("KPA");
         KPA->setMaximumSize(QSize(16777215, 21));
         KPA->setFont(font5);
+        KPA->setChecked(true);
 
         verticalLayout_8->addWidget(KPA);
 
@@ -412,6 +414,7 @@ public:
         reception = new QCheckBox(groupBox_5);
         reception->setObjectName("reception");
         reception->setFont(font);
+        reception->setChecked(true);
 
         verticalLayout_7->addWidget(reception);
 
@@ -436,9 +439,17 @@ public:
 
         horizontalLayout_10 = new QHBoxLayout();
         horizontalLayout_10->setObjectName("horizontalLayout_10");
+        clearButton = new QPushButton(groupBox_7);
+        clearButton->setObjectName("clearButton");
+        clearButton->setMinimumSize(QSize(20, 20));
+        clearButton->setMaximumSize(QSize(30, 19));
+
+        horizontalLayout_10->addWidget(clearButton);
+
         pushButton_3 = new QPushButton(groupBox_7);
         pushButton_3->setObjectName("pushButton_3");
-        pushButton_3->setMaximumSize(QSize(16777215, 19));
+        pushButton_3->setMinimumSize(QSize(0, 0));
+        pushButton_3->setMaximumSize(QSize(60, 19));
         pushButton_3->setFont(font);
         pushButton_3->setCheckable(true);
 
@@ -446,7 +457,7 @@ public:
 
         pushButton_4 = new QPushButton(groupBox_7);
         pushButton_4->setObjectName("pushButton_4");
-        pushButton_4->setMaximumSize(QSize(16777215, 19));
+        pushButton_4->setMaximumSize(QSize(60, 19));
         pushButton_4->setFont(font);
 
         horizontalLayout_10->addWidget(pushButton_4);
@@ -534,6 +545,7 @@ public:
         broadcast->setText(QCoreApplication::translate("MainWindow", "\320\237\320\265\321\200\320\265\320\264\320\260\321\207\320\260", nullptr));
         codes->setText(QCoreApplication::translate("MainWindow", "\320\232\320\276\320\264\321\213", nullptr));
         parameters->setText(QCoreApplication::translate("MainWindow", "\320\237\320\260\321\200\320\260\320\274\320\265\321\202\321\200\321\213", nullptr));
+        clearButton->setText(QCoreApplication::translate("MainWindow", "C", nullptr));
         pushButton_3->setText(QCoreApplication::translate("MainWindow", "\320\237\320\260\321\203\320\267\320\260", nullptr));
         pushButton_4->setText(QCoreApplication::translate("MainWindow", "\320\227\320\260\320\277\320\270\321\201\321\214", nullptr));
         menu->setTitle(QCoreApplication::translate("MainWindow", "\320\244\320\260\320\271\320\273", nullptr));

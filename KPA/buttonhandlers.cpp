@@ -33,7 +33,6 @@ extern QPushButton* button13;
 extern QPushButton* button14;
 extern QPushButton* button15;
 
-
 bool State_ECE0206_0 = false;
 bool State_ECE0206_1 = false;
 bool isReceivingData = false;
@@ -249,6 +248,10 @@ void handleButtonClick15() {
     clickedButton15 = !clickedButton15;
     button15->setCheckable(true);
     button15->setChecked(clickedButton15);
+}
+
+void handleClearButton() {
+    terminal_down->clear();
 }
 
 void on_pushButton_3_clicked() {

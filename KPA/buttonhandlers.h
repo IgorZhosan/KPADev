@@ -27,6 +27,7 @@ void handleButtonClick13();
 void handleButtonClick14();
 void handleButtonClick15();
 void on_pushButton_3_clicked();
+void handleClearButton();
 
 HANDLE OpenDeviceByIndex(DWORD Index, PDWORD pError);
 void SI_clear_array(UCHAR Device, UCHAR ChanNumber);
