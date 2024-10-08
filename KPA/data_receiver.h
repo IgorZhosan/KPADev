@@ -1,7 +1,7 @@
 #ifndef DATA_RECEIVER_H
 #define DATA_RECEIVER_H
 #include <QCheckBox>
-
+#include <windows.h>
 
 extern QCheckBox *kpaCheckBox;
 extern QCheckBox *priemCheckBox;
@@ -55,5 +55,6 @@ void checkAndSendAD9M2Broadcast();
 void initSerialPort(const wchar_t* portName);
 void  readFromSerialPort();
 void Timer_Event();
+bool openSerialPort(LPCSTR portName);
 
 #endif // DATA_RECEIVER_H

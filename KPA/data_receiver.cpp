@@ -37,6 +37,7 @@ ULONG OUT_KPA[2] = {0};
 ULONG IN_AD9M2[5] = {0};
 
 HANDLE hSerialPort = INVALID_HANDLE_VALUE;
+QTimer* readTimer = new QTimer();
 
 // Структура для получения данных
 typedef struct {
@@ -46,6 +47,128 @@ typedef struct {
 } INPUTPARAM;
 
 INPUTPARAM ParamCod;  // Переменная для получения данных
+
+// Функция открытия COM-порта
+bool openSerialPort(LPCSTR portName) {
+    wchar_t wPortName[256];
+    MultiByteToWideChar(CP_ACP, 0, portName, -1, wPortName, 256);
+
+    hSerialPort = CreateFileW(wPortName, GENERIC_READ | GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
+
+    if (hSerialPort == INVALID_HANDLE_VALUE) {
+        DWORD error = GetLastError();
+        terminal_down->append("Не удалось открыть COM порт. Код ошибки: " + QString::number(error));
+        return false;
+    }
+
+    DCB dcbSerialParams = {0};
+    dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
+
+    if (!GetCommState(hSerialPort, &dcbSerialParams)) {
+        terminal_down->append("Ошибка получения состояния COM порта");
+        return false;
+    }
+
+    dcbSerialParams.BaudRate = CBR_9600;
+    dcbSerialParams.ByteSize = 8;
+    dcbSerialParams.StopBits = ONESTOPBIT;
+    dcbSerialParams.Parity = NOPARITY;
+
+    if (!SetCommState(hSerialPort, &dcbSerialParams)) {
+        terminal_down->append("Ошибка настройки COM порта");
+        return false;
+    }
+
+    COMMTIMEOUTS timeouts = {0};
+    timeouts.ReadIntervalTimeout = 50;
+    timeouts.ReadTotalTimeoutConstant = 50;
+    timeouts.ReadTotalTimeoutMultiplier = 10;
+
+    if (!SetCommTimeouts(hSerialPort, &timeouts)) {
+        terminal_down->append("Ошибка установки тайм-аутов");
+        return false;
+    }
+
+    terminal_down->append("COM порт успешно открыт");
+    return true;
+}
+
+// Функция чтения данных с COM-порта
+void readSerialPort() {
+    if (hSerialPort == INVALID_HANDLE_VALUE) {
+        terminal_down->append("COM порт не открыт");
+        return;
+    }
+
+    DWORD dwEventMask;
+    SetCommMask(hSerialPort, EV_RXCHAR);  // Устанавливаем маску события приема символов
+
+    // Ожидаем, пока что-то произойдет на COM-порте
+    if (WaitCommEvent(hSerialPort, &dwEventMask, NULL)) {
+        if (dwEventMask & EV_RXCHAR) {  // Проверяем, есть ли входящие данные
+            DWORD bytesRead;
+            char buffer[256] = {0};
+
+            if (ReadFile(hSerialPort, buffer, sizeof(buffer), &bytesRead, NULL)) {
+                if (bytesRead > 0) {
+                    QString data = QString::fromUtf8(buffer, bytesRead);
+                    terminal_down->append("Принятые данные: " + data);
+                }
+            } else {
+                terminal_down->append("Ошибка чтения данных с COM порта");
+            }
+        }
+    } else {
+        terminal_down->append("Ошибка ожидания события COM порта");
+    }
+}
+
+// Функция закрытия COM-порта
+void closeSerialPort() {
+    if (hSerialPort != INVALID_HANDLE_VALUE) {
+        CloseHandle(hSerialPort);
+        hSerialPort = INVALID_HANDLE_VALUE;
+        terminal_down->append("COM порт закрыт");
+    }
+}
+
+// Функция инициализации и начала работы
+void startCommunication() {
+    // Открываем COM-порт только один раз
+    if (hSerialPort == INVALID_HANDLE_VALUE) {
+        if (!openSerialPort("COM1")) {
+            terminal_down->append("Не удалось открыть COM порт.");
+            return;
+        }
+    }
+
+    // Запускаем таймер для чтения с COM-порта
+    if (!readTimer->isActive()) {
+        readTimer->start(100);  // Интервал 100 мс
+        QObject::connect(readTimer, &QTimer::timeout, &readSerialPort);
+        terminal_down->append("Начат периодический опрос COM порта");
+    }
+}
+
+// Функция остановки работы с COM-портом
+void stopCommunication() {
+    // Останавливаем таймер для чтения данных
+    if (readTimer->isActive()) {
+        readTimer->stop();
+        terminal_down->append("Опрос COM порта остановлен");
+    }
+
+    // Закрываем COM-порт
+    closeSerialPort();
+}
+
+// Основная логика работы
+void processSerialCommunication() {
+    // Чтение с COM-порта и вывод данных
+    if (TM -> isChecked() && priemCheckBox -> isChecked()) {
+        readSerialPort();  // Выполняем чтение данных при активных чек-боксах
+    }
+}
 
 // Функция для получения посылки и вывода её в терминал
 void receiveDataAndDisplay()
@@ -255,6 +378,7 @@ void Timer_Event() {
         checkAndSendAD9M2Broadcast();
         checkAndSendBroadcastKPA();
         receiveDataIN_KPA();
+        processSerialCommunication();
 }
 
 

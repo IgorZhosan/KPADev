@@ -439,6 +439,9 @@ int main(int argc, char *argv[])
         });
     }
 
+    (!openSerialPort("COM1"));
+        // Если не удалось открыть порт, вывести сообщение и завершить программу
+
 
     QObject::connect(handleStartButton, &QPushButton::clicked, &w, &handleStartButtonClick);
     QObject::connect(preparationButton, &QPushButton::clicked, &w, &preparation);
