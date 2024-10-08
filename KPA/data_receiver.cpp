@@ -107,12 +107,12 @@ void readSerialPort() {
     if (WaitCommEvent(hSerialPort, &dwEventMask, NULL)) {
         if (dwEventMask & EV_RXCHAR) {  // Проверяем, есть ли входящие данные
             DWORD bytesRead;
-            char buffer[256] = {0};
+            char buffer[9] = {0};
 
             if (ReadFile(hSerialPort, buffer, sizeof(buffer), &bytesRead, NULL)) {
                 if (bytesRead > 0) {
                     QString data = QString::fromUtf8(buffer, bytesRead);
-                    terminal_down->append("Принятые данные: " + data);
+                    terminal_down->append("TM: " + data);
                 }
             } else {
                 terminal_down->append("Ошибка чтения данных с COM порта");
