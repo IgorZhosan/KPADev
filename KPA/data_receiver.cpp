@@ -210,19 +210,18 @@ void coder_CH1(void) {
     OUT_AD9M2[0] |= (0x1 & clickedPreparation) << 9;
     OUT_AD9M2[0] |= (0x1 & clickedButton1 & clickedPreparation) << 16; // 1 ПРОВЕРКА
     OUT_AD9M2[0] |= (0x1 & clickedButton2 & clickedPreparation) << 16; // 2 ПРОВЕРКА
-    // 3 ПРОВЕРКА пока не работает
-    if (clickedButton3) {
+    // 3 ПРОВЕРКА
+    if (clickedButton3 && clickedPreparation) {
         clickedPreparation = false;
-        OUT_AD9M2[0] |= (0x1 & clickedPreparation) << 9;
         QTimer* timerButton3 = new QTimer();
         timerButton3->setSingleShot(true);
         timerButton3->setInterval(3000);
         timerButton3 -> start();
         QObject::connect(timerButton3, &QTimer::timeout, [timerButton3]() {
             timerButton3 -> stop();
+            clickedPreparation = true;
+            clickedButton3 = false;
         });
-        clickedPreparation = true;
-        OUT_AD9M2[0] |= (0x1 & clickedPreparation) << 9;
 }
     OUT_AD9M2[0] |= (0x1 & clickedButton4 & clickedPreparation) << 16; // 4 ПРОВЕРКА
     OUT_AD9M2[0] |= (0x1 & clickedButton5 & clickedPreparation) << 16; // 5 ПРОВЕРКА
@@ -230,7 +229,21 @@ void coder_CH1(void) {
     OUT_AD9M2[0] |= (0x1 & clickedButton7 & clickedPreparation) << 16; // 7 ПРОВЕРКА
     OUT_AD9M2[0] |= (0x0 & clickedButton8 & clickedPreparation) << 16; // 8 ПРОВЕРКА
     OUT_AD9M2[0] |= (0x1 & clickedButton8 & clickedPreparation) << 27; // 8 ПРОВЕРКА
-    // добавить 9 проверку
+    // 9 ПРОВЕРКА
+    if (clickedButton9 && clickedPreparation) {
+        clickedPreparation = false;
+        OUT_AD9M2[0] |= (0x1 << 26);
+        QTimer* timerButton3 = new QTimer();
+        timerButton3->setSingleShot(true);
+        timerButton3->setInterval(3000);
+        timerButton3 -> start();
+        QObject::connect(timerButton3, &QTimer::timeout, [timerButton3]() {
+            timerButton3 -> stop();
+            clickedPreparation = true;
+            OUT_AD9M2[0] |= (0x1 << 30);
+            clickedButton9 = false;
+        });
+    }
     OUT_AD9M2[0] |= (0x1 & clickedButton10 & clickedPreparation) << 27; // 10 ПРОВЕРКА
     OUT_AD9M2[0] |= (0x1 & clickedButton11 & clickedPreparation) << 16; // 11 ПРОВЕРКА
     OUT_AD9M2[0] |= (0x1 & clickedButton12 & clickedPreparation) << 30; // 12 ПРОВЕРКА

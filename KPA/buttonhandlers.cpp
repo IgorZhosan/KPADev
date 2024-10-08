@@ -120,7 +120,7 @@ void handleStartButtonClick() {
            // terminal_down->append("Данные отправляются...");
             isReceivingData = true;
 
-            timerPreparation->setInterval(120000);
+            timerPreparation->setInterval(120);
             timerPreparation->start();
             QObject::connect(timerPreparation, &QTimer::timeout, []() {
                 preparationButton->setEnabled(true);
@@ -162,92 +162,92 @@ void preparation() {
 
 void handleButtonClick1() {
     clickedButton1 = !clickedButton1;
-    button1->setCheckable(true);
-    button1->setChecked(clickedButton1);
+   // button1->setCheckable(true);
+   // button1->setChecked(clickedButton1);
 }
 
 void handleButtonClick2() {
     clickedButton2 = !clickedButton2;
-    button2->setCheckable(true);
-    button2->setChecked(clickedButton2);
+   // button2->setCheckable(true);
+   // button2->setChecked(clickedButton2);
 }
 
 void handleButtonClick3() {
     clickedButton3 = !clickedButton3;
-    button3->setCheckable(true);
-    button3->setChecked(clickedButton3);
+   // button3->setCheckable(true);
+   // button3->setChecked(clickedButton3);
 }
 
 void handleButtonClick4() {
     clickedButton4 = !clickedButton4;
-    button4->setCheckable(true);
-    button4->setChecked(clickedButton4);
+   // button4->setCheckable(true);
+    //button4->setChecked(clickedButton4);
 }
 
 void handleButtonClick5() {
     clickedButton5 = !clickedButton5;
-    button5->setCheckable(true);
-    button5->setChecked(clickedButton5);
+   // button5->setCheckable(true);
+   // button5->setChecked(clickedButton5);
 }
 
 void handleButtonClick6() {
     clickedButton6 = !clickedButton6;
-    button6->setCheckable(true);
-    button6->setChecked(clickedButton6);
+   // button6->setCheckable(true);
+   // button6->setChecked(clickedButton6);
 }
 
 void handleButtonClick7() {
     clickedButton7 = !clickedButton7;
-    button7->setCheckable(true);
-    button7->setChecked(clickedButton7);
+   // button7->setCheckable(true);
+   // button7->setChecked(clickedButton7);
 }
 
 void handleButtonClick8() {
     clickedButton8 = !clickedButton8;
-    button8->setCheckable(true);
-    button8->setChecked(clickedButton8);
+   // button8->setCheckable(true);
+   // button8->setChecked(clickedButton8);
 }
 
 void handleButtonClick9() {
     clickedButton9 = !clickedButton9;
-    button9->setCheckable(true);
-    button9->setChecked(clickedButton9);
+   // button9->setCheckable(true);
+   // button9->setChecked(clickedButton9);
 }
 
 void handleButtonClick10() {
     clickedButton10 = !clickedButton10;
-    button10->setCheckable(true);
-    button10->setChecked(clickedButton10);
+   // button10->setCheckable(true);
+   // button10->setChecked(clickedButton10);
 }
 
 void handleButtonClick11() {
     clickedButton11 = !clickedButton11;
-    button11->setCheckable(true);
-    button11->setChecked(clickedButton11);
+   // button11->setCheckable(true);
+   // button11->setChecked(clickedButton11);
 }
 
 void handleButtonClick12() {
     clickedButton12 = !clickedButton12;
-    button12->setCheckable(true);
-    button12->setChecked(clickedButton12);
+   // button12->setCheckable(true);
+   // button12->setChecked(clickedButton12);
 }
 
 void handleButtonClick13() {
     clickedButton13 = !clickedButton13;
-    button13->setCheckable(true);
-    button13->setChecked(clickedButton13);
+   // button13->setCheckable(true);
+   // button13->setChecked(clickedButton13);
 }
 
 void handleButtonClick14() {
     clickedButton14 = !clickedButton14;
-    button14->setCheckable(true);
-    button14->setChecked(clickedButton14);
+   // button14->setCheckable(true);
+   // button14->setChecked(clickedButton14);
 }
 
 void handleButtonClick15() {
     clickedButton15 = !clickedButton15;
-    button15->setCheckable(true);
-    button15->setChecked(clickedButton15);
+   // button15->setCheckable(true);
+   // button15->setChecked(clickedButton15);
 }
 
 void handleClearButton() {
