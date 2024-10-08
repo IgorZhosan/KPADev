@@ -7,32 +7,6 @@
 #include <QTextEdit>
 #include <QPushButton>
 
-extern HANDLE hECE0206_0;
-extern HANDLE hECE0206_1;
-extern DWORD nOutput;
-extern UCHAR bufOutput[10];
-extern DWORD Error;
-extern QTimer *Timer;
-extern QPushButton *handleStartButton;
-extern QPushButton *pushButton_3;
-extern ULONG OUT_AD9M2[7];
-extern QPushButton* preparationButton;
-extern QPushButton* button1;
-extern QPushButton* button2;
-extern QPushButton* button3;
-extern QPushButton* button4;
-extern QPushButton* button5;
-extern QPushButton* button6;
-extern QPushButton* button7;
-extern QPushButton* button8;
-extern QPushButton* button9;
-extern QPushButton* button10;
-extern QPushButton* button11;
-extern QPushButton* button12;
-extern QPushButton* button13;
-extern QPushButton* button14;
-extern QPushButton* button15;
-
 bool State_ECE0206_0 = false;
 bool State_ECE0206_1 = false;
 bool isReceivingData = false;

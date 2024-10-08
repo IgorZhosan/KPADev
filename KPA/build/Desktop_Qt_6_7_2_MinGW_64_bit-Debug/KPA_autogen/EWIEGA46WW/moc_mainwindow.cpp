@@ -87,7 +87,7 @@ void MainWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _id, 
         auto *_t = static_cast<MainWindow *>(_o);
         (void)_t;
         switch (_id) {
-        //case 0: _t->on_pushButton_3_clicked(); break;
+        // case 0: _t->on_pushButton_3_clicked(); break;
         default: ;
         }
     }
