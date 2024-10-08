@@ -6,6 +6,8 @@
 #include <QString>
 #include <QCheckBox>
 #include <QTimer>
+#include <thread>
+#include <chrono>
 
 extern HANDLE hECE0206_1;
 extern QTextEdit* terminal_down;
@@ -69,7 +71,7 @@ bool openSerialPort(LPCSTR portName) {
         return false;
     }
 
-    dcbSerialParams.BaudRate = CBR_9600;
+    dcbSerialParams.BaudRate = CBR_115200;
     dcbSerialParams.ByteSize = 8;
     dcbSerialParams.StopBits = ONESTOPBIT;
     dcbSerialParams.Parity = NOPARITY;
@@ -80,9 +82,11 @@ bool openSerialPort(LPCSTR portName) {
     }
 
     COMMTIMEOUTS timeouts = {0};
-    timeouts.ReadIntervalTimeout = 50;
-    timeouts.ReadTotalTimeoutConstant = 50;
-    timeouts.ReadTotalTimeoutMultiplier = 10;
+    timeouts.ReadIntervalTimeout = 10;  // Интервал между символами
+    timeouts.ReadTotalTimeoutConstant = 10;  // Общий таймаут на операцию чтения
+    timeouts.ReadTotalTimeoutMultiplier = 1;  // Таймаут на каждый байт
+    SetCommTimeouts(hSerialPort, &timeouts);
+
 
     if (!SetCommTimeouts(hSerialPort, &timeouts)) {
         terminal_down->append("Ошибка установки тайм-аутов");
@@ -94,32 +98,44 @@ bool openSerialPort(LPCSTR portName) {
 }
 
 // Функция чтения данных с COM-порта
-void readSerialPort() {
+OVERLAPPED osReader = {0};  // Структура для асинхронных операций
+
+// Функция для чтения данных с COM-порта асинхронно
+void readSerialPortAsync() {
     if (hSerialPort == INVALID_HANDLE_VALUE) {
         terminal_down->append("COM порт не открыт");
         return;
     }
 
+    // Устанавливаем маску события приема символов
     DWORD dwEventMask;
-    SetCommMask(hSerialPort, EV_RXCHAR);  // Устанавливаем маску события приема символов
+    SetCommMask(hSerialPort, EV_RXCHAR);
 
-    // Ожидаем, пока что-то произойдет на COM-порте
-    if (WaitCommEvent(hSerialPort, &dwEventMask, NULL)) {
-        if (dwEventMask & EV_RXCHAR) {  // Проверяем, есть ли входящие данные
-            DWORD bytesRead;
-            char buffer[9] = {0};
+    // Ожидаем данных на COM-порте
+    if (WaitCommEvent(hSerialPort, &dwEventMask, &osReader)) {
+        if (dwEventMask & EV_RXCHAR) {  // Проверяем наличие входящих данных
+            DWORD bytesRead = 0;
+            char buffer[24] = {0};  // Ограниченный буфер
 
-            if (ReadFile(hSerialPort, buffer, sizeof(buffer), &bytesRead, NULL)) {
+            if (ReadFile(hSerialPort, buffer, sizeof(buffer), &bytesRead, &osReader)) {
                 if (bytesRead > 0) {
                     QString data = QString::fromUtf8(buffer, bytesRead);
-                    terminal_down->append("TM: " + data);
+                    terminal_down->append("Принятые данные: " + data);
+                }
+            } else if (GetLastError() == ERROR_IO_PENDING) {
+                // Ожидание завершения асинхронной операции чтения
+                WaitForSingleObject(osReader.hEvent, INFINITE);
+
+                // Обрабатываем завершение операции
+                DWORD dwRead;
+                if (GetOverlappedResult(hSerialPort, &osReader, &dwRead, TRUE)) {
+                    QString data = QString::fromUtf8(buffer, dwRead);
+                    terminal_down->append("Принятые данные: " + data);
                 }
             } else {
                 terminal_down->append("Ошибка чтения данных с COM порта");
             }
         }
-    } else {
-        terminal_down->append("Ошибка ожидания события COM порта");
     }
 }
 
@@ -132,23 +148,33 @@ void closeSerialPort() {
     }
 }
 
-// Функция инициализации и начала работы
+void startAsyncReading() {
+    std::thread readerThread([]() {
+        while (true) {
+            readSerialPortAsync();  // Асинхронная функция чтения
+            std::this_thread::sleep_for(std::chrono::milliseconds(100));  // Периодический опрос
+        }
+    });
+    readerThread.detach();  // Отсоединяем поток
+}
+
+
 void startCommunication() {
-    // Открываем COM-порт только один раз
+    // Проверяем, открыт ли COM-порт
     if (hSerialPort == INVALID_HANDLE_VALUE) {
+        // Пытаемся открыть COM-порт
         if (!openSerialPort("COM1")) {
             terminal_down->append("Не удалось открыть COM порт.");
             return;
         }
     }
 
-    // Запускаем таймер для чтения с COM-порта
-    if (!readTimer->isActive()) {
-        readTimer->start(100);  // Интервал 100 мс
-        QObject::connect(readTimer, &QTimer::timeout, &readSerialPort);
-        terminal_down->append("Начат периодический опрос COM порта");
-    }
+    // Запуск асинхронного чтения в отдельном потоке
+    startAsyncReading();
+
+    terminal_down->append("Асинхронное чтение данных с COM порта запущено.");
 }
+
 
 // Функция остановки работы с COM-портом
 void stopCommunication() {
@@ -166,7 +192,7 @@ void stopCommunication() {
 void processSerialCommunication() {
     // Чтение с COM-порта и вывод данных
     if (TM -> isChecked() && priemCheckBox -> isChecked()) {
-        readSerialPort();  // Выполняем чтение данных при активных чек-боксах
+        readSerialPortAsync();  // Выполняем чтение данных при активных чек-боксах
     }
 }
 

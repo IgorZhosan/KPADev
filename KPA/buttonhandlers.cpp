@@ -120,7 +120,7 @@ void handleStartButtonClick() {
            // terminal_down->append("Данные отправляются...");
             isReceivingData = true;
 
-            timerPreparation->setInterval(120);
+            timerPreparation->setInterval(120000);
             timerPreparation->start();
             QObject::connect(timerPreparation, &QTimer::timeout, []() {
                 preparationButton->setEnabled(true);

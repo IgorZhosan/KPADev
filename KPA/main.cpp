@@ -439,7 +439,7 @@ int main(int argc, char *argv[])
         });
     }
 
-    (!openSerialPort("COM1"));
+    (!openSerialPort("COM2"));
         // Если не удалось открыть порт, вывести сообщение и завершить программу
 
 
