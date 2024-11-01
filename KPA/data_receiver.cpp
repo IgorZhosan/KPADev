@@ -417,7 +417,7 @@ void Timer_Event() {
         checkAndSendAD9M2Broadcast();
         checkAndSendBroadcastKPA();
         receiveDataIN_KPA();
-        processSerialCommunication();
+        //processSerialCommunication();
 }
 
 

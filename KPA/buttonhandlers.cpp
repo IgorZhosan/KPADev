@@ -6,6 +6,7 @@
 #include <QTimer>
 #include <QTextEdit>
 #include <QPushButton>
+#include <QTableWidget>
 
 bool State_ECE0206_0 = false;
 bool State_ECE0206_1 = false;
@@ -94,11 +95,13 @@ void handleStartButtonClick() {
            // terminal_down->append("Данные отправляются...");
             isReceivingData = true;
 
-            timerPreparation->setInterval(120000);
+            timerPreparation->setInterval(120);
             timerPreparation->start();
             QObject::connect(timerPreparation, &QTimer::timeout, []() {
                 preparationButton->setEnabled(true);
-                timerPreparation->stop();
+               turning_on_the_equipment->item(2, 1)->setBackground(QColor(0, 128, 0));
+              //  item->setBackground(QColor(0, 128, 0));
+                timerPreparation -> stop();
             });
         }
     }

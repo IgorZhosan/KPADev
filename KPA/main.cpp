@@ -232,7 +232,7 @@ int main(int argc, char *argv[])
 
     // Доступ к таблице через класс MainWindow, объект интерфейса создается внутри MainWindow
     terminal_down = w.findChild<QTextEdit*>("terminal_down");
-    QTableWidget *turning_on_the_equipment = w.findChild<QTableWidget*>("turning_on_the_equipment");
+    turning_on_the_equipment = w.findChild<QTableWidget*>("turning_on_the_equipment");
 
     if (turning_on_the_equipment) {
         turning_on_the_equipment->setSelectionMode(QAbstractItemView::NoSelection);

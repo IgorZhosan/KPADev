@@ -95,7 +95,7 @@ void SI_stop(UCHAR Device, UCHAR ChanNumber)
 void SO_stop(UCHAR Device)
 {
     if (Device==0) DeviceIoControl (hECE0206_0, ECE02061_XP_SO_STOP1, NULL, 0, NULL, 0, &nOutput ,NULL  );
-    else if (Device==1) DeviceIoControl (hECE0206_1, ECE02061_XP_SO_STOP1, NULL, 0, NULL, 0, &nOutput ,NULL  );
+    else if (Device==1) DeviceIoControl (hECE0206_1, ECE02061_XP_SO_STOP1, NULL, 0, NULL, 0, &nOutput ,NULL);
 
     DWORD	tick = GetTickCount();
     while (( GetTickCount()- tick)<300) {};

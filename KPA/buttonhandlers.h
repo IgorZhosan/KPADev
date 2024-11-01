@@ -4,6 +4,7 @@
 #include <windows.h>  // Подключение Windows API типов
 #include <QTextEdit>
 #include <QPushButton>
+#include <QTableWidget>
 
 extern QTextEdit *terminal_down;
 extern QTimer *Timer;
@@ -34,6 +35,7 @@ extern QPushButton* button12;
 extern QPushButton* button13;
 extern QPushButton* button14;
 extern QPushButton* button15;
+extern QTableWidget *turning_on_the_equipment;
 
 void handleStartButtonClick();
 void preparation();
