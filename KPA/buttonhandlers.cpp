@@ -7,6 +7,10 @@
 #include <QTextEdit>
 #include <QPushButton>
 #include <QTableWidget>
+#include <QIcon>
+#include <QPixmap>
+#include <QPainter>
+
 
 bool State_ECE0206_0 = false;
 bool State_ECE0206_1 = false;
@@ -36,6 +40,19 @@ QTimer *timerPreparation = new QTimer();
 UCHAR bufOutput[10] = {0};
 DWORD Error = 0;
 
+QIcon createCircleIcon(const QColor &color, int diameter = 16) {
+    QPixmap pixmap(diameter, diameter);
+    pixmap.fill(Qt::transparent);  // Прозрачный фон
+
+    QPainter painter(&pixmap);
+    painter.setRenderHint(QPainter::Antialiasing);  // Сглаживание для круга
+    painter.setBrush(color);  // Устанавливаем цвет заливки
+    painter.setPen(Qt::NoPen);  // Без обводки
+    painter.drawEllipse(0, 0, diameter, diameter);  // Рисуем круг
+
+    return QIcon(pixmap);
+}
+
 void handleStartButtonClick() {
     QString s;
     clicledStartbutton = !clicledStartbutton;
@@ -52,6 +69,7 @@ void handleStartButtonClick() {
             {
               //  terminal_down->append("Состояние CH1: ОШИБКА ПОДКЛ. ECE-0206-1C-S");
                 State_ECE0206_0 = false;
+                toolButton_14->setIcon(createCircleIcon(Qt::red));
             }
             else
             {
@@ -64,6 +82,7 @@ void handleStartButtonClick() {
                 SI_pusk(0, 1, 0, 1, 0); // канал 1, рабочий режим, контроль четности, прием на частотах 36-100КГц
               //  terminal_down->append("Состояние CH1: ОЖИДАНИЕ");
                 State_ECE0206_0 = true;
+                toolButton_14->setIcon(createCircleIcon(Qt::green));
             }
         }
 
@@ -75,17 +94,19 @@ void handleStartButtonClick() {
             {
               //  terminal_down->append("Состояние CH2: ОШИБКА ПОДКЛ. ECE-0206-1C-S");
                 State_ECE0206_1 = false;
+                toolButton_15->setIcon(createCircleIcon(Qt::red));
             }
             else
             {
                 DeviceIoControl(hECE0206_1, ECE02061_XP_SET_LONG_MODE, NULL, 0, NULL, 0, &nOutput, NULL);
                 DeviceIoControl(hECE0206_1, ECE02061_XP_GET_SERIAL_NUMBER, NULL, 0, &bufOutput, 10, &nOutput, NULL);
                 s = "ARINC429_CH2  S\\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
-              //  terminal_down->append(s);
+              //  terminal_down->append(s);r
                 SI_clear_array(1, 2);   // очистка буфера приемника 2 канала
                 SI_pusk(1, 2, 0, 1, 0); // канал 2, рабочий режим, контроль четности, прием на частотах 36-100КГц
               //  terminal_down->append("Состояние CH2: ОЖИДАНИЕ");
                 State_ECE0206_1 = true;
+                toolButton_15->setIcon(createCircleIcon(Qt::green));
             }
         }
         // Если хотя бы одно устройство подключено, начинаем отправку данных
@@ -118,6 +139,7 @@ void handleStartButtonClick() {
             CloseHandle(hECE0206_0);
            // terminal_down->append("Состояние CH1: НЕ ПОДКЛЮЧЕН");
             State_ECE0206_0 = false;
+            toolButton_14->setIcon(createCircleIcon(Qt::red));
         }
 
         if (State_ECE0206_1) {
@@ -126,6 +148,7 @@ void handleStartButtonClick() {
             CloseHandle(hECE0206_1);
            // terminal_down->append("Состояние CH2: НЕ ПОДКЛЮЧЕН");
             State_ECE0206_1 = false;
+            toolButton_15->setIcon(createCircleIcon(Qt::red));
         }
     handleStartButton -> setText("Старт");
     }

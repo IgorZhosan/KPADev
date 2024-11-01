@@ -20,6 +20,7 @@
 #include <QDebug>
 #include <QGroupBox>
 #include <QLabel>
+#include <QToolButton>
 
 
 // Глобальные переменные для всех элементов интерфейса
@@ -48,6 +49,8 @@ QPushButton *button13 = nullptr;
 QPushButton *button14 = nullptr;
 QPushButton *button15 = nullptr;
 QPushButton *clearButton = nullptr;
+QToolButton *toolButton_14 = nullptr;
+QToolButton *toolButton_15 = nullptr;
 
 
 // Добавляем глобальные переменные для чекбоксов ЛТ
@@ -467,6 +470,9 @@ int main(int argc, char *argv[])
     pushButton_3 = w.findChild<QPushButton*>("pushButton_3");
     QObject::connect(pushButton_3, &QPushButton::clicked, &on_pushButton_3_clicked);
     w.show();
+
+    toolButton_14 = w.findChild<QToolButton*>("toolButton_14");
+    toolButton_15 = w.findChild<QToolButton*>("toolButton_15");
 
     return a.exec();
 }

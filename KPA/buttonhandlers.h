@@ -5,6 +5,7 @@
 #include <QTextEdit>
 #include <QPushButton>
 #include <QTableWidget>
+#include <QToolButton>
 
 extern QTextEdit *terminal_down;
 extern QTimer *Timer;
@@ -36,6 +37,8 @@ extern QPushButton* button13;
 extern QPushButton* button14;
 extern QPushButton* button15;
 extern QTableWidget *turning_on_the_equipment;
+extern QToolButton *toolButton_14;
+extern QToolButton *toolButton_15 ;
 
 void handleStartButtonClick();
 void preparation();
