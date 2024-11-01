@@ -6,6 +6,8 @@
 #include <QPushButton>
 #include <QTableWidget>
 #include <QToolButton>
+#include <QIcon>
+#include <QColor>
 
 extern QTextEdit *terminal_down;
 extern QTimer *Timer;
@@ -59,6 +61,7 @@ void handleButtonClick14();
 void handleButtonClick15();
 void on_pushButton_3_clicked();
 void handleClearButton();
+QIcon createCircleIcon(const QColor &color);
 
 HANDLE OpenDeviceByIndex(DWORD Index, PDWORD pError);
 void SI_clear_array(UCHAR Device, UCHAR ChanNumber);

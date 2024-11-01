@@ -40,15 +40,16 @@ QTimer *timerPreparation = new QTimer();
 UCHAR bufOutput[10] = {0};
 DWORD Error = 0;
 
-QIcon createCircleIcon(const QColor &color, int diameter = 16) {
-    QPixmap pixmap(diameter, diameter);
+QIcon createCircleIcon(const QColor &color) {
+    QPixmap pixmap(16, 16);
+
     pixmap.fill(Qt::transparent);  // Прозрачный фон
 
     QPainter painter(&pixmap);
     painter.setRenderHint(QPainter::Antialiasing);  // Сглаживание для круга
-    painter.setBrush(color);  // Устанавливаем цвет заливки
+    painter.setBrush(Qt::red);  // Устанавливаем цвет заливки
     painter.setPen(Qt::NoPen);  // Без обводки
-    painter.drawEllipse(0, 0, diameter, diameter);  // Рисуем круг
+    painter.drawEllipse(0, 0, 16, 16);  // Рисуем круг
 
     return QIcon(pixmap);
 }

@@ -51,6 +51,12 @@ QPushButton *button15 = nullptr;
 QPushButton *clearButton = nullptr;
 QToolButton *toolButton_14 = nullptr;
 QToolButton *toolButton_15 = nullptr;
+QToolButton *toolButton_16 = nullptr;
+QToolButton *toolButton_17 = nullptr;
+QToolButton *toolButton_18 = nullptr;
+QToolButton *toolButton_19 = nullptr;
+QToolButton *toolButton_20 = nullptr;
+
 
 
 // Добавляем глобальные переменные для чекбоксов ЛТ
@@ -472,7 +478,19 @@ int main(int argc, char *argv[])
     w.show();
 
     toolButton_14 = w.findChild<QToolButton*>("toolButton_14");
+    toolButton_14->setIcon(createCircleIcon(Qt::red));
     toolButton_15 = w.findChild<QToolButton*>("toolButton_15");
+    toolButton_15->setIcon(createCircleIcon(Qt::red));
+    toolButton_16 = w.findChild<QToolButton*>("toolButton_16");
+    toolButton_16->setIcon(createCircleIcon(Qt::red));
+    toolButton_17 = w.findChild<QToolButton*>("toolButton_17");
+    toolButton_17->setIcon(createCircleIcon(Qt::red));
+    toolButton_18 = w.findChild<QToolButton*>("toolButton_18");
+    toolButton_18->setIcon(createCircleIcon(Qt::red));
+    toolButton_19 = w.findChild<QToolButton*>("toolButton_19");
+    toolButton_19->setIcon(createCircleIcon(Qt::red));
+    toolButton_20 = w.findChild<QToolButton*>("toolButton_20");
+    toolButton_20->setIcon(createCircleIcon(Qt::red));
 
     return a.exec();
 }
