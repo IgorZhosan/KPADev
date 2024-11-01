@@ -163,8 +163,8 @@ void preparation() {
 
 void handleButtonClick1() {
     clickedButton1 = !clickedButton1;
-   // button1->setCheckable(true);
-   // button1->setChecked(clickedButton1);
+    button1->setCheckable(true);
+    button1->setChecked(clickedButton1);
 }
 
 void handleButtonClick2() {

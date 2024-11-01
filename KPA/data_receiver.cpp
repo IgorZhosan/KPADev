@@ -254,11 +254,13 @@ void coder_CH1(void) {
     OUT_AD9M2[0] |= (0x1 & clickedButton6 & clickedPreparation) << 16; // 6 ПРОВЕРКА
     OUT_AD9M2[0] |= (0x1 & clickedButton7 & clickedPreparation) << 16; // 7 ПРОВЕРКА
     OUT_AD9M2[0] |= (0x0 & clickedButton8 & clickedPreparation) << 16; // 8 ПРОВЕРКА
-    OUT_AD9M2[0] |= (0x1 & clickedButton8 & clickedPreparation) << 27; // 8 ПРОВЕРКА
+    OUT_AD9M2[0] |= (0x1 & clickedButton8 & clickedPreparation) << 11; // 8 ПРОВЕРКА
+    OUT_AD9M2[0] |= (0x0 & clickedButton8 & clickedPreparation) << 14; // 8 ПРОВЕРКА
+
     // 9 ПРОВЕРКА
     if (clickedButton9 && clickedPreparation) {
         clickedPreparation = false;
-        OUT_AD9M2[0] |= (0x1 << 26);
+        OUT_AD9M2[0] |= (0x1 << 10);
         QTimer* timerButton3 = new QTimer();
         timerButton3->setSingleShot(true);
         timerButton3->setInterval(3000);
@@ -266,7 +268,7 @@ void coder_CH1(void) {
         QObject::connect(timerButton3, &QTimer::timeout, [timerButton3]() {
             timerButton3 -> stop();
             clickedPreparation = true;
-            OUT_AD9M2[0] |= (0x1 << 30);
+            OUT_AD9M2[0] |= (0x1 << 14);
             clickedButton9 = false;
         });
     }
