@@ -11,7 +11,6 @@
 #include <QPixmap>
 #include <QPainter>
 
-
 bool State_ECE0206_0 = false;
 bool State_ECE0206_1 = false;
 bool isReceivingData = false;
@@ -117,7 +116,7 @@ void handleStartButtonClick() {
            // terminal_down->append("Данные отправляются...");
             isReceivingData = true;
 
-            timerPreparation->setInterval(120);
+            timerPreparation->setInterval(120000);
             timerPreparation->start();
             QObject::connect(timerPreparation, &QTimer::timeout, []() {
                 preparationButton->setEnabled(true);
@@ -163,8 +162,8 @@ void preparation() {
 
 void handleButtonClick1() {
     clickedButton1 = !clickedButton1;
-    button1->setCheckable(true);
-    button1->setChecked(clickedButton1);
+   // button1->setCheckable(true);
+   // button1->setChecked(clickedButton1);
 }
 
 void handleButtonClick2() {

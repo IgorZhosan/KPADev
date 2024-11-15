@@ -100,7 +100,6 @@ bool openSerialPort(LPCSTR portName) {
 // Функция чтения данных с COM-порта
 OVERLAPPED osReader = {0};  // Структура для асинхронных операций
 
-// Функция для чтения данных с COM-порта асинхронно
 void readSerialPortAsync() {
     if (hSerialPort == INVALID_HANDLE_VALUE) {
         terminal_down->append("COM порт не открыт");
@@ -119,8 +118,11 @@ void readSerialPortAsync() {
 
             if (ReadFile(hSerialPort, buffer, sizeof(buffer), &bytesRead, &osReader)) {
                 if (bytesRead > 0) {
-                    QString data = QString::fromUtf8(buffer, bytesRead);
-                    terminal_down->append("Принятые данные: " + data);
+                    QString hexData;
+                    for (DWORD i = 0; i < bytesRead; i++) {
+                        hexData += QString::asprintf("%02X ", static_cast<unsigned char>(buffer[i]));
+                    }
+                    terminal_down->append("Принятые данные: " + hexData.trimmed());
                 }
             } else if (GetLastError() == ERROR_IO_PENDING) {
                 // Ожидание завершения асинхронной операции чтения
@@ -129,8 +131,11 @@ void readSerialPortAsync() {
                 // Обрабатываем завершение операции
                 DWORD dwRead;
                 if (GetOverlappedResult(hSerialPort, &osReader, &dwRead, TRUE)) {
-                    QString data = QString::fromUtf8(buffer, dwRead);
-                    terminal_down->append("Принятые данные: " + data);
+                    QString hexData;
+                    for (DWORD i = 0; i < dwRead; i++) {
+                        hexData += QString::asprintf("%02X ", static_cast<unsigned char>(buffer[i]));
+                    }
+                    terminal_down->append("Принятые данные: " + hexData.trimmed());
                 }
             } else {
                 terminal_down->append("Ошибка чтения данных с COM порта");
@@ -261,6 +266,7 @@ void coder_CH1(void) {
     if (clickedButton9 && clickedPreparation) {
         clickedPreparation = false;
         OUT_AD9M2[0] |= (0x1 << 10);
+        OUT_AD9M2[0] |= (0x0 << 10);
         QTimer* timerButton3 = new QTimer();
         timerButton3->setSingleShot(true);
         timerButton3->setInterval(3000);
@@ -419,7 +425,7 @@ void Timer_Event() {
         checkAndSendAD9M2Broadcast();
         checkAndSendBroadcastKPA();
         receiveDataIN_KPA();
-        //processSerialCommunication();
+        processSerialCommunication();
 }
 
 
