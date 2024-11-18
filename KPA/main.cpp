@@ -448,8 +448,13 @@ int main(int argc, char *argv[])
         });
     }
 
-    (!openSerialPort("COM2"));
-        // Если не удалось открыть порт, вывести сообщение и завершить программу
+    if (!openSerialPort("COM2")) {
+        terminal_down->append("Первичное открытие COM порта не удалось.");
+    } else {
+        terminal_down->append("COM порт успешно открыт при запуске.");
+    }
+
+    initializePortCheckTimer();  // Запуск таймера для проверки состояния порта
 
 
     QObject::connect(handleStartButton, &QPushButton::clicked, &w, &handleStartButtonClick);

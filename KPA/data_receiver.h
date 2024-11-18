@@ -56,5 +56,6 @@ void initSerialPort(const wchar_t* portName);
 void  readFromSerialPort();
 void Timer_Event();
 bool openSerialPort(LPCSTR portName);
+void initializePortCheckTimer();
 
 #endif // DATA_RECEIVER_H

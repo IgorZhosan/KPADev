@@ -40,6 +40,9 @@ ULONG IN_AD9M2[5] = {0};
 
 HANDLE hSerialPort = INVALID_HANDLE_VALUE;
 QTimer* readTimer = new QTimer();
+QTimer* portCheckTimer = new QTimer();
+bool isReconnecting = false;
+
 
 // Структура для получения данных
 typedef struct {
@@ -49,6 +52,51 @@ typedef struct {
 } INPUTPARAM;
 
 INPUTPARAM ParamCod;  // Переменная для получения данных
+
+bool isPortOpen() {
+    if (hSerialPort == INVALID_HANDLE_VALUE) {
+        terminal_down->append("COM порт не открыт: INVALID_HANDLE_VALUE");
+        return false;
+    }
+    DWORD errors;
+    COMSTAT status;
+    if (!ClearCommError(hSerialPort, &errors, &status)) {
+        terminal_down->append("Ошибка проверки состояния COM порта через ClearCommError.");
+        return false;
+    }
+    terminal_down->append("COM порт открыт и доступен.");
+    return true;
+}
+
+void reconnectSerialPortAsync() {
+    if (isReconnecting) return;
+
+    isReconnecting = true;
+    std::thread reconnectThread([]() {
+        if (!openSerialPort("COM2")) {
+            terminal_down->append("Не удалось переподключить COM порт.");
+        } else {
+            terminal_down->append("COM порт успешно переподключен.");
+        }
+        isReconnecting = false;
+    });
+    reconnectThread.detach();  // Освобождаем поток
+}
+
+void initializePortCheckTimer() {
+    QObject::connect(portCheckTimer, &QTimer::timeout, []() {
+        terminal_down->append("Таймер проверки состояния COM порта сработал.");
+        if (!isPortOpen()) {
+            terminal_down->append("COM порт не подключен. Попытка переподключения...");
+            reconnectSerialPortAsync();
+        } else {
+            terminal_down->append("COM порт подключен.");
+        }
+    });
+
+    portCheckTimer->start(15000);  // Устанавливаем интервал в 15 секунд
+    terminal_down->append("Таймер проверки состояния COM порта запущен.");
+}
 
 // Функция открытия COM-порта
 bool openSerialPort(LPCSTR portName) {
@@ -174,6 +222,8 @@ void startCommunication() {
         }
     }
 
+    // Запускаем таймер для проверки состояния порта
+    initializePortCheckTimer();
     // Запуск асинхронного чтения в отдельном потоке
     startAsyncReading();
 
@@ -183,10 +233,12 @@ void startCommunication() {
 
 // Функция остановки работы с COM-портом
 void stopCommunication() {
-    // Останавливаем таймер для чтения данных
+    if (portCheckTimer->isActive()) {
+        portCheckTimer->stop();
+    }
+
     if (readTimer->isActive()) {
         readTimer->stop();
-        terminal_down->append("Опрос COM порта остановлен");
     }
 
     // Закрываем COM-порт
