@@ -299,7 +299,7 @@ int main(int argc, char *argv[])
         terminal->setPlainText(fileContent);
     }
 
-    QTableWidget *checking_the_operation = w.findChild<QTableWidget*>("checking_the_operation");
+    checking_the_operation = w.findChild<QTableWidget*>("checking_the_operation");
 
     if (checking_the_operation) {
         checking_the_operation->setSelectionMode(QAbstractItemView::NoSelection);
