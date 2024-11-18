@@ -109,7 +109,7 @@ bool openSerialPort(LPCSTR portName) {
 
     if (hSerialPort == INVALID_HANDLE_VALUE) {
         DWORD error = GetLastError();
-        terminal_down->append("Не удалось открыть COM порт. Код ошибки: " + QString::number(error));
+       // terminal_down->append("Не удалось открыть COM порт. Код ошибки: " + QString::number(error));
         return false;
     }
 
@@ -117,14 +117,14 @@ bool openSerialPort(LPCSTR portName) {
     dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
 
     if (!GetCommState(hSerialPort, &dcbSerialParams)) {
-        terminal_down->append("Ошибка получения состояния COM порта");
+       // terminal_down->append("Ошибка получения состояния COM порта");
         return false;
     }
 
     dcbSerialParams.BaudRate = CBR_115200;
     dcbSerialParams.ByteSize = 8;
     dcbSerialParams.StopBits = ONESTOPBIT;
-    dcbSerialParams.Parity = NOPARITY;
+    dcbSerialParams.Parity = EVENPARITY;
 
     if (!SetCommState(hSerialPort, &dcbSerialParams)) {
         terminal_down->append("Ошибка настройки COM порта");
@@ -149,39 +149,60 @@ bool openSerialPort(LPCSTR portName) {
 // Функция чтения данных с COM-порта
 OVERLAPPED osReader = {0};  // Структура для асинхронных операций
 
+bool isValidPacket(const QByteArray& packet) {
+    // Проверяем длину пакета
+    if (packet.size() != 24) {
+        return false;
+    }
+
+    // Проверяем, что первый байт равен ожидаемому значению
+    if (static_cast<unsigned char>(packet[0]) != 0x80) {
+        return false;
+    }
+
+    // Дополнительные проверки (контрольная сумма, формат и т.д.)
+    return true;
+}
+
 void readSerialPortAsync() {
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-        //terminal_down->append("COM порт не открыт");
         return;
     }
 
-    const size_t PACKET_SIZE = 24;  // Ожидаемый размер посылки
-    char tempBuffer[PACKET_SIZE] = {0}; // Временный буфер для чтения
+    const size_t PACKET_SIZE = 24;  // Размер одной посылки
+    char tempBuffer[24] = {0};    // Временный буфер для чтения
     DWORD bytesRead = 0;
 
     // Чтение данных с COM-порта
-    if (ReadFile(hSerialPort, tempBuffer, PACKET_SIZE, &bytesRead, NULL)) {
-        // Добавляем прочитанные данные во временный буфер
+    if (ReadFile(hSerialPort, tempBuffer, sizeof(tempBuffer), &bytesRead, NULL)) {
+        // Добавляем прочитанные данные в общий буфер
         packetBuffer.append(tempBuffer, bytesRead);
 
-        // Обработка данных, когда накоплен полный пакет
+        // Обработка данных из буфера
         while (packetBuffer.size() >= PACKET_SIZE) {
+            // Проверяем, начинается ли посылка с правильного байта
+            if (static_cast<unsigned char>(packetBuffer[0]) != 0x80) {
+                // Удаляем байт до синхронизации
+                packetBuffer.remove(0, 1);
+                continue;
+            }
+
             // Извлекаем полный пакет
             QByteArray fullPacket = packetBuffer.left(PACKET_SIZE);
             packetBuffer.remove(0, PACKET_SIZE);  // Удаляем обработанный пакет
 
             // Выводим пакет в терминал
             if (!isTerminalPause) {
-            QString hexData;
-            for (char byte : fullPacket) {
-                hexData += QString::asprintf("%02X ", static_cast<unsigned char>(byte));
+                QString hexData;
+                for (char byte : fullPacket) {
+                    hexData += QString::asprintf("%02X ", static_cast<unsigned char>(byte));
+                }
+                terminal_down->append("TM: " + hexData.trimmed());
             }
-            terminal_down->append("TM: " + hexData.trimmed());
-        }
         }
     } else {
         DWORD error = GetLastError();
-        //terminal_down->append("Ошибка чтения данных с COM порта. Код ошибки: " + QString::number(error));
+        terminal_down->append("Ошибка чтения данных с COM порта. Код ошибки: " + QString::number(error));
     }
 }
 
@@ -198,7 +219,7 @@ void startAsyncReading() {
     std::thread readerThread([]() {
         while (true) {
             readSerialPortAsync();  // Асинхронная функция чтения
-            std::this_thread::sleep_for(std::chrono::milliseconds(100));  // Периодический опрос
+            std::this_thread::sleep_for(std::chrono::milliseconds(200));  // Периодический опрос
         }
     });
     readerThread.detach();  // Отсоединяем поток
