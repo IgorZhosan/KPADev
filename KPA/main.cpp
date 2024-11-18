@@ -386,8 +386,6 @@ int main(int argc, char *argv[])
     handleStartButton->setFixedSize(65, 50);
     layout->setStretchFactor(handleStartButton, 1);
 
-
-
     QHBoxLayout* horizontalLayout_8 = w.findChild<QHBoxLayout*>("horizontalLayout_8");
 
     QPushButton* button = new QPushButton("Выбор литеры");
@@ -449,9 +447,9 @@ int main(int argc, char *argv[])
     }
 
     if (!openSerialPort("COM2")) {
-        terminal_down->append("Первичное открытие COM порта не удалось.");
+       // terminal_down->append("Первичное открытие COM порта не удалось.");
     } else {
-        terminal_down->append("COM порт успешно открыт при запуске.");
+       // terminal_down->append("COM порт успешно открыт при запуске.");
     }
 
     initializePortCheckTimer();  // Запуск таймера для проверки состояния порта
