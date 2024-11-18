@@ -191,33 +191,33 @@ void preparation() {
 }
 
 void handleButtonClick1() {
-    clickedButton1 = !clickedButton1;
+    // clickedButton1 = !clickedButton1;
     OUT_AD9M2[0] &= ~(0x1 << 16); // Сбрасываем бит
-    OUT_AD9M2[0] |= (0x1 & clickedButton1 & clickedPreparation) << 16; // Устанавливаем бит
+    OUT_AD9M2[0] |= (0x1 & clickedPreparation) << 16; // Устанавливаем бит
 
     ULONG sum = KS(OUT_AD9M2, 6);
     OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
 
     BUF256x32_write(0, OUT_AD9M2, 7);
     // Проверка статуса выполнения
-    updateOperationStatus(0, OUT_AD9M2[0] == 0x001102);
+    updateOperationStatus(0, (QString::number(OUT_AD9M2[0], 16) == "110280"));
 }
 
 void handleButtonClick2() {
-    clickedButton2 = !clickedButton2;
+    // clickedButton2 = !clickedButton2;
     OUT_AD9M2[0] &= ~(0x1 << 16); // Сбрасываем бит
-    OUT_AD9M2[0] |= (0x1 & clickedButton2 & clickedPreparation) << 16;
+    OUT_AD9M2[0] |= (0x1 & clickedPreparation) << 16;
 
     ULONG sum = KS(OUT_AD9M2, 6);
     OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
     BUF256x32_write(0, OUT_AD9M2, 7);
     // Проверка статуса выполнения
-    updateOperationStatus(1, OUT_AD9M2[0] == 0x001102);
+    updateOperationStatus(1, (QString::number(OUT_AD9M2[0], 16) == "110280"));
 }
 
 void handleButtonClick3() {
-    clickedButton3 = !clickedButton3;
-    if (clickedButton3 && clickedPreparation) {
+    // clickedButton3 = !clickedButton3;
+    if (clickedPreparation) {
         clickedPreparation = false;
         OUT_AD9M2[0] &= ~(0x1 << 9); // Сбрасываем бит 9 для подготовки
         OUT_AD9M2[0] &= ~(0x1 << 16); // Сбрасываем бит 16
@@ -248,66 +248,66 @@ void handleButtonClick3() {
 }
 
 void handleButtonClick4() {
-    clickedButton4 = !clickedButton4;
+    // clickedButton4 = !clickedButton4;
     OUT_AD9M2[0] &= ~(0x1 << 16); // Сбрасываем бит
-    OUT_AD9M2[0] |= (0x1 & clickedButton4 & clickedPreparation) << 16; // Устанавливаем бит
+    OUT_AD9M2[0] |= (0x1 & clickedPreparation) << 16; // Устанавливаем бит
 
     ULONG sum = KS(OUT_AD9M2, 6);
     OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
     BUF256x32_write(0, OUT_AD9M2, 7);
     // Проверка статуса выполнения
-    updateOperationStatus(3, OUT_AD9M2[0] == 0x001102);
+    updateOperationStatus(3, (QString::number(OUT_AD9M2[0], 16) == "110280"));
 }
 
 void handleButtonClick5() {
-    clickedButton5 = !clickedButton5;
+    // clickedButton5 = !clickedButton5;
     OUT_AD9M2[0] &= ~(0x1 << 16); // Сбрасываем бит
-    OUT_AD9M2[0] |= (0x1 & clickedButton5 & clickedPreparation) << 16; // Устанавливаем бит
+    OUT_AD9M2[0] |= (0x1 & clickedPreparation) << 16; // Устанавливаем бит
 
     ULONG sum = KS(OUT_AD9M2, 6);
     OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
     BUF256x32_write(0, OUT_AD9M2, 7);
     // Проверка статуса выполнения
-    updateOperationStatus(4, OUT_AD9M2[0] == 0x001102);
+    updateOperationStatus(4, (QString::number(OUT_AD9M2[0], 16) == "110280"));
 }
 
 void handleButtonClick6() {
-    clickedButton6 = !clickedButton6;
+    // clickedButton6 = !clickedButton6;
     OUT_AD9M2[0] &= ~(0x1 << 16); // Сбрасываем бит
-    OUT_AD9M2[0] |= (0x1 & clickedButton6 & clickedPreparation) << 16; // Устанавливаем бит
+    OUT_AD9M2[0] |= (0x1 & clickedPreparation) << 16; // Устанавливаем бит
 
     ULONG sum = KS(OUT_AD9M2, 6);
     OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
     BUF256x32_write(0, OUT_AD9M2, 7);
     // Проверка статуса выполнения
-    updateOperationStatus(5, OUT_AD9M2[0] == 0x001102);
-}
-
-void handleButtonClick8() {
-    clickedButton8 = !clickedButton8;
-    OUT_AD9M2[0] &= ~((0x1 << 16) | (0x1 << 11) | (0x1 << 14)); // Сбрасываем все три бита
-    OUT_AD9M2[0] |= (0x1 & clickedButton8 & clickedPreparation) << 11; // Устанавливаем бит 11
-
-    ULONG sum = KS(OUT_AD9M2, 6);
-    OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
-    BUF256x32_write(0, OUT_AD9M2, 7);
+    updateOperationStatus(5, (QString::number(OUT_AD9M2[0], 16) == "110280"));
 }
 
 void handleButtonClick7() {
-    clickedButton7 = !clickedButton7;
+    // clickedButton7 = !clickedButton7;
     OUT_AD9M2[0] &= ~(0x1 << 16); // Сбрасываем бит
-    OUT_AD9M2[0] |= (0x1 & clickedButton7 & clickedPreparation) << 16; // Устанавливаем бит
+    OUT_AD9M2[0] |= (0x1 & clickedPreparation) << 16; // Устанавливаем бит
 
     ULONG sum = KS(OUT_AD9M2, 6);
     OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
     BUF256x32_write(0, OUT_AD9M2, 7);
     // Проверка статуса выполнения
-    updateOperationStatus(6, OUT_AD9M2[0] == 0x001102);
+    updateOperationStatus(6, (QString::number(OUT_AD9M2[0], 16) == "110280"));
+}
+
+void handleButtonClick8() {
+    // clickedButton8 = !clickedButton8;
+    OUT_AD9M2[0] &= ~((0x1 << 16) | (0x1 << 11) | (0x1 << 14)); // Сбрасываем все три бита
+    OUT_AD9M2[0] |= (0x1 & clickedPreparation) << 11; // Устанавливаем бит 11
+
+    ULONG sum = KS(OUT_AD9M2, 6);
+    OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
+    BUF256x32_write(0, OUT_AD9M2, 7);
 }
 
 void handleButtonClick9() {
-    clickedButton9 = !clickedButton9;
-    if (clickedButton9 && clickedPreparation) {
+    // clickedButton9 = !clickedButton9;
+    if (clickedPreparation) {
         clickedPreparation = false;
         OUT_AD9M2[0] &= ~((0x1 << 16) | (0x1 << 9)); // Сбрасываем бит 16 и бит 9 для подготовки
         OUT_AD9M2[0] |= (0x1 << 10); // Устанавливаем бит 10
@@ -337,7 +337,7 @@ void handleButtonClick9() {
 }
 
 void handleButtonClick10() {
-    clickedButton10 = !clickedButton10;
+    // clickedButton10 = !clickedButton10;
     OUT_AD9M2[0] |= (0x1 << 11); // Устанавливаем бит 11
 
     ULONG sum = KS(OUT_AD9M2, 6);
@@ -346,19 +346,20 @@ void handleButtonClick10() {
 }
 
 void handleButtonClick11() {
-    clickedButton11 = !clickedButton11;
+    // clickedButton11 = !clickedButton11;
     OUT_AD9M2[0] |= (0x1 << 16); // Устанавливаем бит 16
 
     ULONG sum = KS(OUT_AD9M2, 6);
     OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
     BUF256x32_write(0, OUT_AD9M2, 7);
+    updateOperationStatus(10, (QString::number(OUT_AD9M2[0], 16) == "110280"));
 }
 
 void handleButtonClick12() {
-    clickedButton12 = !clickedButton12;
+    // clickedButton12 = !clickedButton12;
     OUT_AD9M2[0] &= ~((0x1 << 30) | (0x1 << 27)); // Сбрасываем биты 30 и 27
-    OUT_AD9M2[0] |= (0x1 & clickedButton12 & clickedPreparation) << 30;
-    OUT_AD9M2[0] |= (0x1 & clickedButton12 & clickedPreparation) << 27;
+    OUT_AD9M2[0] |= (0x1 & clickedPreparation) << 30;
+    OUT_AD9M2[0] |= (0x1 & clickedPreparation) << 27;
 
     ULONG sum = KS(OUT_AD9M2, 6);
     OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
