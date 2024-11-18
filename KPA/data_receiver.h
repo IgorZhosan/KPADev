@@ -46,8 +46,6 @@ extern QCheckBox *out_kk7_checkbox;
 extern QCheckBox *out_kk8_checkbox;
 extern bool isStatePause;
 
-
-
 // Объявление функции
 void receiveDataAndDisplay();
 void coder_ch1();
@@ -57,5 +55,6 @@ void  readFromSerialPort();
 void Timer_Event();
 bool openSerialPort(LPCSTR portName);
 void initializePortCheckTimer();
+ULONG KS(ULONG *array, int size);
 
 #endif // DATA_RECEIVER_H

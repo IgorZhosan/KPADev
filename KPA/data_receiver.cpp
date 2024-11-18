@@ -35,7 +35,7 @@ ULONG KS(ULONG *array, int size);
 
 // Массив для сохранения посылки
 ULONG IN_KPA[11] = {0};
-ULONG OUT_AD9M2[7] = {0};
+ULONG OUT_AD9M2[7] = {0x80, 0x40, 0xC0, 0x20, 0xA0, 0x60, 0xE5};
 ULONG OUT_KPA[2] = {0};
 ULONG IN_AD9M2[5] = {0};
 
@@ -57,16 +57,16 @@ INPUTPARAM ParamCod;  // Переменная для получения данн
 
 bool isPortOpen() {
     if (hSerialPort == INVALID_HANDLE_VALUE) {
-      //  terminal_down->append("COM порт не открыт: INVALID_HANDLE_VALUE");
+        //  terminal_down->append("COM порт не открыт: INVALID_HANDLE_VALUE");
         return false;
     }
     DWORD errors;
     COMSTAT status;
     if (!ClearCommError(hSerialPort, &errors, &status)) {
-      //  terminal_down->append("Ошибка проверки состояния COM порта через ClearCommError.");
+        //  terminal_down->append("Ошибка проверки состояния COM порта через ClearCommError.");
         return false;
     }
-   // terminal_down->append("COM порт открыт и доступен.");
+    // terminal_down->append("COM порт открыт и доступен.");
     return true;
 }
 
@@ -76,9 +76,9 @@ void reconnectSerialPortAsync() {
     isReconnecting = true;
     std::thread reconnectThread([]() {
         if (!openSerialPort("COM2")) {
-         //   terminal_down->append("Не удалось переподключить COM порт.");
+            //   terminal_down->append("Не удалось переподключить COM порт.");
         } else {
-         //   terminal_down->append("COM порт успешно переподключен.");
+            //   terminal_down->append("COM порт успешно переподключен.");
         }
         isReconnecting = false;
     });
@@ -87,12 +87,12 @@ void reconnectSerialPortAsync() {
 
 void initializePortCheckTimer() {
     QObject::connect(portCheckTimer, &QTimer::timeout, []() {
-      //  terminal_down->append("Таймер проверки состояния COM порта сработал.");
+        //  terminal_down->append("Таймер проверки состояния COM порта сработал.");
         if (!isPortOpen()) {
-          //  terminal_down->append("COM порт не подключен. Попытка переподключения...");
+            //  terminal_down->append("COM порт не подключен. Попытка переподключения...");
             reconnectSerialPortAsync();
         } else {
-          //  terminal_down->append("COM порт подключен.");
+            //  terminal_down->append("COM порт подключен.");
         }
     });
 
@@ -109,7 +109,7 @@ bool openSerialPort(LPCSTR portName) {
 
     if (hSerialPort == INVALID_HANDLE_VALUE) {
         DWORD error = GetLastError();
-       // terminal_down->append("Не удалось открыть COM порт. Код ошибки: " + QString::number(error));
+        // terminal_down->append("Не удалось открыть COM порт. Код ошибки: " + QString::number(error));
         return false;
     }
 
@@ -117,7 +117,7 @@ bool openSerialPort(LPCSTR portName) {
     dcbSerialParams.DCBlength = sizeof(dcbSerialParams);
 
     if (!GetCommState(hSerialPort, &dcbSerialParams)) {
-       // terminal_down->append("Ошибка получения состояния COM порта");
+        // terminal_down->append("Ошибка получения состояния COM порта");
         return false;
     }
 
@@ -142,7 +142,7 @@ bool openSerialPort(LPCSTR portName) {
         return false;
     }
 
-   // terminal_down->append("COM порт успешно открыт");
+    // terminal_down->append("COM порт успешно открыт");
     return true;
 }
 
@@ -211,7 +211,7 @@ void closeSerialPort() {
     if (hSerialPort != INVALID_HANDLE_VALUE) {
         CloseHandle(hSerialPort);
         hSerialPort = INVALID_HANDLE_VALUE;
-       // terminal_down->append("COM порт закрыт");
+        // terminal_down->append("COM порт закрыт");
     }
 }
 
@@ -230,7 +230,7 @@ void startCommunication() {
     if (hSerialPort == INVALID_HANDLE_VALUE) {
         // Пытаемся открыть COM-порт
         if (!openSerialPort("COM1")) {
-          //  terminal_down->append("Не удалось открыть COM порт.");
+            //  terminal_down->append("Не удалось открыть COM порт.");
             return;
         }
     }
@@ -293,61 +293,11 @@ void receiveDataAndDisplay()
     }
 }
 
+// функция для литеров
 void coder_CH1(void) {
     ULONG sum = 0;
 
-    // Инициализация первого элемента массива OUT_AD9M2
-    OUT_AD9M2[0] = 0x80;  // Базовое значение
-
     OUT_AD9M2[0] |= 0x1 << 20;
-    OUT_AD9M2[0] |= (0x1 & clickedPreparation) << 9;
-    OUT_AD9M2[0] |= (0x1 & clickedButton1 & clickedPreparation) << 16; // 1 ПРОВЕРКА
-    OUT_AD9M2[0] |= (0x1 & clickedButton2 & clickedPreparation) << 16; // 2 ПРОВЕРКА
-    // 3 ПРОВЕРКА
-    if (clickedButton3 && clickedPreparation) {
-        clickedPreparation = false;
-        QTimer* timerButton3 = new QTimer();
-        timerButton3->setSingleShot(true);
-        timerButton3->setInterval(3000);
-        timerButton3 -> start();
-        QObject::connect(timerButton3, &QTimer::timeout, [timerButton3]() {
-            timerButton3 -> stop();
-            clickedPreparation = true;
-            clickedButton3 = false;
-        });
-}
-    OUT_AD9M2[0] |= (0x1 & clickedButton4 & clickedPreparation) << 16; // 4 ПРОВЕРКА
-    OUT_AD9M2[0] |= (0x1 & clickedButton5 & clickedPreparation) << 16; // 5 ПРОВЕРКА
-    OUT_AD9M2[0] |= (0x1 & clickedButton6 & clickedPreparation) << 16; // 6 ПРОВЕРКА
-    OUT_AD9M2[0] |= (0x1 & clickedButton7 & clickedPreparation) << 16; // 7 ПРОВЕРКА
-    OUT_AD9M2[0] |= (0x0 & clickedButton8 & clickedPreparation) << 16; // 8 ПРОВЕРКА
-    OUT_AD9M2[0] |= (0x1 & clickedButton8 & clickedPreparation) << 11; // 8 ПРОВЕРКА
-    OUT_AD9M2[0] |= (0x0 & clickedButton8 & clickedPreparation) << 14; // 8 ПРОВЕРКА
-
-    // 9 ПРОВЕРКА
-    if (clickedButton9 && clickedPreparation) {
-        clickedPreparation = false;
-        OUT_AD9M2[0] |= (0x1 << 10);
-        OUT_AD9M2[0] |= (0x0 << 10);
-        QTimer* timerButton3 = new QTimer();
-        timerButton3->setSingleShot(true);
-        timerButton3->setInterval(3000);
-        timerButton3 -> start();
-        QObject::connect(timerButton3, &QTimer::timeout, [timerButton3]() {
-            timerButton3 -> stop();
-            clickedPreparation = true;
-            OUT_AD9M2[0] |= (0x1 << 14);
-            clickedButton9 = false;
-        });
-    }
-    OUT_AD9M2[0] |= (0x1 & clickedButton10 & clickedPreparation) << 27; // 10 ПРОВЕРКА
-    OUT_AD9M2[0] |= (0x1 & clickedButton11 & clickedPreparation) << 16; // 11 ПРОВЕРКА
-    OUT_AD9M2[0] |= (0x1 & clickedButton12 & clickedPreparation) << 30; // 12 ПРОВЕРКА
-    OUT_AD9M2[0] |= (0x1 & clickedButton12 & clickedPreparation) << 27; // 12 ПРОВЕРКА
-    OUT_AD9M2[0] |= (0x0 & clickedButton12 & clickedPreparation) << 27; // 12 ПРОВЕРКА
-
-    // Формирование второго элемента массива OUT_AD9M2 на основе состояния чекбоксов ЛК
-    OUT_AD9M2[1] = 0x40;  // Базовое значение
 
     OUT_AD9M2[1] |= ((0x1 & (out_lt1_checkbox->isChecked())) << 9) |
                     ((0x1 & (out_lt2_checkbox->isChecked())) << 10) |
@@ -373,40 +323,32 @@ void coder_CH1(void) {
                     ((0x1 & (out_kk7_checkbox->isChecked())) << 26) |
                     ((0x1 & (out_kk8_checkbox->isChecked())) << 27);
 
-    // Инициализация остальных элементов массива
-    OUT_AD9M2[2] = 0xC0;
-    OUT_AD9M2[3] = 0x20;
-    OUT_AD9M2[4] = 0xA0;
-    OUT_AD9M2[5] = 0x60;
+    sum = KS(OUT_AD9M2, 6);
 
-     sum = KS(OUT_AD9M2, 6);
-
-    OUT_AD9M2[6] = 0xE5;
+    //OUT_AD9M2[6] = 0xE5;
     OUT_AD9M2[6] |= ((sum & 0xFFFF) << 8);
 }
 
 void checkAndSendAD9M2Broadcast() {
-        // Формируем посылку
-        coder_CH1();  //функцию для формирования посылки
+    coder_CH1();
+    // Отправляем данные через канал (здесь `BUF256x32_write` и `SO_pusk` - функции для работы с каналом)
+    BUF256x32_write(0, OUT_AD9M2, 7);  // Отправляем данные, 7 - это количество элементов массива
 
-        // Отправляем данные через канал (здесь `BUF256x32_write` и `SO_pusk` - функции для работы с каналом)
-        BUF256x32_write(0, OUT_AD9M2, 7);  // Отправляем данные, 7 - это количество элементов массива
-
-        // Выводим данные в textEdit, если чекбокс для вывода активирован
-        if (!isTerminalPause && terminal_down && AD9M2->isChecked() && broadcast->isChecked()) {
-            QString strout = "OUT: ";
-            QString str;
-            // Формируем строку для вывода в терминал
-            for (int i = 0; i < 7; i++) {
-                str = QString("%1 ").arg((DWORD)OUT_AD9M2[i], 8, 16, QChar('0')).toUpper();
-                str.resize(6);
-                strout += str + "   ";
-            }
-            terminal_down->append(strout);  // Выводим строку в текстовый виджет
+    // Выводим данные в textEdit, если чекбокс для вывода активирован
+    if (!isTerminalPause && terminal_down && AD9M2->isChecked() && broadcast->isChecked()) {
+        QString strout = "OUT: ";
+        QString str;
+        // Формируем строку для вывода в терминал
+        for (int i = 0; i < 7; i++) {
+            str = QString("%1 ").arg((DWORD)OUT_AD9M2[i], 8, 16, QChar('0')).toUpper();
+            str.resize(6);
+            strout += str + "   ";
         }
-        // Отправка данных на канал
-        SO_pusk(0);  // 0 - это номер канала
+        terminal_down->append(strout);  // Выводим строку в текстовый виджет
     }
+    // Отправка данных на канал
+    SO_pusk(0);  // 0 - это номер канала
+}
 
 ULONG KS(ULONG *array, int size) // функция подсчета КС/ size - число ячеек массива, для которых нужно посчитать КС
 {
@@ -430,27 +372,27 @@ void coder_CH2() {
     OUT_KPA[0] = 0x0;
     OUT_KPA[0] |= (0x40 << 8);  // было & (0xFF)
     OUT_KPA[0] |= (0x40 << 16); // было & (0x7F)
-   // OUT_KPA[0] |= ((0x1 << 28));
-   // OUT_KPA[0] |= ((0x1 << 29));
-   // OUT_KPA[0] |= ((0x1 << 30));
+    // OUT_KPA[0] |= ((0x1 << 28));
+    // OUT_KPA[0] |= ((0x1 << 29));
+    // OUT_KPA[0] |= ((0x1 << 30));
     OUT_KPA[1] = (0x80 | (OUT_KPA[0] & 0xFFFFFF00));
 }
 
 void checkAndSendBroadcastKPA() {
     coder_CH2();
     BUF256x32_write(1, OUT_KPA, 2);
-        if (!isTerminalPause && terminal_down && kpaCheckBox->isChecked() && broadcast->isChecked()) {
+    if (!isTerminalPause && terminal_down && kpaCheckBox->isChecked() && broadcast->isChecked()) {
         QString strout = "OUT: ";
         QString str;
-            strout="OUT: ";
-            for (int i=0; i < 2; i++)
-            {
-                str=(QString("%1 ").arg((DWORD)OUT_KPA[i], 8, 16, QChar('0'))).toUpper();
-                str.resize(6);
-                strout+=str + "   ";
-            }
-            terminal_down->append(strout);
+        strout="OUT: ";
+        for (int i=0; i < 2; i++)
+        {
+            str=(QString("%1 ").arg((DWORD)OUT_KPA[i], 8, 16, QChar('0'))).toUpper();
+            str.resize(6);
+            strout+=str + "   ";
         }
+        terminal_down->append(strout);
+    }
     SO_pusk(1);  // отправка данных на канал 2
 }
 
@@ -470,22 +412,22 @@ void receiveDataIN_KPA() {
         IN_AD9M2[i]=ParamCod.param;
     }
 
-        if (!isTerminalPause && terminal_down && AD9M2->isChecked() && priemCheckBox->isChecked()) {
-            strout="IN:  ";
-            for (int i = 0; i < 5; i++)
-            {
-                str=(QString("%1 ").arg((DWORD)IN_AD9M2[i], 8, 16, QChar('0'))).toUpper();
-                str.resize(6);
-                strout+=str + "   ";
-            }
-            terminal_down->append(strout);
+    if (!isTerminalPause && terminal_down && AD9M2->isChecked() && priemCheckBox->isChecked()) {
+        strout="IN:  ";
+        for (int i = 0; i < 5; i++)
+        {
+            str=(QString("%1 ").arg((DWORD)IN_AD9M2[i], 8, 16, QChar('0'))).toUpper();
+            str.resize(6);
+            strout+=str + "   ";
         }
+        terminal_down->append(strout);
+    }
 }
 
 void Timer_Event() {
-        receiveDataAndDisplay();
-        checkAndSendAD9M2Broadcast();
-        checkAndSendBroadcastKPA();
-        receiveDataIN_KPA();
-        processSerialCommunication();
+    receiveDataAndDisplay();
+    checkAndSendAD9M2Broadcast();
+    checkAndSendBroadcastKPA();
+    receiveDataIN_KPA();
+    processSerialCommunication();
 }

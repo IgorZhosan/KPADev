@@ -41,6 +41,7 @@ extern QPushButton* button15;
 extern QTableWidget *turning_on_the_equipment;
 extern QToolButton *toolButton_14;
 extern QToolButton *toolButton_15 ;
+extern QTableWidget *checking_the_operation;
 
 void handleStartButtonClick();
 void preparation();

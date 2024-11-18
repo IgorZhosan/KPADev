@@ -53,6 +53,23 @@ QIcon createCircleIcon(const QColor &color) {
     return QIcon(pixmap);
 }
 
+void updateOperationStatus(int row, bool success) {
+    if (checking_the_operation) {
+        QTableWidgetItem* item = checking_the_operation->item(row, 2);
+        if (!item) {
+            item = new QTableWidgetItem();
+            checking_the_operation->setItem(row, 2, item);
+        }
+        if (success) {
+            item->setText("Выполнено");
+            item->setBackground(QColor(0, 128, 0)); // Зеленый цвет
+        } else {
+            item->setText("Не выполнено");
+            item->setBackground(QColor(255, 0, 0)); // Красный цвет
+        }
+    }
+}
+
 void handleStartButtonClick() {
     QString s;
     clicledStartbutton = !clicledStartbutton;
@@ -116,7 +133,7 @@ void handleStartButtonClick() {
            // terminal_down->append("Данные отправляются...");
             isReceivingData = true;
 
-            timerPreparation->setInterval(120000);
+            timerPreparation->setInterval(120);
             timerPreparation->start();
             QObject::connect(timerPreparation, &QTimer::timeout, []() {
                 preparationButton->setEnabled(true);
@@ -154,100 +171,216 @@ void handleStartButtonClick() {
     }
 }
 
+
 void preparation() {
     clickedPreparation = !clickedPreparation;
     preparationButton->setCheckable(true);
     preparationButton->setChecked(clickedPreparation);
+
+    if (clickedPreparation) {
+        OUT_AD9M2[0] |= (0x1 << 9);
+    } else {
+        OUT_AD9M2[0] &= ~(0x1 << 9);
+    }
+
+    ULONG sum = KS(OUT_AD9M2, 6);
+    OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
+
+    BUF256x32_write(0, OUT_AD9M2, 7);
+    SO_pusk(0);
 }
 
 void handleButtonClick1() {
     clickedButton1 = !clickedButton1;
-   // button1->setCheckable(true);
-   // button1->setChecked(clickedButton1);
+    OUT_AD9M2[0] &= ~(0x1 << 16); // Сбрасываем бит
+    OUT_AD9M2[0] |= (0x1 & clickedButton1 & clickedPreparation) << 16; // Устанавливаем бит
+
+    ULONG sum = KS(OUT_AD9M2, 6);
+    OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
+
+    BUF256x32_write(0, OUT_AD9M2, 7);
+    // Проверка статуса выполнения
+    updateOperationStatus(0, OUT_AD9M2[0] == 0x001102);
 }
 
 void handleButtonClick2() {
     clickedButton2 = !clickedButton2;
-   // button2->setCheckable(true);
-   // button2->setChecked(clickedButton2);
+    OUT_AD9M2[0] &= ~(0x1 << 16); // Сбрасываем бит
+    OUT_AD9M2[0] |= (0x1 & clickedButton2 & clickedPreparation) << 16;
+
+    ULONG sum = KS(OUT_AD9M2, 6);
+    OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
+    BUF256x32_write(0, OUT_AD9M2, 7);
+    // Проверка статуса выполнения
+    updateOperationStatus(1, OUT_AD9M2[0] == 0x001102);
 }
 
 void handleButtonClick3() {
     clickedButton3 = !clickedButton3;
-   // button3->setCheckable(true);
-   // button3->setChecked(clickedButton3);
+    if (clickedButton3 && clickedPreparation) {
+        clickedPreparation = false;
+        OUT_AD9M2[0] &= ~(0x1 << 9); // Сбрасываем бит 9 для подготовки
+        OUT_AD9M2[0] &= ~(0x1 << 16); // Сбрасываем бит 16
+        OUT_AD9M2[0] |= (0x1 & clickedButton3) << 16;
+
+        ULONG sum = KS(OUT_AD9M2, 6);
+        OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
+        BUF256x32_write(0, OUT_AD9M2, 7);
+
+        QTimer* timerButton3 = new QTimer();
+        timerButton3->setSingleShot(true);
+        timerButton3->setInterval(3000);
+        timerButton3->start();
+
+        QObject::connect(timerButton3, &QTimer::timeout, [timerButton3]() {
+            clickedPreparation = true;
+            OUT_AD9M2[0] |= (0x1 << 9); // Восстанавливаем бит 9 для подготовки
+            clickedButton3 = false;
+
+            ULONG sum = KS(OUT_AD9M2, 6);
+            OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
+            BUF256x32_write(0, OUT_AD9M2, 7);
+
+            timerButton3->stop();
+            delete timerButton3;
+        });
+    }
 }
 
 void handleButtonClick4() {
     clickedButton4 = !clickedButton4;
-   // button4->setCheckable(true);
-    //button4->setChecked(clickedButton4);
+    OUT_AD9M2[0] &= ~(0x1 << 16); // Сбрасываем бит
+    OUT_AD9M2[0] |= (0x1 & clickedButton4 & clickedPreparation) << 16; // Устанавливаем бит
+
+    ULONG sum = KS(OUT_AD9M2, 6);
+    OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
+    BUF256x32_write(0, OUT_AD9M2, 7);
+    // Проверка статуса выполнения
+    updateOperationStatus(3, OUT_AD9M2[0] == 0x001102);
 }
 
 void handleButtonClick5() {
     clickedButton5 = !clickedButton5;
-   // button5->setCheckable(true);
-   // button5->setChecked(clickedButton5);
+    OUT_AD9M2[0] &= ~(0x1 << 16); // Сбрасываем бит
+    OUT_AD9M2[0] |= (0x1 & clickedButton5 & clickedPreparation) << 16; // Устанавливаем бит
+
+    ULONG sum = KS(OUT_AD9M2, 6);
+    OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
+    BUF256x32_write(0, OUT_AD9M2, 7);
+    // Проверка статуса выполнения
+    updateOperationStatus(4, OUT_AD9M2[0] == 0x001102);
 }
 
 void handleButtonClick6() {
     clickedButton6 = !clickedButton6;
-   // button6->setCheckable(true);
-   // button6->setChecked(clickedButton6);
-}
+    OUT_AD9M2[0] &= ~(0x1 << 16); // Сбрасываем бит
+    OUT_AD9M2[0] |= (0x1 & clickedButton6 & clickedPreparation) << 16; // Устанавливаем бит
 
-void handleButtonClick7() {
-    clickedButton7 = !clickedButton7;
-   // button7->setCheckable(true);
-   // button7->setChecked(clickedButton7);
+    ULONG sum = KS(OUT_AD9M2, 6);
+    OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
+    BUF256x32_write(0, OUT_AD9M2, 7);
+    // Проверка статуса выполнения
+    updateOperationStatus(5, OUT_AD9M2[0] == 0x001102);
 }
 
 void handleButtonClick8() {
     clickedButton8 = !clickedButton8;
-   // button8->setCheckable(true);
-   // button8->setChecked(clickedButton8);
+    OUT_AD9M2[0] &= ~((0x1 << 16) | (0x1 << 11) | (0x1 << 14)); // Сбрасываем все три бита
+    OUT_AD9M2[0] |= (0x1 & clickedButton8 & clickedPreparation) << 11; // Устанавливаем бит 11
+
+    ULONG sum = KS(OUT_AD9M2, 6);
+    OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
+    BUF256x32_write(0, OUT_AD9M2, 7);
+}
+
+void handleButtonClick7() {
+    clickedButton7 = !clickedButton7;
+    OUT_AD9M2[0] &= ~(0x1 << 16); // Сбрасываем бит
+    OUT_AD9M2[0] |= (0x1 & clickedButton7 & clickedPreparation) << 16; // Устанавливаем бит
+
+    ULONG sum = KS(OUT_AD9M2, 6);
+    OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
+    BUF256x32_write(0, OUT_AD9M2, 7);
+    // Проверка статуса выполнения
+    updateOperationStatus(6, OUT_AD9M2[0] == 0x001102);
 }
 
 void handleButtonClick9() {
     clickedButton9 = !clickedButton9;
-   // button9->setCheckable(true);
-   // button9->setChecked(clickedButton9);
+    if (clickedButton9 && clickedPreparation) {
+        clickedPreparation = false;
+        OUT_AD9M2[0] &= ~((0x1 << 16) | (0x1 << 9)); // Сбрасываем бит 16 и бит 9 для подготовки
+        OUT_AD9M2[0] |= (0x1 << 10); // Устанавливаем бит 10
+
+        ULONG sum = KS(OUT_AD9M2, 6);
+        OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
+        BUF256x32_write(0, OUT_AD9M2, 7);
+
+        QTimer* timerButton9 = new QTimer();
+        timerButton9->setSingleShot(true);
+        timerButton9->setInterval(3000);
+        timerButton9->start();
+
+        QObject::connect(timerButton9, &QTimer::timeout, [timerButton9]() {
+            clickedPreparation = true;
+            OUT_AD9M2[0] |= (0x1 << 9); // Восстанавливаем бит 9 для подготовки
+            OUT_AD9M2[0] |= (0x1 << 14); // Устанавливаем бит 14
+
+            ULONG sum = KS(OUT_AD9M2, 6);
+            OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
+            BUF256x32_write(0, OUT_AD9M2, 7);
+
+            timerButton9->stop();
+            delete timerButton9;
+        });
+    }
 }
 
 void handleButtonClick10() {
     clickedButton10 = !clickedButton10;
-   // button10->setCheckable(true);
-   // button10->setChecked(clickedButton10);
+    OUT_AD9M2[0] |= (0x1 << 11); // Устанавливаем бит 11
+
+    ULONG sum = KS(OUT_AD9M2, 6);
+    OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
+    BUF256x32_write(0, OUT_AD9M2, 7);
 }
 
 void handleButtonClick11() {
     clickedButton11 = !clickedButton11;
-   // button11->setCheckable(true);
-   // button11->setChecked(clickedButton11);
+    OUT_AD9M2[0] |= (0x1 << 16); // Устанавливаем бит 16
+
+    ULONG sum = KS(OUT_AD9M2, 6);
+    OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
+    BUF256x32_write(0, OUT_AD9M2, 7);
 }
 
 void handleButtonClick12() {
     clickedButton12 = !clickedButton12;
-   // button12->setCheckable(true);
-   // button12->setChecked(clickedButton12);
+    OUT_AD9M2[0] &= ~((0x1 << 30) | (0x1 << 27)); // Сбрасываем биты 30 и 27
+    OUT_AD9M2[0] |= (0x1 & clickedButton12 & clickedPreparation) << 30;
+    OUT_AD9M2[0] |= (0x1 & clickedButton12 & clickedPreparation) << 27;
+
+    ULONG sum = KS(OUT_AD9M2, 6);
+    OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
+    BUF256x32_write(0, OUT_AD9M2, 7);
 }
 
 void handleButtonClick13() {
     clickedButton13 = !clickedButton13;
-   // button13->setCheckable(true);
-   // button13->setChecked(clickedButton13);
+    // button13->setCheckable(true);
+    // button13->setChecked(clickedButton13);
 }
 
 void handleButtonClick14() {
     clickedButton14 = !clickedButton14;
-   // button14->setCheckable(true);
-   // button14->setChecked(clickedButton14);
+    // button14->setCheckable(true);
+    // button14->setChecked(clickedButton14);
 }
 
 void handleButtonClick15() {
     clickedButton15 = !clickedButton15;
-   // button15->setCheckable(true);
-   // button15->setChecked(clickedButton15);
+    // button15->setCheckable(true);
+    // button15->setChecked(clickedButton15);
 }
 
 void handleClearButton() {
