@@ -88,7 +88,7 @@ void handleStartButtonClick() {
                 }
                 gotTempTimer->deleteLater(); // Удаляем таймер, чтобы избежать утечек памяти
             });
-            gotTempTimer->start(1000);
+            gotTempTimer->start(0); // Отключаем задержку, но оставляем подсветку на 1 секунду
         }
 
         // Проверка подключения к устройству ARINC429 для CH1
@@ -99,6 +99,9 @@ void handleStartButtonClick() {
                 if (toolButton_14) {
                     toolButton_14->setIcon(createCircleIcon(Qt::red));
                 }
+                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0)) {
+                    turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0)); // Подсвечиваем "Включить тумблер СПС" красным при отсутствии подключения
+                }
             } else {
                 DeviceIoControl(hECE0206_0, ECE02061_XP_SET_LONG_MODE, nullptr, 0, nullptr, 0, &nOutput, nullptr);
                 DeviceIoControl(hECE0206_0, ECE02061_XP_GET_SERIAL_NUMBER, nullptr, 0, &bufOutput, 10, &nOutput, nullptr);
@@ -108,6 +111,9 @@ void handleStartButtonClick() {
                 State_ECE0206_0 = true;
                 if (toolButton_14) {
                     toolButton_14->setIcon(createCircleIcon(Qt::green));
+                }
+                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0)) {
+                    turning_on_the_equipment->item(1, 0)->setBackground(Qt::white); // Сбрасываем красную подсветку перед установкой синей
                 }
                 if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1)) {
                     turning_on_the_equipment->item(1, 1)->setBackground(QColor(0, 0, 255)); // Подсвечиваем "СПС" синим при успешном подключении
@@ -127,6 +133,9 @@ void handleStartButtonClick() {
                     if (toolButton_15) {
                         toolButton_15->setIcon(createCircleIcon(Qt::red));
                     }
+                    if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0)) {
+                        turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0)); // Подсвечиваем "Включить тумблер СПС" красным при отсутствии подключения
+                    }
                 } else {
                     DeviceIoControl(hECE0206_1, ECE02061_XP_SET_LONG_MODE, nullptr, 0, nullptr, 0, &nOutput, nullptr);
                     DeviceIoControl(hECE0206_1, ECE02061_XP_GET_SERIAL_NUMBER, nullptr, 0, &bufOutput, 10, &nOutput, nullptr);
@@ -136,6 +145,9 @@ void handleStartButtonClick() {
                     State_ECE0206_1 = true;
                     if (toolButton_15) {
                         toolButton_15->setIcon(createCircleIcon(Qt::green));
+                    }
+                    if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0)) {
+                        turning_on_the_equipment->item(1, 0)->setBackground(Qt::white); // Сбрасываем красную подсветку перед установкой синей
                     }
                     if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1)) {
                         turning_on_the_equipment->item(1, 1)->setBackground(QColor(0, 0, 255)); // Подсвечиваем "СПС" синим при успешном подключении
@@ -157,7 +169,17 @@ void handleStartButtonClick() {
             }
 
             Timer->start(40);
-            QObject::connect(Timer, &QTimer::timeout, Timer_Event);
+            QObject::connect(Timer, &QTimer::timeout, [=]() {
+                if (!State_ECE0206_0 && !State_ECE0206_1) {
+                    Timer->stop();
+                    isReceivingData = false;
+                    if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0)) {
+                        turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0)); // Подсвечиваем "Включить тумблер СПС" красным при отключении
+                    }
+                } else {
+                    Timer_Event();
+                }
+            });
 
             isReceivingData = true;
 
@@ -198,8 +220,8 @@ void handleStartButtonClick() {
             if (toolButton_14) {
                 toolButton_14->setIcon(createCircleIcon(Qt::red));
             }
-            if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1)) {
-                turning_on_the_equipment->item(1, 1)->setBackground(QColor(255, 0, 0)); // Подсвечиваем "СПС" красным при отключении
+            if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0)) {
+                turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0)); // Подсвечиваем "Включить тумблер СПС" красным при отключении
             }
         }
 
@@ -211,8 +233,8 @@ void handleStartButtonClick() {
             if (toolButton_15) {
                 toolButton_15->setIcon(createCircleIcon(Qt::red));
             }
-            if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1)) {
-                turning_on_the_equipment->item(1, 1)->setBackground(QColor(255, 0, 0)); // Подсвечиваем "СПС" красным при отключении
+            if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0)) {
+                turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0)); // Подсвечиваем "Включить тумблер СПС" красным при отключении
             }
         }
 
@@ -228,7 +250,6 @@ void handleStartButtonClick() {
         }
     }
 }
-
 
 void preparation() {
     clickedPreparation = !clickedPreparation;
