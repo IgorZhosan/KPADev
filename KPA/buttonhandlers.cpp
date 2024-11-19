@@ -36,6 +36,7 @@ bool clickedButton15 = false;
 
 QTimer *Timer = new QTimer();
 QTimer *timerPreparation = new QTimer();
+QTimer* timer2 = new QTimer();
 UCHAR bufOutput[10] = {0};
 DWORD Error = 0;
 
@@ -72,103 +73,198 @@ void updateOperationStatus(int row, bool success) {
 
 void handleStartButtonClick() {
     QString s;
-    // Проверка текущего состояния кнопки
+
     if (!clicledStartbutton) { // Кнопка "Старт" нажата
-        // Проверка подключения к устройству ARINC429 для CH1
         bool isDeviceConnected = false;
 
+        // Подсвечиваем "Гот ТЕРМ." синим на 1 секунду, затем возвращаем белый цвет
+        if (turning_on_the_equipment && turning_on_the_equipment->item(0, 1)) {
+            turning_on_the_equipment->item(0, 1)->setBackground(QColor(0, 0, 255));
+            QTimer* gotTempTimer = new QTimer();
+            gotTempTimer->setSingleShot(true);
+            QObject::connect(gotTempTimer, &QTimer::timeout, [=]() {
+                if (turning_on_the_equipment && turning_on_the_equipment->item(0, 1)) {
+                    turning_on_the_equipment->item(0, 1)->setBackground(Qt::white);
+                }
+                gotTempTimer->deleteLater(); // Удаляем таймер, чтобы избежать утечек памяти
+            });
+            gotTempTimer->start(1000);
+        }
+
+        // Проверка подключения к устройству ARINC429 для CH1
         if (!State_ECE0206_0) {
             hECE0206_0 = OpenDeviceByIndex(0, &Error);
             if (hECE0206_0 == INVALID_HANDLE_VALUE) {
-                terminal_down->append("Состояние CH1: ОШИБКА ПОДКЛ. ECE-0206-1C-S");
+                if (terminal_down) {
+                    terminal_down->append("Состояние CH1: ОШИБКА ПОДКЛ. ECE-0206-1C-S");
+                }
                 State_ECE0206_0 = false;
-                toolButton_14->setIcon(createCircleIcon(Qt::red));
+                if (toolButton_14) {
+                    toolButton_14->setIcon(createCircleIcon(Qt::red));
+                }
+                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1)) {
+                    turning_on_the_equipment->item(1, 1)->setBackground(QColor(255, 0, 0)); // Подсвечиваем "СПС" красным при ошибке
+                }
             } else {
-                DeviceIoControl(hECE0206_0, ECE02061_XP_SET_LONG_MODE, NULL, 0, NULL, 0, &nOutput, NULL);
-                DeviceIoControl(hECE0206_0, ECE02061_XP_GET_SERIAL_NUMBER, NULL, 0, &bufOutput, 10, &nOutput, NULL);
+                DeviceIoControl(hECE0206_0, ECE02061_XP_SET_LONG_MODE, nullptr, 0, nullptr, 0, &nOutput, nullptr);
+                DeviceIoControl(hECE0206_0, ECE02061_XP_GET_SERIAL_NUMBER, nullptr, 0, &bufOutput, 10, &nOutput, nullptr);
                 s = "ARINC429_CH1  S\\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
-                terminal_down->append(s);
+             //   if (terminal_down) {
+             //       terminal_down->append(s);
+             //   }
                 SI_clear_array(0, 1);
                 SI_pusk(0, 1, 0, 1, 0);
-                terminal_down->append("Состояние CH1: ОЖИДАНИЕ");
+              //  if (terminal_down) {
+              //      terminal_down->append("Состояние CH1: ОЖИДАНИЕ");
+              //  }
                 State_ECE0206_0 = true;
-                toolButton_14->setIcon(createCircleIcon(Qt::green));
+                if (toolButton_14) {
+                    toolButton_14->setIcon(createCircleIcon(Qt::green));
+                }
+                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1)) {
+                    turning_on_the_equipment->item(1, 1)->setBackground(QColor(0, 0, 255)); // Подсвечиваем "СПС" синим при успешном подключении
+                }
                 isDeviceConnected = true;
             }
         }
 
         // Проверка подключения к устройству ARINC429 для CH2
-        if (!State_ECE0206_1) {
-            hECE0206_1 = OpenDeviceByIndex(1, &Error);
-            if (hECE0206_1 == INVALID_HANDLE_VALUE) {
-                terminal_down->append("Состояние CH2: ОШИБКА ПОДКЛ. ECE-0206-1C-S");
-                State_ECE0206_1 = false;
-                toolButton_15->setIcon(createCircleIcon(Qt::red));
-            } else {
-                DeviceIoControl(hECE0206_1, ECE02061_XP_SET_LONG_MODE, NULL, 0, NULL, 0, &nOutput, NULL);
-                DeviceIoControl(hECE0206_1, ECE02061_XP_GET_SERIAL_NUMBER, NULL, 0, &bufOutput, 10, &nOutput, NULL);
-                s = "ARINC429_CH2  S\\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
-                terminal_down->append(s);
-                SI_clear_array(1, 2);
-                SI_pusk(1, 2, 0, 1, 0);
-                terminal_down->append("Состояние CH2: ОЖИДАНИЕ");
-                State_ECE0206_1 = true;
-                toolButton_15->setIcon(createCircleIcon(Qt::green));
-                isDeviceConnected = true;
+        QTimer* timer2 = new QTimer();
+        timer2->setSingleShot(true);
+        QObject::connect(timer2, &QTimer::timeout, [=, &isDeviceConnected, &s]() mutable {
+            if (!State_ECE0206_1) {
+                hECE0206_1 = OpenDeviceByIndex(1, &Error);
+                if (hECE0206_1 == INVALID_HANDLE_VALUE) {
+                  //  if (terminal_down) {
+                  //      terminal_down->append("Состояние CH2: ОШИБКА ПОДКЛ. ECE-0206-1C-S");
+                  //  }
+                    State_ECE0206_1 = false;
+                    if (toolButton_15) {
+                        toolButton_15->setIcon(createCircleIcon(Qt::red));
+                    }
+                    if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1)) {
+                        turning_on_the_equipment->item(1, 1)->setBackground(QColor(255, 0, 0)); // Подсвечиваем "СПС" красным при ошибке
+                    }
+                } else {
+                    DeviceIoControl(hECE0206_1, ECE02061_XP_SET_LONG_MODE, nullptr, 0, nullptr, 0, &nOutput, nullptr);
+                    DeviceIoControl(hECE0206_1, ECE02061_XP_GET_SERIAL_NUMBER, nullptr, 0, &bufOutput, 10, &nOutput, nullptr);
+                    s = "ARINC429_CH2  S\\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
+                   // if (terminal_down) {
+                   //     terminal_down->append(s);
+                   // }
+                    SI_clear_array(1, 2);
+                    SI_pusk(1, 2, 0, 1, 0);
+                   // if (terminal_down) {
+                   //     terminal_down->append("Состояние CH2: ОЖИДАНИЕ");
+                   // }
+                    State_ECE0206_1 = true;
+                    if (toolButton_15) {
+                        toolButton_15->setIcon(createCircleIcon(Qt::green));
+                    }
+                    if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1)) {
+                        turning_on_the_equipment->item(1, 1)->setBackground(QColor(0, 0, 255)); // Подсвечиваем "СПС" синим при успешном подключении
+                    }
+                    isDeviceConnected = true;
+                }
             }
-        }
+            timer2->deleteLater(); // Удаляем таймер
+        });
+        timer2->start(2000);
 
-        // Если хотя бы одно устройство подключено
+        // Если хотя бы одно устройство подключено, запускаем передачу данных
         if (isDeviceConnected) {
             clicledStartbutton = true; // Меняем состояние кнопки
-            handleStartButton->setCheckable(true);
-            handleStartButton->setChecked(clicledStartbutton);
-            handleStartButton->setText("Стоп");
+            if (handleStartButton) {
+                handleStartButton->setCheckable(true);
+                handleStartButton->setChecked(clicledStartbutton);
+                handleStartButton->setText("Стоп");
+            }
 
             Timer->start(40);
-            QObject::connect(Timer, &QTimer::timeout, &Timer_Event);
-            terminal_down->append("Данные отправляются...");
+            QObject::connect(Timer, &QTimer::timeout, Timer_Event);
+
+          //  if (terminal_down) {
+           //     terminal_down->append("Данные отправляются...");
+           // }
             isReceivingData = true;
+
+            if (turning_on_the_equipment && turning_on_the_equipment->item(2, 0)) {
+                turning_on_the_equipment->item(2, 0)->setBackground(QColor(0, 0, 255)); // "Т1А Гот" синий, пока идёт обмен данными
+            }
 
             timerPreparation->setInterval(120);
             timerPreparation->start();
-            QObject::connect(timerPreparation, &QTimer::timeout, []() {
-                preparationButton->setEnabled(true);
-                turning_on_the_equipment->item(2, 1)->setBackground(QColor(0, 128, 0));
+            QObject::connect(timerPreparation, &QTimer::timeout, [=]() {
+                if (preparationButton) {
+                    preparationButton->setEnabled(true);
+                }
+                if (turning_on_the_equipment && turning_on_the_equipment->item(2, 1)) {
+                    turning_on_the_equipment->item(2, 1)->setBackground(QColor(0, 128, 0));
+                }
                 timerPreparation->stop();
             });
         } else {
-            terminal_down->append("Нет доступных устройств для подключения. Попробуйте снова.");
+            if (terminal_down) {
+                terminal_down->append("Нет доступных устройств для подключения. Попробуйте снова.");
+            }
         }
 
     } else { // Кнопка "Стоп" нажата, остановка процесса
         clicledStartbutton = false; // Меняем состояние кнопки
-        handleStartButton->setCheckable(true);
-        handleStartButton->setChecked(clicledStartbutton);
-        handleStartButton->setText("Старт");
+        if (handleStartButton) {
+            handleStartButton->setCheckable(true);
+            handleStartButton->setChecked(clicledStartbutton);
+            handleStartButton->setText("Старт");
+        }
 
         Timer->stop();
         timerPreparation->stop();
-        terminal_down->append("Процесс получения данных остановлен.");
+      //  if (terminal_down) {
+       //     terminal_down->append("Процесс получения данных остановлен.");
+       // }
         isReceivingData = false;
 
-        // Остановка каналов и закрытие устройств
         if (State_ECE0206_0) {
             SI_stop(0, 1);
             SO_stop(0);
             CloseHandle(hECE0206_0);
-            terminal_down->append("Состояние CH1: НЕ ПОДКЛЮЧЕН");
+           // if (terminal_down) {
+           //     terminal_down->append("Состояние CH1: НЕ ПОДКЛЮЧЕН");
+           // }
             State_ECE0206_0 = false;
-            toolButton_14->setIcon(createCircleIcon(Qt::red));
+            if (toolButton_14) {
+                toolButton_14->setIcon(createCircleIcon(Qt::red));
+            }
+            if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1)) {
+                turning_on_the_equipment->item(1, 1)->setBackground(QColor(255, 0, 0)); // Подсвечиваем "СПС" красным при отключении
+            }
         }
 
         if (State_ECE0206_1) {
             SI_stop(1, 2);
             SO_stop(1);
             CloseHandle(hECE0206_1);
-            terminal_down->append("Состояние CH2: НЕ ПОДКЛЮЧЕН");
+           // if (terminal_down) {
+           //     terminal_down->append("Состояние CH2: НЕ ПОДКЛЮЧЕН");
+           // }
             State_ECE0206_1 = false;
-            toolButton_15->setIcon(createCircleIcon(Qt::red));
+            if (toolButton_15) {
+                toolButton_15->setIcon(createCircleIcon(Qt::red));
+            }
+            if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1)) {
+                turning_on_the_equipment->item(1, 1)->setBackground(QColor(255, 0, 0)); // Подсвечиваем "СПС" красным при отключении
+            }
+        }
+
+        if (turning_on_the_equipment) {
+            // Сброс подсветки поля "Гот ТЕМПЕРАТУРЫ"
+            if (turning_on_the_equipment->item(0, 1)) {
+                turning_on_the_equipment->item(0, 1)->setBackground(Qt::white);
+            }
+            // Сброс подсветки поля "СПС"
+            if (turning_on_the_equipment->item(1, 1)) {
+                turning_on_the_equipment->item(1, 1)->setBackground(Qt::white);
+            }
         }
     }
 }
