@@ -95,28 +95,16 @@ void handleStartButtonClick() {
         if (!State_ECE0206_0) {
             hECE0206_0 = OpenDeviceByIndex(0, &Error);
             if (hECE0206_0 == INVALID_HANDLE_VALUE) {
-                if (terminal_down) {
-                    terminal_down->append("Состояние CH1: ОШИБКА ПОДКЛ. ECE-0206-1C-S");
-                }
                 State_ECE0206_0 = false;
                 if (toolButton_14) {
                     toolButton_14->setIcon(createCircleIcon(Qt::red));
                 }
-                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1)) {
-                    turning_on_the_equipment->item(1, 1)->setBackground(QColor(255, 0, 0)); // Подсвечиваем "СПС" красным при ошибке
-                }
             } else {
                 DeviceIoControl(hECE0206_0, ECE02061_XP_SET_LONG_MODE, nullptr, 0, nullptr, 0, &nOutput, nullptr);
                 DeviceIoControl(hECE0206_0, ECE02061_XP_GET_SERIAL_NUMBER, nullptr, 0, &bufOutput, 10, &nOutput, nullptr);
-                s = "ARINC429_CH1  S\\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
-             //   if (terminal_down) {
-             //       terminal_down->append(s);
-             //   }
+                s = "ARINC429_CH1  S\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
                 SI_clear_array(0, 1);
                 SI_pusk(0, 1, 0, 1, 0);
-              //  if (terminal_down) {
-              //      terminal_down->append("Состояние CH1: ОЖИДАНИЕ");
-              //  }
                 State_ECE0206_0 = true;
                 if (toolButton_14) {
                     toolButton_14->setIcon(createCircleIcon(Qt::green));
@@ -135,28 +123,16 @@ void handleStartButtonClick() {
             if (!State_ECE0206_1) {
                 hECE0206_1 = OpenDeviceByIndex(1, &Error);
                 if (hECE0206_1 == INVALID_HANDLE_VALUE) {
-                  //  if (terminal_down) {
-                  //      terminal_down->append("Состояние CH2: ОШИБКА ПОДКЛ. ECE-0206-1C-S");
-                  //  }
                     State_ECE0206_1 = false;
                     if (toolButton_15) {
                         toolButton_15->setIcon(createCircleIcon(Qt::red));
                     }
-                    if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1)) {
-                        turning_on_the_equipment->item(1, 1)->setBackground(QColor(255, 0, 0)); // Подсвечиваем "СПС" красным при ошибке
-                    }
                 } else {
                     DeviceIoControl(hECE0206_1, ECE02061_XP_SET_LONG_MODE, nullptr, 0, nullptr, 0, &nOutput, nullptr);
                     DeviceIoControl(hECE0206_1, ECE02061_XP_GET_SERIAL_NUMBER, nullptr, 0, &bufOutput, 10, &nOutput, nullptr);
-                    s = "ARINC429_CH2  S\\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
-                   // if (terminal_down) {
-                   //     terminal_down->append(s);
-                   // }
+                    s = "ARINC429_CH2  S\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
                     SI_clear_array(1, 2);
                     SI_pusk(1, 2, 0, 1, 0);
-                   // if (terminal_down) {
-                   //     terminal_down->append("Состояние CH2: ОЖИДАНИЕ");
-                   // }
                     State_ECE0206_1 = true;
                     if (toolButton_15) {
                         toolButton_15->setIcon(createCircleIcon(Qt::green));
@@ -183,9 +159,6 @@ void handleStartButtonClick() {
             Timer->start(40);
             QObject::connect(Timer, &QTimer::timeout, Timer_Event);
 
-          //  if (terminal_down) {
-           //     terminal_down->append("Данные отправляются...");
-           // }
             isReceivingData = true;
 
             if (turning_on_the_equipment && turning_on_the_equipment->item(2, 0)) {
@@ -203,10 +176,6 @@ void handleStartButtonClick() {
                 }
                 timerPreparation->stop();
             });
-        } else {
-            if (terminal_down) {
-                terminal_down->append("Нет доступных устройств для подключения. Попробуйте снова.");
-            }
         }
 
     } else { // Кнопка "Стоп" нажата, остановка процесса
@@ -219,18 +188,12 @@ void handleStartButtonClick() {
 
         Timer->stop();
         timerPreparation->stop();
-      //  if (terminal_down) {
-       //     terminal_down->append("Процесс получения данных остановлен.");
-       // }
         isReceivingData = false;
 
         if (State_ECE0206_0) {
             SI_stop(0, 1);
             SO_stop(0);
             CloseHandle(hECE0206_0);
-           // if (terminal_down) {
-           //     terminal_down->append("Состояние CH1: НЕ ПОДКЛЮЧЕН");
-           // }
             State_ECE0206_0 = false;
             if (toolButton_14) {
                 toolButton_14->setIcon(createCircleIcon(Qt::red));
@@ -244,9 +207,6 @@ void handleStartButtonClick() {
             SI_stop(1, 2);
             SO_stop(1);
             CloseHandle(hECE0206_1);
-           // if (terminal_down) {
-           //     terminal_down->append("Состояние CH2: НЕ ПОДКЛЮЧЕН");
-           // }
             State_ECE0206_1 = false;
             if (toolButton_15) {
                 toolButton_15->setIcon(createCircleIcon(Qt::red));
@@ -268,6 +228,7 @@ void handleStartButtonClick() {
         }
     }
 }
+
 
 void preparation() {
     clickedPreparation = !clickedPreparation;
