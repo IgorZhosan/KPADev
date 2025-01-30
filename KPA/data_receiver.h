@@ -46,6 +46,8 @@ extern QCheckBox *out_kk7_checkbox;
 extern QCheckBox *out_kk8_checkbox;
 extern bool isStatePause;
 
+extern ULONG IN_KPA[11];
+
 // Объявление функции
 void receiveDataAndDisplay();
 void coder_ch1();

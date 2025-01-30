@@ -285,7 +285,7 @@ int main(int argc, char *argv[])
 
     if (terminal) {
         qDebug() << "Текущий каталог:" << QDir::currentPath();
-        QString filePath = "C:\\KPADev\\KPA\\GUI\\Controlinfo.txt";
+        QString filePath = "C:\\KPADev\\KPADev\\KPA\\GUI\\Controlinfo.txt";
         QFile file(filePath);
 
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
