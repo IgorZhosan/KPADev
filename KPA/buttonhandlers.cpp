@@ -71,180 +71,253 @@ void updateOperationStatus(int row, bool success) {
     }
 }
 
-void handleStartButtonClick() {
+void handleStartButtonClick()
+{
+    // Переменная для вывода серийного номера и прочих сообщений
     QString s;
 
-    if (!clicledStartbutton) { // Кнопка "Старт" нажата
-        bool isDeviceConnected = false;
+    // Если кнопка "Старт" ещё не нажата
+    if (!clicledStartbutton)
+    {
+        bool isDeviceConnected = false; // Флаг, что хотя бы одно устройство подключилось
 
-        // Подсвечиваем "Гот ТЕРМ." синим на 1 секунду, затем возвращаем белый цвет
-        if (turning_on_the_equipment && turning_on_the_equipment->item(0, 1)) {
+        // --- Подсвечиваем "Гот ТЕРМ." синим на 1 секунду ---
+        // Делается асинхронно через singleShot, чтобы не блокировать GUI
+        if (turning_on_the_equipment && turning_on_the_equipment->item(0, 1))
+        {
+            // Устанавливаем синий цвет
             turning_on_the_equipment->item(0, 1)->setBackground(QColor(0, 0, 255));
-            QTimer* gotTempTimer = new QTimer();
-            gotTempTimer->setSingleShot(true);
-            QObject::connect(gotTempTimer, &QTimer::timeout, [=]() {
-                if (turning_on_the_equipment && turning_on_the_equipment->item(0, 1)) {
+
+            // Через 1 секунду возвращаем белый цвет
+            QTimer::singleShot(1000, [=]() {
+                if (turning_on_the_equipment && turning_on_the_equipment->item(0, 1))
+                {
                     turning_on_the_equipment->item(0, 1)->setBackground(Qt::white);
                 }
-                gotTempTimer->deleteLater(); // Удаляем таймер, чтобы избежать утечек памяти
             });
-            gotTempTimer->start(0); // Отключаем задержку, но оставляем подсветку на 1 секунду
         }
 
-        // Проверка подключения к устройству ARINC429 для CH1
-        if (!State_ECE0206_0) {
+        // --- Подключаемся к устройству ARINC429 для CH1 ---
+        // Если ещё не подключено
+        if (!State_ECE0206_0)
+        {
+            // Пытаемся открыть устройство
             hECE0206_0 = OpenDeviceByIndex(0, &Error);
-            if (hECE0206_0 == INVALID_HANDLE_VALUE) {
+            if (hECE0206_0 == INVALID_HANDLE_VALUE)
+            {
                 State_ECE0206_0 = false;
-                if (toolButton_14) {
+                // Красная иконка на toolButton_14
+                if (toolButton_14)
+                {
                     toolButton_14->setIcon(createCircleIcon(Qt::red));
                 }
-                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0)) {
-                    turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0)); // Подсвечиваем "Включить тумблер СПС" красным при отсутствии подключения
+                // Подсвечиваем "Включить тумблер СПС" красным, так как не подключено
+                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0))
+                {
+                    turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0));
                 }
-            } else {
+            }
+            else
+            {
+                // Успешное подключение — настраиваем устройство
                 DeviceIoControl(hECE0206_0, ECE02061_XP_SET_LONG_MODE, nullptr, 0, nullptr, 0, &nOutput, nullptr);
                 DeviceIoControl(hECE0206_0, ECE02061_XP_GET_SERIAL_NUMBER, nullptr, 0, &bufOutput, 10, &nOutput, nullptr);
                 s = "ARINC429_CH1  S\\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
+
                 SI_clear_array(0, 1);
                 SI_pusk(0, 1, 0, 1, 0);
-                State_ECE0206_0 = true;
-                if (toolButton_14) {
+
+                State_ECE0206_0 = true; // Флаг «подключено»
+                // Зелёная иконка на toolButton_14
+                if (toolButton_14)
+                {
                     toolButton_14->setIcon(createCircleIcon(Qt::green));
                 }
-                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0)) {
-                    turning_on_the_equipment->item(1, 0)->setBackground(Qt::white); // Сбрасываем красную подсветку перед установкой синей
+                // Сбрасываем красную подсветку, если была
+                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0))
+                {
+                    turning_on_the_equipment->item(1, 0)->setBackground(Qt::white);
                 }
-                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1)) {
-                    turning_on_the_equipment->item(1, 1)->setBackground(QColor(0, 0, 255)); // Подсвечиваем "СПС" синим при успешном подключении
+                // Подсвечиваем "СПС" синим при успешном подключении
+                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1))
+                {
+                    turning_on_the_equipment->item(1, 1)->setBackground(QColor(0, 0, 255));
                 }
                 isDeviceConnected = true;
             }
         }
 
-        // Проверка подключения к устройству ARINC429 для CH2
-        QTimer* timer2 = new QTimer();
-        timer2->setSingleShot(true);
-        QObject::connect(timer2, &QTimer::timeout, [=, &isDeviceConnected, &s]() mutable {
-            if (!State_ECE0206_1) {
-                hECE0206_1 = OpenDeviceByIndex(1, &Error);
-                if (hECE0206_1 == INVALID_HANDLE_VALUE) {
-                    State_ECE0206_1 = false;
-                    if (toolButton_15) {
-                        toolButton_15->setIcon(createCircleIcon(Qt::red));
-                    }
-                    if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0)) {
-                        turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0)); // Подсвечиваем "Включить тумблер СПС" красным при отсутствии подключения
-                    }
-                } else {
-                    DeviceIoControl(hECE0206_1, ECE02061_XP_SET_LONG_MODE, nullptr, 0, nullptr, 0, &nOutput, nullptr);
-                    DeviceIoControl(hECE0206_1, ECE02061_XP_GET_SERIAL_NUMBER, nullptr, 0, &bufOutput, 10, &nOutput, nullptr);
-                    s = "ARINC429_CH2  S\\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
-                    SI_clear_array(1, 2);
-                    SI_pusk(1, 2, 0, 1, 0);
-                    State_ECE0206_1 = true;
-                    if (toolButton_15) {
-                        toolButton_15->setIcon(createCircleIcon(Qt::green));
-                    }
-                    if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0)) {
-                        turning_on_the_equipment->item(1, 0)->setBackground(Qt::white); // Сбрасываем красную подсветку перед установкой синей
-                    }
-                    if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1)) {
-                        turning_on_the_equipment->item(1, 1)->setBackground(QColor(0, 0, 255)); // Подсвечиваем "СПС" синим при успешном подключении
-                    }
-                    isDeviceConnected = true;
+        // --- Подключаемся к устройству ARINC429 для CH2 ---
+        // Здесь убираем задержку в 2 секунды, делаем проверку сразу
+        if (!State_ECE0206_1)
+        {
+            hECE0206_1 = OpenDeviceByIndex(1, &Error);
+            if (hECE0206_1 == INVALID_HANDLE_VALUE)
+            {
+                State_ECE0206_1 = false;
+                // Красная иконка на toolButton_15
+                if (toolButton_15)
+                {
+                    toolButton_15->setIcon(createCircleIcon(Qt::red));
+                }
+                // Подсвечиваем "Включить тумблер СПС" красным, так как не подключено
+                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0))
+                {
+                    turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0));
                 }
             }
-            timer2->deleteLater(); // Удаляем таймер
-        });
-        timer2->start(2000);
+            else
+            {
+                // Успешное подключение — настраиваем устройство
+                DeviceIoControl(hECE0206_1, ECE02061_XP_SET_LONG_MODE, nullptr, 0, nullptr, 0, &nOutput, nullptr);
+                DeviceIoControl(hECE0206_1, ECE02061_XP_GET_SERIAL_NUMBER, nullptr, 0, &bufOutput, 10, &nOutput, nullptr);
+                s = "ARINC429_CH2  S\\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
 
-        // Если хотя бы одно устройство подключено, запускаем передачу данных
-        if (isDeviceConnected) {
-            clicledStartbutton = true; // Меняем состояние кнопки
-            if (handleStartButton) {
+                SI_clear_array(1, 2);
+                SI_pusk(1, 2, 0, 1, 0);
+
+                State_ECE0206_1 = true; // Флаг «подключено»
+                // Зелёная иконка на toolButton_15
+                if (toolButton_15)
+                {
+                    toolButton_15->setIcon(createCircleIcon(Qt::green));
+                }
+                // Сбрасываем красную подсветку, если была
+                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0))
+                {
+                    turning_on_the_equipment->item(1, 0)->setBackground(Qt::white);
+                }
+                // Подсвечиваем "СПС" синим при успешном подключении
+                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1))
+                {
+                    turning_on_the_equipment->item(1, 1)->setBackground(QColor(0, 0, 255));
+                }
+                isDeviceConnected = true;
+            }
+        }
+
+        // --- Если хотя бы одно устройство удалось подключить ---
+        if (isDeviceConnected)
+        {
+            // Меняем состояние на «стартанули»
+            clicledStartbutton = true;
+
+            // Настраиваем внешний вид/текст кнопки "Старт"/"Стоп"
+            if (handleStartButton)
+            {
                 handleStartButton->setCheckable(true);
                 handleStartButton->setChecked(clicledStartbutton);
                 handleStartButton->setText("Стоп");
             }
 
+            // Запускаем периодический опрос с периодом 40 мс
             Timer->start(40);
+
+            // При каждом срабатывании таймера проверяем устройства и обрабатываем данные
             QObject::connect(Timer, &QTimer::timeout, [=]() {
-                if (!State_ECE0206_0 && !State_ECE0206_1) {
+                // Если оба устройства отвалились — останавливаем Timer
+                if (!State_ECE0206_0 && !State_ECE0206_1)
+                {
                     Timer->stop();
                     isReceivingData = false;
-                    if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0)) {
-                        turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0)); // Подсвечиваем "Включить тумблер СПС" красным при отключении
+                    // Подсвечиваем красным "Включить тумблер СПС", если всё отключилось
+                    if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0))
+                    {
+                        turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0));
                     }
-                } else {
+                }
+                else
+                {
+                    // Если устройства активны — вызываем обработку
                     Timer_Event();
                 }
             });
 
             isReceivingData = true;
 
-            if (turning_on_the_equipment && turning_on_the_equipment->item(2, 0)) {
-                turning_on_the_equipment->item(2, 0)->setBackground(QColor(0, 0, 255)); // "Т1А Гот" синий, пока идёт обмен данными
+            // Подсвечиваем "Т1А Гот" синим, пока идёт обмен
+            if (turning_on_the_equipment && turning_on_the_equipment->item(2, 0))
+            {
+                turning_on_the_equipment->item(2, 0)->setBackground(QColor(0, 0, 255));
             }
 
+            // Запускаем ещё один таймер на 120 мс для включения кнопки "Подготовка"
             timerPreparation->setInterval(120);
             timerPreparation->start();
             QObject::connect(timerPreparation, &QTimer::timeout, [=]() {
-                if (preparationButton) {
+                if (preparationButton)
+                {
                     preparationButton->setEnabled(true);
                 }
-                if (turning_on_the_equipment && turning_on_the_equipment->item(2, 1)) {
+                if (turning_on_the_equipment && turning_on_the_equipment->item(2, 1))
+                {
                     turning_on_the_equipment->item(2, 1)->setBackground(QColor(0, 128, 0));
                 }
                 timerPreparation->stop();
             });
         }
-
-    } else { // Кнопка "Стоп" нажата, остановка процесса
-        clicledStartbutton = false; // Меняем состояние кнопки
-        if (handleStartButton) {
+    }
+    else
+    {
+        // --- Если нажата кнопка "Стоп" ---
+        clicledStartbutton = false; // Меняем состояние
+        if (handleStartButton)
+        {
             handleStartButton->setCheckable(true);
             handleStartButton->setChecked(clicledStartbutton);
             handleStartButton->setText("Старт");
         }
 
+        // Останавливаем все таймеры, останавливаем приём данных
         Timer->stop();
         timerPreparation->stop();
         isReceivingData = false;
 
-        if (State_ECE0206_0) {
+        // Закрываем CH1, если был активен
+        if (State_ECE0206_0)
+        {
             SI_stop(0, 1);
             SO_stop(0);
             CloseHandle(hECE0206_0);
             State_ECE0206_0 = false;
-            if (toolButton_14) {
+            if (toolButton_14)
+            {
                 toolButton_14->setIcon(createCircleIcon(Qt::red));
             }
-            if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0)) {
-                turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0)); // Подсвечиваем "Включить тумблер СПС" красным при отключении
+            if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0))
+            {
+                turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0));
             }
         }
 
-        if (State_ECE0206_1) {
+        // Закрываем CH2, если был активен
+        if (State_ECE0206_1)
+        {
             SI_stop(1, 2);
             SO_stop(1);
             CloseHandle(hECE0206_1);
             State_ECE0206_1 = false;
-            if (toolButton_15) {
+            if (toolButton_15)
+            {
                 toolButton_15->setIcon(createCircleIcon(Qt::red));
             }
-            if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0)) {
-                turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0)); // Подсвечиваем "Включить тумблер СПС" красным при отключении
+            if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0))
+            {
+                turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0));
             }
         }
 
-        if (turning_on_the_equipment) {
-            // Сброс подсветки поля "Гот ТЕМПЕРАТУРЫ"
-            if (turning_on_the_equipment->item(0, 1)) {
+        // Возвращаем в исходное состояние подсветку полей
+        if (turning_on_the_equipment)
+        {
+            // "Гот ТЕМПЕРАТУРЫ"
+            if (turning_on_the_equipment->item(0, 1))
+            {
                 turning_on_the_equipment->item(0, 1)->setBackground(Qt::white);
             }
-            // Сброс подсветки поля "СПС"
-            if (turning_on_the_equipment->item(1, 1)) {
+            // "СПС"
+            if (turning_on_the_equipment->item(1, 1))
+            {
                 turning_on_the_equipment->item(1, 1)->setBackground(Qt::white);
             }
         }
