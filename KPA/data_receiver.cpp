@@ -275,8 +275,8 @@ void receiveDataAndDisplay()
         // Используем DeviceIoControl для получения посылки
         DeviceIoControl(hECE0206_1, ECE02061_XP_READ_PARAM_AP2, &temp, 1, &ParamCod, sizeof(ParamCod), &nOutput, NULL);
 
-        // Сохраняем данные в массив
-        IN_KPA[i] = ParamCod.param;
+        // Сохраняем данные в массив, сбрасывая бит чётности (старший бит)
+        IN_KPA[i] = ParamCod.param & 0x7FFFFFFF;
     }
 
     // Формируем строку для вывода в терминал
@@ -287,9 +287,9 @@ void receiveDataAndDisplay()
         strout += str + " ";
     }
 
-    // Выводим строку в terminal_down
+    // Выводим строку в terminal_down (если условия выполнения включены)
     if (!isTerminalPause && terminal_down && kpaCheckBox->isChecked() && priemCheckBox->isChecked()) {
-        terminal_down->append(strout);  // Выводим в текстовый виджет
+        terminal_down->append(strout);
     }
 }
 
