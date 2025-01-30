@@ -67,3 +67,17 @@
 191	2752	7599418256901902	CMakeFiles/KPA.dir/mainwindow.cpp.obj	a425f4e208250813
 193	3701	7599418256921916	CMakeFiles/KPA.dir/buttonhandlers.cpp.obj	89de0fc1914bdd70
 3701	4336	7599418292008746	KPA.exe	1b8c57300cdd3673
+33	263	7599451492795950	KPA_autogen/timestamp	fa1c1a953e267799
+33	263	7599451492795950	KPA_autogen/mocs_compilation.cpp	fa1c1a953e267799
+33	263	7599451492795950	C:/KPADev/KPADev/KPA/build/Desktop_Qt_6_8_1_MinGW_64_bit-Debug/KPA_autogen/timestamp	fa1c1a953e267799
+33	263	7599451492795950	C:/KPADev/KPADev/KPA/build/Desktop_Qt_6_8_1_MinGW_64_bit-Debug/KPA_autogen/mocs_compilation.cpp	fa1c1a953e267799
+263	3240	7599451495093940	CMakeFiles/KPA.dir/mainwindow.cpp.obj	a425f4e208250813
+267	4738	7599451495130141	CMakeFiles/KPA.dir/buttonhandlers.cpp.obj	89de0fc1914bdd70
+4738	5097	7599451539842622	KPA.exe	1b8c57300cdd3673
+12	159	7599460362242864	KPA_autogen/timestamp	fa1c1a953e267799
+12	159	7599460362242864	KPA_autogen/mocs_compilation.cpp	fa1c1a953e267799
+12	159	7599460362242864	C:/KPADev/KPADev/KPA/build/Desktop_Qt_6_8_1_MinGW_64_bit-Debug/KPA_autogen/timestamp	fa1c1a953e267799
+12	159	7599460362242864	C:/KPADev/KPADev/KPA/build/Desktop_Qt_6_8_1_MinGW_64_bit-Debug/KPA_autogen/mocs_compilation.cpp	fa1c1a953e267799
+160	2557	7599460363724402	CMakeFiles/KPA.dir/mainwindow.cpp.obj	a425f4e208250813
+163	3923	7599460363754398	CMakeFiles/KPA.dir/buttonhandlers.cpp.obj	89de0fc1914bdd70
+3923	4302	7599460401355136	KPA.exe	1b8c57300cdd3673

@@ -74,199 +74,168 @@ void updateOperationStatus(int row, bool success) {
 
 void handleStartButtonClick()
 {
-    // Если кнопка "Старт" ещё не нажата — переходим к логике включения
+    QString s;
+
+    // Если кнопка "Старт" ещё не нажата
     if (!clicledStartbutton)
     {
-        // --- 1. Сбрасываем только цвет некоторых ячеек (без очистки текста) ---
+        // --- 1. Сбрасываем фон (не трогаем тексты) ---
         if (turning_on_the_equipment)
         {
-            // Ячейки, которые мы могли красить в прошлый раз
-            if (auto item = turning_on_the_equipment->item(0, 1)) {
+            if (auto item = turning_on_the_equipment->item(0, 1))
                 item->setBackground(Qt::white);
-            }
-            if (auto item = turning_on_the_equipment->item(1, 0)) {
+            if (auto item = turning_on_the_equipment->item(1, 0))
                 item->setBackground(Qt::white);
-            }
-            if (auto item = turning_on_the_equipment->item(1, 1)) {
+            if (auto item = turning_on_the_equipment->item(1, 1))
                 item->setBackground(Qt::white);
-            }
-            if (auto item = turning_on_the_equipment->item(2, 0)) {
+            if (auto item = turning_on_the_equipment->item(2, 0))
                 item->setBackground(Qt::white);
-            }
-            if (auto item = turning_on_the_equipment->item(2, 1)) {
+            if (auto item = turning_on_the_equipment->item(2, 1))
                 item->setBackground(Qt::white);
-            }
-            if (auto item = turning_on_the_equipment->item(2, 2)) {
+            if (auto item = turning_on_the_equipment->item(2, 2))
                 item->setBackground(Qt::white);
-                // Если где-то раньше вы писали "Ошибка..." в текст,
-                // а хотите вернуть "Тгот = (Допуск (0-15)с)", тогда можно:
-                // item->setText("Тгот = (Допуск (0-15)с)");
-                // Иначе не трогаем, чтобы сохранить то, что было.
-            }
         }
 
-        // --- 2. Подключение к устройствам CH1 / CH2 ---
         bool isDeviceConnected = false;
+        bool isReceivingData   = false;
 
-        // (пример) Подсвечиваем (0,1) в синий на 1 секунду
-        if (turning_on_the_equipment && turning_on_the_equipment->item(0, 1)) {
+        // --- 2. "Гот ТЕРМ." синий на 1с ---
+        if (turning_on_the_equipment && turning_on_the_equipment->item(0, 1))
+        {
             turning_on_the_equipment->item(0, 1)->setBackground(QColor(0, 0, 255));
-            QTimer::singleShot(1000, [=]() {
-                if (turning_on_the_equipment && turning_on_the_equipment->item(0, 1)) {
+            QTimer* gotTempTimer = new QTimer();
+            gotTempTimer->setSingleShot(true);
+            gotTempTimer->setInterval(1000);
+            QObject::connect(gotTempTimer, &QTimer::timeout, [=]() {
+                if (turning_on_the_equipment && turning_on_the_equipment->item(0, 1))
                     turning_on_the_equipment->item(0, 1)->setBackground(Qt::white);
-                }
+                gotTempTimer->deleteLater();
             });
+            gotTempTimer->start();
         }
 
-        // ---------- CH1 ----------
-        if (!State_ECE0206_0)
-        {
+        // --- 3. Проверяем CH1 сразу ---
+        if (!State_ECE0206_0) {
             hECE0206_0 = OpenDeviceByIndex(0, &Error);
-            if (hECE0206_0 == INVALID_HANDLE_VALUE)
-            {
+            if (hECE0206_0 == INVALID_HANDLE_VALUE) {
+                // Не подключилось
                 State_ECE0206_0 = false;
-                // Красная иконка на toolButton_14 (например)
-                if (toolButton_14) {
+                if (toolButton_14)
                     toolButton_14->setIcon(createCircleIcon(Qt::red));
-                }
-                // Красим (1,0) — "Включить тумблер СПС" — в красный, сообщая об ошибке подключения
-                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0)) {
+                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0))
                     turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0));
-                }
-            }
-            else
-            {
-                // Успешное подключение CH1
+            } else {
+                // Успешно
                 DeviceIoControl(hECE0206_0, ECE02061_XP_SET_LONG_MODE, nullptr, 0, nullptr, 0, &nOutput, nullptr);
                 DeviceIoControl(hECE0206_0, ECE02061_XP_GET_SERIAL_NUMBER, nullptr, 0, &bufOutput, 10, &nOutput, nullptr);
 
-                // Выполняем SI_clear_array..., SI_pusk...,
-                // State_ECE0206_0 = true;
+                s = "ARINC429_CH1  S\\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
+                SI_clear_array(0, 1);
+                SI_pusk(0, 1, 0, 1, 0);
                 State_ECE0206_0 = true;
 
-                if (toolButton_14) {
+                if (toolButton_14)
                     toolButton_14->setIcon(createCircleIcon(Qt::green));
-                }
-                // Если была красная подсветка (1,0), убираем её (белый)
-                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0)) {
+                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0))
                     turning_on_the_equipment->item(1, 0)->setBackground(Qt::white);
-                }
-                // (1,1) — "СПС" красим в синий, раз всё ок
-                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1)) {
+                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1))
                     turning_on_the_equipment->item(1, 1)->setBackground(QColor(0, 0, 255));
-                }
+
                 isDeviceConnected = true;
             }
         }
 
-        // ---------- CH2 ----------
-        if (!State_ECE0206_1)
-        {
-            hECE0206_1 = OpenDeviceByIndex(1, &Error);
-            if (hECE0206_1 == INVALID_HANDLE_VALUE)
-            {
-                State_ECE0206_1 = false;
-                if (toolButton_15) {
-                    toolButton_15->setIcon(createCircleIcon(Qt::red));
-                }
-                // Тоже красим (1,0) в красный, если 2‐й канал нужен для "СПС"
-                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0)) {
-                    turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0));
+        // --- 4. Создаём таймер на 2 секунды для CH2 ---
+        QTimer* timer2 = new QTimer();
+        timer2->setSingleShot(true);
+        QObject::connect(timer2, &QTimer::timeout, [=, &isDeviceConnected, &s]() mutable {
+            if (!State_ECE0206_1) {
+                hECE0206_1 = OpenDeviceByIndex(1, &Error);
+                if (hECE0206_1 == INVALID_HANDLE_VALUE) {
+                    State_ECE0206_1 = false;
+                    if (toolButton_15)
+                        toolButton_15->setIcon(createCircleIcon(Qt::red));
+                    if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0))
+                        turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0));
+                } else {
+                    // Успешное подключение CH2
+                    DeviceIoControl(hECE0206_1, ECE02061_XP_SET_LONG_MODE, nullptr, 0, nullptr, 0, &nOutput, nullptr);
+                    DeviceIoControl(hECE0206_1, ECE02061_XP_GET_SERIAL_NUMBER, nullptr, 0, &bufOutput, 10, &nOutput, nullptr);
+
+                    s = "ARINC429_CH2  S\\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
+                    SI_clear_array(1, 2);
+                    SI_pusk(1, 2, 0, 1, 0);
+                    State_ECE0206_1 = true;
+
+                    if (toolButton_15)
+                        toolButton_15->setIcon(createCircleIcon(Qt::green));
+                    if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0))
+                        turning_on_the_equipment->item(1, 0)->setBackground(Qt::white);
+                    if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1))
+                        turning_on_the_equipment->item(1, 1)->setBackground(QColor(0, 0, 255));
+
+                    // Если CH2 открылся, то у нас всё равно есть подключение
+                    isDeviceConnected = true;
                 }
             }
-            else
-            {
-                // Успешное подключение CH2
-                DeviceIoControl(hECE0206_1, ECE02061_XP_SET_LONG_MODE, nullptr, 0, nullptr, 0, &nOutput, nullptr);
-                DeviceIoControl(hECE0206_1, ECE02061_XP_GET_SERIAL_NUMBER, nullptr, 0, &bufOutput, 10, &nOutput, nullptr);
+            timer2->deleteLater();
+        });
+        timer2->start(2000);
 
-                // SI_clear_array(1,2)..., SI_pusk(...);
-                State_ECE0206_1 = true;
-
-                if (toolButton_15) {
-                    toolButton_15->setIcon(createCircleIcon(Qt::green));
-                }
-                // Убираем красный, если был
-                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0)) {
-                    turning_on_the_equipment->item(1, 0)->setBackground(Qt::white);
-                }
-                // Красим (1,1) в синий как признак, что всё подключилось
-                if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1)) {
-                    turning_on_the_equipment->item(1, 1)->setBackground(QColor(0, 0, 255));
-                }
-                isDeviceConnected = true;
-            }
-        }
-
-        // --- 3. Если хотя бы одно устройство "поднялось" ---
+        // --- 5. Если CH1 уже открыт — запускаем обмен ---
         if (isDeviceConnected)
         {
-            // Меняем кнопку
             clicledStartbutton = true;
-            if (handleStartButton)
-            {
+            if (handleStartButton) {
                 handleStartButton->setCheckable(true);
                 handleStartButton->setChecked(true);
                 handleStartButton->setText("Стоп");
             }
 
-            // Запускаем периодический опрос (40 мс)
             Timer->start(40);
-            QObject::connect(Timer, &QTimer::timeout, [=]() {
-                // Если оба отключились
-                if (!State_ECE0206_0 && !State_ECE0206_1) {
+            // Захватываем isDeviceConnected, isReceivingData по ссылке, чтобы разрешить им меняться
+            QObject::connect(Timer, &QTimer::timeout, [=, &isDeviceConnected, &isReceivingData]() mutable {
+                // Если оба канала отвалились
+                if (!State_ECE0206_0 && !State_ECE0206_1)
+                {
                     Timer->stop();
-                    isReceivingData = false;
-                    // Можно покрасить (1,0) в красный, если нужно
+                    isDeviceConnected = false;  // Меняем переменную
+                    isReceivingData   = false;
+
+                    // Красим (1,0) в красный, если нужно
                     if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0))
                         turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0));
-                } else {
-                    Timer_Event(); // ваш цикл обмена
+                }
+                else
+                {
+                    Timer_Event();  // основной опрос
                 }
             });
+
             isReceivingData = true;
 
-            // (2,0) — "Т1А Гот" покрасим в синий, пока идёт обмен
+            // "Т1А Гот" синий, пока идёт обмен
             if (turning_on_the_equipment && turning_on_the_equipment->item(2, 0))
                 turning_on_the_equipment->item(2, 0)->setBackground(QColor(0, 0, 255));
 
-            // Блокируем "Подготовка" на 2 мин, пока не нажмут Ctrl+P
-            if (preparationButton)
-                preparationButton->setEnabled(false);
-
-            timerPreparation->stop();
-            timerPreparation->setSingleShot(true);
-            timerPreparation->setInterval(120000); // 2 минуты
-
-            QObject::connect(timerPreparation, &QTimer::timeout, [=]() {
-                // Разблокируем "Подготовка"
-                if (preparationButton)
-                    preparationButton->setEnabled(true);
-                // (2,1) делаем зелёным как сигнал "готово"
-                if (turning_on_the_equipment && turning_on_the_equipment->item(2, 1))
-                    turning_on_the_equipment->item(2, 1)->setBackground(QColor(0, 128, 0));
-            });
-
+            // Пример: timerPreparation на 120 мс (как в старом коде)
+            timerPreparation->setInterval(120);
             timerPreparation->start();
-
-            // Горячая клавиша Ctrl+P, чтобы не ждать 2 мин
-            QShortcut* skipWaitShortcut = new QShortcut(QKeySequence("Ctrl+P"), handleStartButton);
-            QObject::connect(skipWaitShortcut, &QShortcut::activated, [=]() {
-                timerPreparation->stop();
+            QObject::connect(timerPreparation, &QTimer::timeout, [=]() {
                 if (preparationButton)
                     preparationButton->setEnabled(true);
                 if (turning_on_the_equipment && turning_on_the_equipment->item(2, 1))
                     turning_on_the_equipment->item(2, 1)->setBackground(QColor(0, 128, 0));
+                timerPreparation->stop();
             });
         }
-        // Если вообще ничего не подключилось, никаких таймеров не запускаем.
+        // Если CH1 тоже не поднялся, то ничего не делаем (останемся без обмена)
     }
     else
     {
-        // --- Нажали "Стоп" ---
+        // --- Кнопка "Стоп" ---
         clicledStartbutton = false;
-        if (handleStartButton)
-        {
+        if (handleStartButton) {
             handleStartButton->setCheckable(true);
             handleStartButton->setChecked(false);
             handleStartButton->setText("Старт");
@@ -276,23 +245,22 @@ void handleStartButtonClick()
         timerPreparation->stop();
         isReceivingData = false;
 
-        // Отключаем CH1
-        if (State_ECE0206_0)
-        {
+        // Закрываем CH1
+        if (State_ECE0206_0) {
             SI_stop(0, 1);
             SO_stop(0);
             CloseHandle(hECE0206_0);
             State_ECE0206_0 = false;
             if (toolButton_14)
                 toolButton_14->setIcon(createCircleIcon(Qt::red));
-            // По желанию красим (1,0) в красный, сигнализируя, что отключено.
             if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0))
                 turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0));
+            if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1))
+                turning_on_the_equipment->item(1, 1)->setBackground(Qt::white);
         }
 
-        // Отключаем CH2
-        if (State_ECE0206_1)
-        {
+        // Закрываем CH2
+        if (State_ECE0206_1) {
             SI_stop(1, 2);
             SO_stop(1);
             CloseHandle(hECE0206_1);
@@ -301,15 +269,14 @@ void handleStartButtonClick()
                 toolButton_15->setIcon(createCircleIcon(Qt::red));
             if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0))
                 turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0));
+            if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1))
+                turning_on_the_equipment->item(1, 1)->setBackground(Qt::white);
         }
 
-        // Если хотим, можем сбросить (0,1), (1,1), (2,0), (2,1) в белый
-        // Но тексты "Тобогр = ..." и т.п. не трогаем
+        // Можно сбрасывать прочие цвета
         if (turning_on_the_equipment)
         {
             if (auto item = turning_on_the_equipment->item(0, 1))
-                item->setBackground(Qt::white);
-            if (auto item = turning_on_the_equipment->item(1, 1))
                 item->setBackground(Qt::white);
             if (auto item = turning_on_the_equipment->item(2, 0))
                 item->setBackground(Qt::white);
