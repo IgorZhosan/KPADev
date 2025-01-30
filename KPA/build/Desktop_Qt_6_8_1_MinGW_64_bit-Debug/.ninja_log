@@ -1,0 +1,20 @@
+# ninja log v6
+23	650	7599349097442673	KPA_autogen/timestamp	fa1c1a953e267799
+23	650	7599349097442673	KPA_autogen/mocs_compilation.cpp	fa1c1a953e267799
+23	650	7599349097442673	C:/KPADev/KPADev/KPA/build/Desktop_Qt_6_8_1_MinGW_64_bit-Debug/KPA_autogen/timestamp	fa1c1a953e267799
+23	650	7599349097442673	C:/KPADev/KPADev/KPA/build/Desktop_Qt_6_8_1_MinGW_64_bit-Debug/KPA_autogen/mocs_compilation.cpp	fa1c1a953e267799
+665	2395	7599349098161761	CMakeFiles/KPA.dir/OpenECE0206byIndex.cpp.obj	e8d7b0714d3f0ef
+663	2598	7599349098141095	CMakeFiles/KPA.dir/library02061.cpp.obj	47f948ac6e09f6ab
+655	2924	7599349098055934	CMakeFiles/KPA.dir/KPA_autogen/mocs_compilation.cpp.obj	7dea022af6515c56
+659	3532	7599349098101334	CMakeFiles/KPA.dir/mainwindow.cpp.obj	a425f4e208250813
+661	4920	7599349098121969	CMakeFiles/KPA.dir/buttonhandlers.cpp.obj	89de0fc1914bdd70
+668	5088	7599349098184373	CMakeFiles/KPA.dir/data_receiver.cpp.obj	10ff77b656f5ed19
+657	5619	7599349098081341	CMakeFiles/KPA.dir/main.cpp.obj	85139144cf4a11bb
+5619	6138	7599349147699979	KPA.exe	1b8c57300cdd3673
+50	202	7599371587773494	KPA_autogen/timestamp	fa1c1a953e267799
+50	202	7599371587773494	KPA_autogen/mocs_compilation.cpp	fa1c1a953e267799
+50	202	7599371587773494	C:/KPADev/KPADev/KPA/build/Desktop_Qt_6_8_1_MinGW_64_bit-Debug/KPA_autogen/timestamp	fa1c1a953e267799
+50	202	7599371587773494	C:/KPADev/KPADev/KPA/build/Desktop_Qt_6_8_1_MinGW_64_bit-Debug/KPA_autogen/mocs_compilation.cpp	fa1c1a953e267799
+203	2533	7599371589311167	CMakeFiles/KPA.dir/mainwindow.cpp.obj	a425f4e208250813
+206	3442	7599371589335798	CMakeFiles/KPA.dir/buttonhandlers.cpp.obj	89de0fc1914bdd70
+3442	4043	7599371621695937	KPA.exe	1b8c57300cdd3673

@@ -63,10 +63,10 @@ bool isPortOpen() {
     DWORD errors;
     COMSTAT status;
     if (!ClearCommError(hSerialPort, &errors, &status)) {
-        //  terminal_down->append("Ошибка проверки состояния COM порта через ClearCommError.");
+          terminal_down->append("Ошибка проверки состояния COM порта через ClearCommError.");
         return false;
     }
-    // terminal_down->append("COM порт открыт и доступен.");
+     terminal_down->append("COM порт открыт и доступен.");
     return true;
 }
 

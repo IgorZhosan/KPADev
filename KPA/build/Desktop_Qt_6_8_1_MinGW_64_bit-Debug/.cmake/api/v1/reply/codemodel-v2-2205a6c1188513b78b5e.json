@@ -1,0 +1,79 @@
+{
+	"configurations" : 
+	[
+		{
+			"directories" : 
+			[
+				{
+					"build" : ".",
+					"hasInstallRule" : true,
+					"jsonFile" : "directory-.-Debug-8afcabf13f5241444a85.json",
+					"minimumCMakeVersion" : 
+					{
+						"string" : "3.16"
+					},
+					"projectIndex" : 0,
+					"source" : ".",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"name" : "Debug",
+			"projects" : 
+			[
+				{
+					"directoryIndexes" : 
+					[
+						0
+					],
+					"name" : "KPA",
+					"targetIndexes" : 
+					[
+						0,
+						1,
+						2
+					]
+				}
+			],
+			"targets" : 
+			[
+				{
+					"directoryIndex" : 0,
+					"id" : "KPA::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-KPA-Debug-1214c51372bec340ab13.json",
+					"name" : "KPA",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "KPA_autogen::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-KPA_autogen-Debug-608371aa23a7cf6e5191.json",
+					"name" : "KPA_autogen",
+					"projectIndex" : 0
+				},
+				{
+					"directoryIndex" : 0,
+					"id" : "KPA_autogen_timestamp_deps::@6890427a1f51a3e7e1df",
+					"jsonFile" : "target-KPA_autogen_timestamp_deps-Debug-7ec0c1c0562077d0c4d5.json",
+					"name" : "KPA_autogen_timestamp_deps",
+					"projectIndex" : 0
+				}
+			]
+		}
+	],
+	"kind" : "codemodel",
+	"paths" : 
+	{
+		"build" : "C:/KPADev/KPADev/KPA/build/Desktop_Qt_6_8_1_MinGW_64_bit-Debug",
+		"source" : "C:/KPADev/KPADev/KPA"
+	},
+	"version" : 
+	{
+		"major" : 2,
+		"minor" : 7
+	}
+}

@@ -105,7 +105,7 @@ void handleStartButtonClick() {
             } else {
                 DeviceIoControl(hECE0206_0, ECE02061_XP_SET_LONG_MODE, nullptr, 0, nullptr, 0, &nOutput, nullptr);
                 DeviceIoControl(hECE0206_0, ECE02061_XP_GET_SERIAL_NUMBER, nullptr, 0, &bufOutput, 10, &nOutput, nullptr);
-                s = "ARINC429_CH1  S\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
+                s = "ARINC429_CH1  S\\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
                 SI_clear_array(0, 1);
                 SI_pusk(0, 1, 0, 1, 0);
                 State_ECE0206_0 = true;
@@ -139,7 +139,7 @@ void handleStartButtonClick() {
                 } else {
                     DeviceIoControl(hECE0206_1, ECE02061_XP_SET_LONG_MODE, nullptr, 0, nullptr, 0, &nOutput, nullptr);
                     DeviceIoControl(hECE0206_1, ECE02061_XP_GET_SERIAL_NUMBER, nullptr, 0, &bufOutput, 10, &nOutput, nullptr);
-                    s = "ARINC429_CH2  S\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
+                    s = "ARINC429_CH2  S\\N: " + QString::fromUtf8(reinterpret_cast<const char*>(bufOutput), 5);
                     SI_clear_array(1, 2);
                     SI_pusk(1, 2, 0, 1, 0);
                     State_ECE0206_1 = true;
