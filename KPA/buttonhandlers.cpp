@@ -303,11 +303,27 @@ void handleStartButtonClick()
                 turning_on_the_equipment->item(1, 1)->setBackground(Qt::white);
         }
 
+        if (preparationButton)
+        {
+            if (preparationButton->isChecked())
+            {
+                // Снимем флаг checked
+                preparationButton->setChecked(false);
+
+                // Вызовем слот, который отрабатывает "Подготовка off"
+                // (Убедитесь, что вы имеете доступ к функции preparation(bool)
+                //  или подходящий connect)
+                preparation(false);
+            }
+        }
+
         // (I) Сбрасываем OUT_AD9M2, кроме литер
         resetOutAD9M2PreservingLiters();
 
         // (II) Сбрасываем "clickedButton1..15"
         resetAllClickedButtons();
+
+
 
         // (III) Убираем старые ошибки из GUI
         if (turning_on_the_equipment)
@@ -324,6 +340,8 @@ void handleStartButtonClick()
                 item->setBackground(Qt::white);
             }
         }
+
+
     }
 }
 
