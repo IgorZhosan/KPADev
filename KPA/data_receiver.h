@@ -64,6 +64,7 @@ void  readFromSerialPort();
 void Timer_Event();
 bool openSerialPort(LPCSTR portName);
 void initializePortCheckTimer();
+void resetOutAD9M2ToDefault();
 ULONG KS(ULONG *array, int size);
 
 #endif // DATA_RECEIVER_H
