@@ -67,6 +67,7 @@ void resetOutAD9M2PreservingLiters()
 
     // 2) Возвращаем весь OUT_AD9M2[] к дефолту
     OUT_AD9M2[0] = 0x80;
+    OUT_AD9M2[0] |= 0x1 << 20; // задаём НК
     OUT_AD9M2[1] = 0x40;
     OUT_AD9M2[2] = 0xC0;
     OUT_AD9M2[3] = 0x20;
