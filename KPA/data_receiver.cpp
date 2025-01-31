@@ -269,17 +269,52 @@ void receiveDataAndDisplay()
     QString strout;
 
     // Читаем данные по каналу 2
-    for (int i = 0; i < 11; i++) {
+    for (int i = 0; i < 11; i++)
+    {
         int temp = i + 1;
 
-        // Используем DeviceIoControl для получения посылки
-        DeviceIoControl(hECE0206_1, ECE02061_XP_READ_PARAM_AP2, &temp, 1, &ParamCod, sizeof(ParamCod), &nOutput, NULL);
+        DeviceIoControl(hECE0206_1, ECE02061_XP_READ_PARAM_AP2,
+                        &temp, 1, &ParamCod, sizeof(ParamCod), &nOutput, NULL);
 
-        // Сохраняем данные в массив, сбрасывая бит чётности (старший бит)
+        // Сбрасываем старший бит (паритет)
         IN_KPA[i] = ParamCod.param & 0x7FFFFFFF;
     }
 
-    // Формируем строку для вывода в терминал
+    // Проверяем, весь ли массив IN_KPA нулевой
+    bool allZero = true;
+    for (int i = 0; i < 11; i++) {
+        if (IN_KPA[i] != 0) {
+            allZero = false;
+            break;
+        }
+    }
+
+    if (allZero)
+    {
+        // Если всё нули — не выводим в терминал
+        // Подсвечиваем (1,0) «Включить тумблер "СПС"» красным
+        if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0))
+            turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0));
+
+        // А (1,1) «СПС» делаем белым (неактивен)
+        if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1))
+            turning_on_the_equipment->item(1, 1)->setBackground(Qt::white);
+
+        return; // Выходим, ничего не печатаем
+    }
+    else
+    {
+        // Если массив не нулевой, значит есть посылка
+        // (1,1) «СПС» — синий
+        if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1))
+            turning_on_the_equipment->item(1, 1)->setBackground(QColor(0, 0, 255));
+
+        // И (1,0) «Включить тумблер "СПС"» убираем из красного (делаем белым)
+        if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0))
+            turning_on_the_equipment->item(1, 0)->setBackground(Qt::white);
+    }
+
+    // Формируем строку для терминала
     strout = "IN : ";
     for (int i = 0; i < 11; i++) {
         QString str = QString("%1 ").arg((DWORD)IN_KPA[i], 8, 16, QChar('0')).toUpper();
@@ -287,8 +322,12 @@ void receiveDataAndDisplay()
         strout += str + " ";
     }
 
-    // Выводим строку в terminal_down (если условия выполнения включены)
-    if (!isTerminalPause && terminal_down && kpaCheckBox->isChecked() && priemCheckBox->isChecked()) {
+    // Выводим строку в terminal_down (если соответствующие чекбоксы включены)
+    if (!isTerminalPause &&
+        terminal_down &&
+        kpaCheckBox->isChecked() &&
+        priemCheckBox->isChecked())
+    {
         terminal_down->append(strout);
     }
 }
