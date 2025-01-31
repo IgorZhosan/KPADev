@@ -46,6 +46,13 @@ extern QCheckBox *out_kk7_checkbox;
 extern QCheckBox *out_kk8_checkbox;
 extern bool isStatePause;
 
+struct INPUTPARAM {
+    DWORD param;
+    DWORD timer;
+    UCHAR error;
+};
+extern INPUTPARAM ParamCod;
+
 extern ULONG IN_KPA[11];
 
 // Объявление функции

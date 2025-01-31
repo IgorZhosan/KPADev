@@ -263,8 +263,10 @@ int main(int argc, char *argv[])
         turning_on_the_equipment->setColumnWidth(2,120);
 
         preparationButton = new QPushButton("Подготовка");
-        preparationButton ->setEnabled(false);
+        preparationButton->setCheckable(true);   // ВАЖНО, чтобы она была переключаемая
+        preparationButton->setEnabled(false);    // если хотите, чтобы она стала доступна позже
         turning_on_the_equipment->setCellWidget(2, 0, preparationButton);
+
 
 
         turning_on_the_equipment->setItem(2, 1, new QTableWidgetItem("Т1А ГОТ"));

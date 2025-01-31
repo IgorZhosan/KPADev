@@ -44,7 +44,7 @@ extern QToolButton *toolButton_15 ;
 extern QTableWidget *checking_the_operation;
 
 void handleStartButtonClick();
-void preparation();
+void preparation(bool checked);
 void handleButtonClick1();
 void handleButtonClick2();
 void handleButtonClick3();

@@ -79,9 +79,10 @@ void handleStartButtonClick()
     // Если кнопка "Старт" ещё не нажата
     if (!clicledStartbutton)
     {
-        // --- 1. Сбрасываем фон (не трогаем тексты) ---
+        // --- 1. Сбрасываем фон некоторых ячеек, НЕ трогаем тексты ---
         if (turning_on_the_equipment)
         {
+            // Сбрасываем цвет (0,1), (1,0), (1,1), (2,0), (2,1)
             if (auto item = turning_on_the_equipment->item(0, 1))
                 item->setBackground(Qt::white);
             if (auto item = turning_on_the_equipment->item(1, 0))
@@ -92,14 +93,18 @@ void handleStartButtonClick()
                 item->setBackground(Qt::white);
             if (auto item = turning_on_the_equipment->item(2, 1))
                 item->setBackground(Qt::white);
-            if (auto item = turning_on_the_equipment->item(2, 2))
-                item->setBackground(Qt::white);
+
+            // Ячейка (2,2) только текст: возвращаем исходную надпись, убираем ошибки
+            if (auto item = turning_on_the_equipment->item(2, 2)) {
+                item->setText("Тгот = (Допуск (0-15)с)");  // или ваш изначальный текст
+                item->setBackground(Qt::white);           // Белый фон (без окраски)
+            }
         }
 
         bool isDeviceConnected = false;
         bool isReceivingData   = false;
 
-        // --- 2. "Гот ТЕРМ." синий на 1с ---
+        // --- 2. Подсвечиваем "Гот ТЕРМ." (0,1) синим на 1сек ---
         if (turning_on_the_equipment && turning_on_the_equipment->item(0, 1))
         {
             turning_on_the_equipment->item(0, 1)->setBackground(QColor(0, 0, 255));
@@ -118,7 +123,6 @@ void handleStartButtonClick()
         if (!State_ECE0206_0) {
             hECE0206_0 = OpenDeviceByIndex(0, &Error);
             if (hECE0206_0 == INVALID_HANDLE_VALUE) {
-                // Не подключилось
                 State_ECE0206_0 = false;
                 if (toolButton_14)
                     toolButton_14->setIcon(createCircleIcon(Qt::red));
@@ -145,7 +149,7 @@ void handleStartButtonClick()
             }
         }
 
-        // --- 4. Создаём таймер на 2 секунды для CH2 ---
+        // --- 4. Создаём таймер на 2с для CH2 ---
         QTimer* timer2 = new QTimer();
         timer2->setSingleShot(true);
         QObject::connect(timer2, &QTimer::timeout, [=, &isDeviceConnected, &s]() mutable {
@@ -158,7 +162,7 @@ void handleStartButtonClick()
                     if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0))
                         turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0));
                 } else {
-                    // Успешное подключение CH2
+                    // Успешно
                     DeviceIoControl(hECE0206_1, ECE02061_XP_SET_LONG_MODE, nullptr, 0, nullptr, 0, &nOutput, nullptr);
                     DeviceIoControl(hECE0206_1, ECE02061_XP_GET_SERIAL_NUMBER, nullptr, 0, &bufOutput, 10, &nOutput, nullptr);
 
@@ -174,7 +178,6 @@ void handleStartButtonClick()
                     if (turning_on_the_equipment && turning_on_the_equipment->item(1, 1))
                         turning_on_the_equipment->item(1, 1)->setBackground(QColor(0, 0, 255));
 
-                    // Если CH2 открылся, то у нас всё равно есть подключение
                     isDeviceConnected = true;
                 }
             }
@@ -182,7 +185,7 @@ void handleStartButtonClick()
         });
         timer2->start(2000);
 
-        // --- 5. Если CH1 уже открыт — запускаем обмен ---
+        // --- 5. Если CH1 уже открыт -> запускаем обмен ---
         if (isDeviceConnected)
         {
             clicledStartbutton = true;
@@ -192,50 +195,46 @@ void handleStartButtonClick()
                 handleStartButton->setText("Стоп");
             }
 
-            // Основной таймер опроса (40 мс)
+            // Основной таймер (40 мс)
             Timer->start(40);
             QObject::connect(Timer, &QTimer::timeout, [=, &isDeviceConnected, &isReceivingData]() mutable {
-                // Если оба канала отвалились
                 if (!State_ECE0206_0 && !State_ECE0206_1)
                 {
                     Timer->stop();
                     isDeviceConnected = false;
                     isReceivingData   = false;
-                    // Красим (1,0) в красный, если нужно
                     if (turning_on_the_equipment && turning_on_the_equipment->item(1, 0))
                         turning_on_the_equipment->item(1, 0)->setBackground(QColor(255, 0, 0));
                 }
                 else
                 {
-                    // Ваш цикл обмена
                     Timer_Event();
                 }
             });
 
             isReceivingData = true;
 
-            // "Т1А Гот" — синий, пока идёт обмен
+            // (2,0) "Т1А Гот" — синий, пока идёт обмен
             if (turning_on_the_equipment && turning_on_the_equipment->item(2, 0))
                 turning_on_the_equipment->item(2, 0)->setBackground(QColor(0, 0, 255));
 
-            // Включаем таймер подготовки (120 мс), по истечении разблокируем кнопку "Подготовка"
+            // --- 6. Таймер (120 мс), только чтобы разблокировать «Подготовка» ---
             timerPreparation->setInterval(120);
             timerPreparation->start();
             QObject::connect(timerPreparation, &QTimer::timeout, [=]() {
                 if (preparationButton)
                     preparationButton->setEnabled(true);
-                if (turning_on_the_equipment && turning_on_the_equipment->item(2, 1))
-                    turning_on_the_equipment->item(2, 1)->setBackground(QColor(0, 128, 0));
+                // НЕ красим (2,1) здесь! Это будет в preparation().
                 timerPreparation->stop();
             });
         }
-        // Если CH1 не поднялся, обмен не запускаем
     }
     else
     {
         // --- Кнопка "Стоп" ---
         clicledStartbutton = false;
-        if (handleStartButton) {
+        if (handleStartButton)
+        {
             handleStartButton->setCheckable(true);
             handleStartButton->setChecked(false);
             handleStartButton->setText("Старт");
@@ -273,7 +272,7 @@ void handleStartButtonClick()
                 turning_on_the_equipment->item(1, 1)->setBackground(Qt::white);
         }
 
-        // Полный сброс цветов, чтобы при новом «Старт» всё выглядело «по-новой»
+        // При новом «Старт» убираем старые ошибки:
         if (turning_on_the_equipment)
         {
             if (auto item = turning_on_the_equipment->item(0, 1))
@@ -282,89 +281,137 @@ void handleStartButtonClick()
                 item->setBackground(Qt::white);
             if (auto item = turning_on_the_equipment->item(2, 1))
                 item->setBackground(Qt::white);
-            if (auto item = turning_on_the_equipment->item(2, 2))
+
+            // (2,2) возвращаем исходный текст
+            if (auto item = turning_on_the_equipment->item(2, 2)) {
+                item->setText("Тгот = (Допуск (0-15)с)"); // или изначальная надпись
                 item->setBackground(Qt::white);
+            }
         }
     }
 }
 
-void preparation()
-{
-    // Включаем/выключаем бит 9 (ваша логика подготовки)
-    clickedPreparation = !clickedPreparation;
-    preparationButton->setCheckable(true);
-    preparationButton->setChecked(clickedPreparation);
+static QTimer* readinessTimer = nullptr;  // Один таймер на всё время, глобально/статически
 
-    if (clickedPreparation) {
-        OUT_AD9M2[0] |= (0x1 << 9);
-    } else {
-        OUT_AD9M2[0] &= ~(0x1 << 9);
+void preparation(bool checked)
+{
+    // Если таймер ещё не создан — создаём
+    if (!readinessTimer) {
+        readinessTimer = new QTimer();
+        readinessTimer->setSingleShot(true); // одноразовый
     }
 
-    // Подсчёт контрольной суммы и отправка
-    ULONG sum = KS(OUT_AD9M2, 6);
-    OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
-    BUF256x32_write(0, OUT_AD9M2, 7);
-    SO_pusk(0);
+    if (checked)
+    {
+        // --- Кнопка «Подготовка» нажата (checked = true) ---
+        // Ставим бит 9
+        OUT_AD9M2[0] |= (1UL << 9);
 
-    // Запускаем таймер на 20 секунд, чтобы проверить бит готовности (28) + биты ошибок
-    QTimer* readinessTimer = new QTimer();
-    readinessTimer->setSingleShot(true);
-    readinessTimer->setInterval(20000); // 20 секунд
+        // Подсчитываем КС и отправляем
+        ULONG sum = KS(OUT_AD9M2, 6);
+        OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
+        BUF256x32_write(0, OUT_AD9M2, 7);
+        SO_pusk(0);
 
-    QObject::connect(readinessTimer, &QTimer::timeout, [=]() {
-        // По истечении 20 сек смотрим IN_KPA[2]
-        unsigned long value = IN_KPA[2]; // Обновляется в Timer_Event() -> receiveDataAndDisplay()
+        // Настраиваем 20-секундный таймер
+        readinessTimer->stop();
+        readinessTimer->setInterval(20000);
 
-        bool bit28 = (value & (1UL << 28)); // Готов
-        bool bit27 = (value & (1UL << 27)); // ДГ
-        bool bit26 = (value & (1UL << 26)); // KRL
-        bool bit25 = (value & (1UL << 25)); // Курс ДВ
-        bool bit24 = (value & (1UL << 24)); // Танг ДВ
-        bool bit30 = (value & (1UL << 30)); // DM (наш новый бит)
+        // Удаляем предыдущие connect, чтобы не было дублирующих сигналов
+        QObject::disconnect(readinessTimer, nullptr, nullptr, nullptr);
 
-        // Собираем все ошибки
-        QStringList errorList;
-        if (bit27) errorList << "ДГ";
-        if (bit26) errorList << "KRL";
-        if (bit25) errorList << "Курс ДВ";
-        if (bit24) errorList << "Танг ДВ";
+        // Подключаем логику по истечении таймера
+        QObject::connect(readinessTimer, &QTimer::timeout, [=]() {
+            // (1) Считываем свежие данные IN_KPA
+            receiveDataAndDisplay();
 
-        // Если bit30 = 0 → добавляем "DM"
-        if (!bit30) {
-            errorList << "DM";
+            // (2) Берём биты (28, 27..24, DM=30)
+            unsigned long val2 = IN_KPA[2] & 0x7FFFFFFF;
+            unsigned long val0 = IN_KPA[0] & 0x7FFFFFFF;
+
+            bool bit28 = (val2 & (1UL << 28));
+            bool bit27 = (val2 & (1UL << 27));
+            bool bit26 = (val2 & (1UL << 26));
+            bool bit25 = (val2 & (1UL << 25));
+            bool bit24 = (val2 & (1UL << 24));
+            bool bit30 = (val0 & (1UL << 30)); // DM
+
+            QStringList errorList;
+            if (bit27) errorList << "ДГ";
+            if (bit26) errorList << "KRL";
+            if (bit25) errorList << "Курс ДВ";
+            if (bit24) errorList << "Танг ДВ";
+            if (!bit30) {
+                errorList << "DM";
+            }
+
+            // (3) Ячейки (2,1) — «Т1А ГОТ» и (2,2) — текст
+            QTableWidgetItem* gotItem = turning_on_the_equipment->item(2, 1);
+            if (!gotItem) {
+                gotItem = new QTableWidgetItem("Т1А Гот");
+                turning_on_the_equipment->setItem(2, 1, gotItem);
+            }
+            QTableWidgetItem* errItem = turning_on_the_equipment->item(2, 2);
+            if (!errItem) {
+                errItem = new QTableWidgetItem("Тгот = (Допуск (0-15)с)");
+                turning_on_the_equipment->setItem(2, 2, errItem);
+            }
+            errItem->setBackground(Qt::white);
+
+            // (4) Логика
+            if (bit28)
+            {
+                if (errorList.isEmpty())
+                {
+                    // Нет ошибок
+                    gotItem->setBackground(QColor(0, 128, 0)); // зелёный
+                    errItem->setText("Готов (бит 28)");
+                }
+                else
+                {
+                    // Ошибки
+                    gotItem->setBackground(QColor(255, 0, 0)); // красный
+                    errItem->setText("Готов, но ошибки: " + errorList.join(", "));
+                }
+            }
+            else
+            {
+                // бит 28 = 0 -> не готов
+                gotItem->setBackground(QColor(255, 0, 0));
+                QString baseTxt = "Тгот = (Допуск (0-15)с)";
+                if (!errorList.isEmpty()) {
+                    baseTxt += "; Ошибки: " + errorList.join(", ");
+                }
+                errItem->setText(baseTxt);
+            }
+        });
+
+        readinessTimer->start();
+    }
+    else
+    {
+        // --- Кнопка «Подготовка» отжата (checked = false) ---
+        // Останавливаем таймер (если шёл)
+        if (readinessTimer->isActive()) {
+            readinessTimer->stop();
         }
 
-        // Ячейка (2,2) для итогового сообщения
-        QTableWidgetItem* item = new QTableWidgetItem();
-        turning_on_the_equipment->setItem(2, 2, item);
+        // Снимаем бит 9
+        OUT_AD9M2[0] &= ~(1UL << 9);
+        ULONG sum = KS(OUT_AD9M2, 6);
+        OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
+        BUF256x32_write(0, OUT_AD9M2, 7);
+        SO_pusk(0);
 
-        // Логика готовности
-        if (bit28) {
-            // Бит готовности (28) пришёл
-            if (errorList.isEmpty()) {
-                // Нет ошибок, DM = 1
-                item->setText("Готов (бит 28)");
-                item->setBackground(QColor(0, 128, 0)); // зелёный
-            } else {
-                // Готов, но есть ошибки
-                item->setText("Готов, но ошибки: " + errorList.join(", "));
-                item->setBackground(QColor(255, 0, 0)); // красный
-            }
-        } else {
-            // Бит 28 не пришёл
-            QString errText = "Тгот = (Допуск (0-15)с)";
-            if (!errorList.isEmpty()) {
-                errText += "; Ошибки: " + errorList.join(", ");
-            }
-            item->setText(errText);
-            item->setBackground(QColor(255, 0, 0)); // красный
+        // Сбрасываем «Т1А ГОТ» (2,1) и (2,2)
+        if (QTableWidgetItem* gotItem = turning_on_the_equipment->item(2, 1)) {
+            gotItem->setBackground(Qt::white);
         }
-
-        readinessTimer->deleteLater(); // удаляем таймер
-    });
-
-    readinessTimer->start();
+        if (QTableWidgetItem* errItem = turning_on_the_equipment->item(2, 2)) {
+            errItem->setText("Тгот = (Допуск (0-15)с)");
+            errItem->setBackground(Qt::white);
+        }
+    }
 }
 
 void handleButtonClick1() {

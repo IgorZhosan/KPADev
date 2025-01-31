@@ -46,12 +46,6 @@ bool isReconnecting = false;
 // Глобальный буфер для накопления данных
 QByteArray packetBuffer;
 
-// Структура для получения данных
-typedef struct {
-    DWORD param;  // данные
-    DWORD timer;  // значение таймера
-    UCHAR error;  // код ошибки
-} INPUTPARAM;
 
 INPUTPARAM ParamCod;  // Переменная для получения данных
 
