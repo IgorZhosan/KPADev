@@ -347,13 +347,13 @@ void handleStartButtonClick()
 
 void preparation(bool checked)
 {
-    // 1) Синхронизируем clickedPreparation
+    // Синхронизируем clickedPreparation
     clickedPreparation = checked;
 
     // Если нет readinessTimer, создаём
     if (!readinessTimer) {
         readinessTimer = new QTimer();
-        // Периодический опрос
+        // Периодический опрос (не singleShot)
         readinessTimer->setSingleShot(false);
     }
 
@@ -368,7 +368,7 @@ void preparation(bool checked)
         BUF256x32_write(0, OUT_AD9M2, 7);
         SO_pusk(0);
 
-        // (B) Фиксируем время начала + крайний срок
+        // (B) Запоминаем время начала + крайний срок
         prepStartTime = QTime::currentTime();
         deadlineTime  = prepStartTime.addSecs(20);
 
@@ -381,19 +381,24 @@ void preparation(bool checked)
 
         // (E) Подключаем новый обработчик
         QObject::connect(readinessTimer, &QTimer::timeout, [=]() {
-            // 1) Считываем IN_KPA
+            // 1) Считываем IN_KPA (каждые 200 мс)
             receiveDataAndDisplay();
 
             // 2) Текущее время
             QTime now = QTime::currentTime();
+            int msWaited = prepStartTime.msecsTo(now);
+            double secWaited = msWaited / 1000.0;
 
-            // 3) Проверка, не вышло ли 20 с
+            // 3) Проверка 20 с
             if (now >= deadlineTime)
             {
                 // Останавливаем таймер
                 readinessTimer->stop();
 
-                // Финальная проверка бита28
+                // Ещё раз обновим IN_KPA
+                receiveDataAndDisplay();
+
+                // Смотрим бит28, ошибки
                 unsigned long val2 = IN_KPA[2] & 0x7FFFFFFF;
                 unsigned long val0 = IN_KPA[0] & 0x7FFFFFFF;
 
@@ -413,7 +418,7 @@ void preparation(bool checked)
                     errorList << "DM";
                 }
 
-                // Ячейки (2,1) - T1А Гот, (2,2) - текст
+                // Ячейки: (2,1) «Т1А Гот», (2,2) текст
                 QTableWidgetItem* gotItem = turning_on_the_equipment->item(2, 1);
                 if (!gotItem) {
                     gotItem = new QTableWidgetItem("Т1А Гот");
@@ -426,43 +431,40 @@ void preparation(bool checked)
                 }
                 errItem->setBackground(Qt::white);
 
-                int ms = prepStartTime.msecsTo(now);
-                double sec = ms / 1000.0;
-
                 if (bit28)
                 {
-                    // Бит28=1 на границе 20с
+                    // Бит28=1 ровно в конце
                     if (errorList.isEmpty())
                     {
-                        gotItem->setBackground(QColor(0, 128, 0)); // Зелёный
+                        gotItem->setBackground(QColor(0, 128, 0));
                         errItem->setText(
-                            QString("Готов (бит28); Tгот = %1 c").arg(sec, 0, 'f', 2)
+                            QString("Готов (бит28); Tгот = %1 c").arg(secWaited, 0, 'f', 2)
                             );
                     }
                     else
                     {
-                        gotItem->setBackground(QColor(255, 0, 0)); // Красный, раз есть ошибки
+                        gotItem->setBackground(QColor(255, 0, 0));
                         errItem->setText(
                             QString("Готов, но ошибки: %1; Tгот = %2 c")
                                 .arg(errorList.join(", "))
-                                .arg(QString::number(sec, 'f', 2))
+                                .arg(QString::number(secWaited, 'f', 2))
                             );
                     }
                 }
                 else
                 {
-                    // Не пришёл
+                    // Нет готовности
                     gotItem->setBackground(QColor(255, 0, 0));
-                    QString baseTxt = QString("Нет готовности (бит28=0) за 20с");
+                    QString msg = QString("Нет готовности (бит28=0); Tгот=%1 c").arg(QString::number(secWaited, 'f', 2));
                     if (!errorList.isEmpty()) {
-                        baseTxt += "; Ошибки: " + errorList.join(", ");
+                        msg += "; Ошибки: " + errorList.join(", ");
                     }
-                    errItem->setText(baseTxt);
+                    errItem->setText(msg);
                 }
-                return; // Выходим из лямбды
+                return; // Завершаем лямбду
             }
 
-            // 4) Если 20с ещё не прошло — проверяем bit28
+            // 4) Если 20 с ещё не вышли — смотрим bit28
             unsigned long val2 = IN_KPA[2] & 0x7FFFFFFF;
             unsigned long val0 = IN_KPA[0] & 0x7FFFFFFF;
 
@@ -482,40 +484,41 @@ void preparation(bool checked)
                 errorList << "DM";
             }
 
-            // (NEW) Пока bit28=0 и не вышли 20с —
-            // НЕ красим (2,1) в красный (оставляем белым),
-            // чтобы цвет появился только после итога.
+            // (NEW) Во время ожидания:
+            // Пишем "Ожидание готовности: X.XX c; Ошибки: ..."
+            // (2,1) оставляем белым
+            QTableWidgetItem* gotItem = turning_on_the_equipment->item(2, 1);
+            if (!gotItem) {
+                gotItem = new QTableWidgetItem("Т1А Гот");
+                turning_on_the_equipment->setItem(2, 1, gotItem);
+            }
+            gotItem->setBackground(Qt::white);
 
+            QTableWidgetItem* errItem = turning_on_the_equipment->item(2, 2);
+            if (!errItem) {
+                errItem = new QTableWidgetItem("Тгот = (Допуск (0-15)с)");
+                turning_on_the_equipment->setItem(2, 2, errItem);
+            }
+            errItem->setBackground(Qt::white);
+
+            // Если bit28=1 уже сейчас — завершаем
             if (bit28)
             {
-                // Бит28 пришёл досрочно
                 readinessTimer->stop();
 
                 int ms = prepStartTime.msecsTo(now);
                 double sec = ms / 1000.0;
 
-                QTableWidgetItem* gotItem = turning_on_the_equipment->item(2, 1);
-                if (!gotItem) {
-                    gotItem = new QTableWidgetItem("Т1А Гот");
-                    turning_on_the_equipment->setItem(2, 1, gotItem);
-                }
-                QTableWidgetItem* errItem = turning_on_the_equipment->item(2, 2);
-                if (!errItem) {
-                    errItem = new QTableWidgetItem("Тгот = (Допуск (0-15)с)");
-                    turning_on_the_equipment->setItem(2, 2, errItem);
-                }
-                errItem->setBackground(Qt::white);
-
                 if (errorList.isEmpty())
                 {
-                    gotItem->setBackground(QColor(0, 128, 0)); // зелёный
+                    gotItem->setBackground(QColor(0, 128, 0));
                     errItem->setText(
                         QString("Готов (бит28); Tгот = %1 c").arg(QString::number(sec, 'f', 2))
                         );
                 }
                 else
                 {
-                    gotItem->setBackground(QColor(255, 0, 0)); // красный
+                    gotItem->setBackground(QColor(255, 0, 0));
                     errItem->setText(
                         QString("Готов, но ошибки: %1; Tгот = %2 c")
                             .arg(errorList.join(", "))
@@ -523,10 +526,18 @@ void preparation(bool checked)
                         );
                 }
             }
-            // else { просто ждём дальше, пока не выйдет 20с }
+            else
+            {
+                // Продолжаем ждать, но выводим текущее время и ошибки
+                QString waitText = QString("Ожидание готовности: %1 c").arg(QString::number(secWaited, 'f', 2));
+                if (!errorList.isEmpty()) {
+                    waitText += "; Ошибки: " + errorList.join(", ");
+                }
+                errItem->setText(waitText);
+            }
         });
 
-        // (F) Стартуем
+        // Запускаем
         readinessTimer->start();
     }
     else
@@ -541,7 +552,6 @@ void preparation(bool checked)
         BUF256x32_write(0, OUT_AD9M2, 7);
         SO_pusk(0);
 
-        // Сбрасываем биты (кроме литер)
         resetOutAD9M2PreservingLiters();
         resetAllClickedButtons();
 
@@ -579,81 +589,57 @@ void handleButtonClick2() {
 
 void handleButtonClick3()
 {
-    // Допустим, хотим сработать ТОЛЬКО если «Подготовка» была включена:
-    // Иначе никакого смысла переключать бит9.
-    // Можно и убрать этот if, если нужно всегда
+    // Предполагаем, что для "третьей проверки" нужна уже включённая «Подготовка»
     if (!clickedPreparation) {
-        // Можно вывести сообщение или просто return
+        // Если нужно — оповестить пользователя
         return;
     }
 
-    // 1. Снимаем бит 9 (и заодно бит 16, как в вашем старом примере)
+    // (1) Снимаем бит 9 и бит16
     OUT_AD9M2[0] &= ~(1UL << 9);
     OUT_AD9M2[0] &= ~(1UL << 16);
 
-    // Пересчитываем КС, отправляем
     ULONG sum = KS(OUT_AD9M2, 6);
     OUT_AD9M2[6] = 0xE5 | ((sum & 0xFFFF) << 8);
     BUF256x32_write(0, OUT_AD9M2, 7);
     SO_pusk(0);
 
-    // 2. Создаём таймер на 3 сек (singleShot)
+    // (2) Создаём таймер на 3 с
     QTimer* delayTimer = new QTimer();
     delayTimer->setSingleShot(true);
     delayTimer->setInterval(3000);
 
-    // При срабатывании 3c: снова включаем бит 9 и запускаем 20с проверку
+    // По истечении 3 с: снова включаем бит9 и начинаем 20-секундное ожидание
     QObject::connect(delayTimer, &QTimer::timeout, [delayTimer]() {
 
-        // (A) Снова ставим бит 9
+        // (A) Снова ставим бит9
         OUT_AD9M2[0] |= (1UL << 9);
         ULONG sum2 = KS(OUT_AD9M2, 6);
         OUT_AD9M2[6] = 0xE5 | ((sum2 & 0xFFFF) << 8);
         BUF256x32_write(0, OUT_AD9M2, 7);
         SO_pusk(0);
 
-        // (B) Фиксируем момент запуска «Подготовка» (после 3с паузы)
+        // (B) Запоминаем момент "старта" после 3с
         QTime startTime = QTime::currentTime();
+        QTime deadlineTime = startTime.addSecs(20); // +20c
 
-        // (C) Создаём одноразовый таймер на 20с для проверки bit28
+        // (C) Создаём «периодический» таймер (200 мс) для динамического вывода
         QTimer* readinessCheck = new QTimer();
-        readinessCheck->setSingleShot(true);
-        readinessCheck->setInterval(20000);
+        readinessCheck->setSingleShot(false);
+        readinessCheck->setInterval(200);
 
-        // При срабатывании 20 с — делаем финальную проверку
-        QObject::connect(readinessCheck, &QTimer::timeout, [readinessCheck, startTime]() {
-            // 1) Читаем IN_KPA заново (свежие данные)
+        // Подключаем логику ожидания
+        QObject::connect(readinessCheck, &QTimer::timeout, [readinessCheck, startTime, deadlineTime]() {
+
+            // 1) Считываем IN_KPA
             receiveDataAndDisplay();
 
-            // 2) Берём биты
-            unsigned long val2 = IN_KPA[2] & 0x7FFFFFFF;  // здесь бит28 и биты 27..24
-            unsigned long val0 = IN_KPA[0] & 0x7FFFFFFF;  // здесь bit30 (DM)
+            // 2) Смотрим текущее время, считаем elapsed
+            QTime now = QTime::currentTime();
+            int msElapsed = startTime.msecsTo(now);
+            double secElapsed = msElapsed / 1000.0;
 
-            bool bit28 = (val2 & (1UL << 28));
-            bool bit27 = (val2 & (1UL << 27)); // ДГ
-            bool bit26 = (val2 & (1UL << 26)); // KRL
-            bool bit25 = (val2 & (1UL << 25)); // Курс ДВ
-            bool bit24 = (val2 & (1UL << 24)); // Танг ДВ
-            bool bit30 = (val0 & (1UL << 30)); // DM
-
-            // Собираем ошибки
-            QStringList errorList;
-            if (bit27) errorList << "ДГ";
-            if (bit26) errorList << "KRL";
-            if (bit25) errorList << "Курс ДВ";
-            if (bit24) errorList << "Танг ДВ";
-            if (!bit30) {
-                errorList << "DM";
-            }
-
-            // Считаем фактическое время ожидания
-            int elapsedMs = startTime.msecsTo(QTime::currentTime());
-            double elapsedSec = elapsedMs / 1000.0;
-
-            // Достаём ячейки checking_the_operation
-            // Предположим, row=2 -> третья строка,
-            // col=2 => "Индикация выполнения"
-            // col=3 => "Доп. информация"
+            // Достаём ячейки "Индикация" (кол=2) и "Доп. информация" (кол=3) в строке 2
             QTableWidgetItem* indicationItem = checking_the_operation->item(2, 2);
             if (!indicationItem) {
                 indicationItem = new QTableWidgetItem();
@@ -665,59 +651,148 @@ void handleButtonClick3()
                 checking_the_operation->setItem(2, 3, infoItem);
             }
 
-            // Логика успех/неуспех
+            // 3) Если 20с вышли
+            if (now >= deadlineTime)
+            {
+                // Останавливаем этот таймер
+                readinessCheck->stop();
+                readinessCheck->deleteLater();
+
+                // Ещё раз "финально" читаем IN_KPA
+                receiveDataAndDisplay();
+
+                // Проверяем бит28 и ошибки
+                unsigned long val2 = IN_KPA[2] & 0x7FFFFFFF;
+                unsigned long val0 = IN_KPA[0] & 0x7FFFFFFF;
+
+                bool bit28 = (val2 & (1UL << 28));
+                bool bit27 = (val2 & (1UL << 27));
+                bool bit26 = (val2 & (1UL << 26));
+                bool bit25 = (val2 & (1UL << 25));
+                bool bit24 = (val2 & (1UL << 24));
+                bool bit30 = (val0 & (1UL << 30));
+
+                QStringList errorList;
+                if (bit27) errorList << "ДГ";
+                if (bit26) errorList << "KRL";
+                if (bit25) errorList << "Курс ДВ";
+                if (bit24) errorList << "Танг ДВ";
+                if (!bit30) {
+                    errorList << "DM";
+                }
+
+                // Итоговое время
+                double finalSec = secElapsed; // т.к. now >= deadlineTime
+
+                if (bit28)
+                {
+                    // Успех
+                    if (errorList.isEmpty())
+                    {
+                        indicationItem->setText("Выполнено");
+                        indicationItem->setBackground(QColor(0, 128, 0)); // зелёный
+                        infoItem->setText(
+                            QString("T = %1 c (без ошибок)").arg(finalSec, 0, 'f', 2)
+                            );
+                    }
+                    else
+                    {
+                        indicationItem->setText("Выполнено (с ошибками)");
+                        indicationItem->setBackground(QColor(255, 165, 0)); // оранжевый или красный
+                        infoItem->setText(
+                            QString("T = %1 c; Ошибки: %2")
+                                .arg(QString::number(finalSec, 'f', 2))
+                                .arg(errorList.join(", "))
+                            );
+                    }
+                }
+                else
+                {
+                    // bit28 не пришёл
+                    indicationItem->setText("Не выполнено");
+                    indicationItem->setBackground(QColor(255, 0, 0));
+
+                    if (errorList.isEmpty()) {
+                        infoItem->setText(
+                            QString("Бит28=0; T= %1 c; Ошибок нет").arg(QString::number(finalSec, 'f', 2))
+                            );
+                    } else {
+                        infoItem->setText(
+                            QString("Бит28=0; T= %1 c; Ошибки: %2")
+                                .arg(QString::number(finalSec, 'f', 2))
+                                .arg(errorList.join(", "))
+                            );
+                    }
+                }
+                return; // Завершили
+            }
+
+            // 4) Если время ещё есть, проверяем bit28
+            unsigned long val2 = IN_KPA[2] & 0x7FFFFFFF;
+            unsigned long val0 = IN_KPA[0] & 0x7FFFFFFF;
+
+            bool bit28 = (val2 & (1UL << 28));
+            bool bit27 = (val2 & (1UL << 27));
+            bool bit26 = (val2 & (1UL << 26));
+            bool bit25 = (val2 & (1UL << 25));
+            bool bit24 = (val2 & (1UL << 24));
+            bool bit30 = (val0 & (1UL << 30));
+
+            QStringList errorList;
+            if (bit27) errorList << "ДГ";
+            if (bit26) errorList << "KRL";
+            if (bit25) errorList << "Курс ДВ";
+            if (bit24) errorList << "Танг ДВ";
+            if (!bit30) {
+                errorList << "DM";
+            }
+
             if (bit28)
             {
-                // Успех (бит28=1)
-                QString timeStr = QString::number(elapsedSec, 'f', 2) + " c";
-                // Если хотим указывать ошибки даже при bit28=1, допишем
+                // Бит28 пришёл досрочно
+                readinessCheck->stop();
+                readinessCheck->deleteLater();
+
+                // Вычислим время
+                double finalSec = secElapsed;
+
                 if (errorList.isEmpty())
                 {
-                    // Нет ошибок
                     indicationItem->setText("Выполнено");
-                    indicationItem->setBackground(QColor(0, 128, 0)); // зелёный
-
-                    // Доп. инфо: время
+                    indicationItem->setBackground(QColor(0, 128, 0));
                     infoItem->setText(
-                        QString("T = %1 (без ошибок)").arg(timeStr)
+                        QString("T = %1 c (без ошибок)").arg(finalSec, 0, 'f', 2)
                         );
                 }
                 else
                 {
-                    // Бит28=1, но есть ошибки
                     indicationItem->setText("Выполнено (с ошибками)");
-                    indicationItem->setBackground(QColor(255, 165, 0)); // оранжевый? Или красный?
-
+                    indicationItem->setBackground(QColor(255, 165, 0));
                     infoItem->setText(
-                        QString("T = %1; Ошибки: %2").arg(timeStr).arg(errorList.join(", "))
+                        QString("T = %1 c; Ошибки: %2")
+                            .arg(QString::number(finalSec, 'f', 2))
+                            .arg(errorList.join(", "))
                         );
                 }
             }
             else
             {
-                // Неуспех (bit28=0 через 20 c)
-                indicationItem->setText("Не выполнено");
-                indicationItem->setBackground(QColor(255, 0, 0)); // красный
+                // Пока bit28=0, показываем «Ожидание T=..., Ошибки=...»
+                indicationItem->setText(""); // пустое
+                indicationItem->setBackground(Qt::white);
 
-                QString timeStr = QString::number(elapsedSec, 'f', 2) + " c";
-
-                if (errorList.isEmpty()) {
-                    infoItem->setText(QString("Бит28 не пришёл; T = %1; Ошибок нет").arg(timeStr));
-                } else {
-                    infoItem->setText(QString("Бит28=0; T = %1; Ошибки: %2")
-                                          .arg(timeStr)
-                                          .arg(errorList.join(", ")));
+                QString waitStr = QString("Ожидание T= %1 c").arg(secElapsed, 0, 'f', 2);
+                if (!errorList.isEmpty()) {
+                    waitStr += "; Ошибки: " + errorList.join(", ");
                 }
+                infoItem->setText(waitStr);
             }
-
-            readinessCheck->stop();
-            readinessCheck->deleteLater();
         });
 
-        // Стартуем 20‑с проверку
+        // Запускаем этот периодический таймер
         readinessCheck->start();
 
-        // Завершаем таймер 3с
+        // Останавливаем 3с задержку
         delayTimer->stop();
         delayTimer->deleteLater();
     });
@@ -725,7 +800,6 @@ void handleButtonClick3()
     // Стартуем 3‑с задержку
     delayTimer->start();
 }
-
 
 void handleButtonClick4() {
     // clickedButton4 = !clickedButton4;
