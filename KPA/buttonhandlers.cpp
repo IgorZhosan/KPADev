@@ -12,6 +12,9 @@
 #include <QPixmap>
 #include <QPainter>
 #include <QShortcut>
+#include <QKeySequence>
+#include <QShortcut>
+#include <QWidget>
 
 bool State_ECE0206_0 = false;
 bool State_ECE0206_1 = false;
@@ -44,6 +47,153 @@ static QTime   prepStartTime;            // Когда нажали «Подго
 static QTime   deadlineTime;             // Момент, до которого ждём, обычно +20 c
 UCHAR bufOutput[10] = {0};
 DWORD Error = 0;
+
+
+void setupArrowShortcuts(QWidget* parent)
+{
+    // Чтобы стрелки работали по всему приложению,
+    // а не только при фокусе, используем Qt::ApplicationShortcut.
+
+    auto upShortcut = new QShortcut(QKeySequence(Qt::Key_Up), parent);
+    upShortcut->setContext(Qt::ApplicationShortcut);
+    QObject::connect(upShortcut, &QShortcut::activated, [](){
+        arrowUp();
+    });
+
+    auto downShortcut = new QShortcut(QKeySequence(Qt::Key_Down), parent);
+    downShortcut->setContext(Qt::ApplicationShortcut);
+    QObject::connect(downShortcut, &QShortcut::activated, [](){
+        arrowDown();
+    });
+
+    auto leftShortcut = new QShortcut(QKeySequence(Qt::Key_Left), parent);
+    leftShortcut->setContext(Qt::ApplicationShortcut);
+    QObject::connect(leftShortcut, &QShortcut::activated, [](){
+        arrowLeft();
+    });
+
+    auto rightShortcut = new QShortcut(QKeySequence(Qt::Key_Right), parent);
+    rightShortcut->setContext(Qt::ApplicationShortcut);
+    QObject::connect(rightShortcut, &QShortcut::activated, [](){
+        arrowRight();
+    });
+
+    auto oShortcut = new QShortcut(QKeySequence(Qt::Key_O), parent);
+    oShortcut->setContext(Qt::ApplicationShortcut);
+    QObject::connect(oShortcut, &QShortcut::activated, [](){
+        arrowResetToStart();
+    });
+}
+
+// Проверка, установлен ли бит НКК (бит 16 в OUT_AD9M2[0]):
+static bool isNkkSet()
+{
+    // Если (1<<16) в OUT_AD9M2[0], значит НКК есть
+    return ( (OUT_AD9M2[0] & (1UL << 16)) != 0 );
+}
+
+// Извлекаем mid (2-й байт) и low (3-й байт) из OUT_KPA[0]
+//   OUT_KPA[0]: [ HIGH_байт ][ mid ][ low ]
+static void getMidLow(unsigned char &mid, unsigned char &low)
+{
+    // Берём младшие 16 бит
+    unsigned long val16 = (OUT_KPA[0] & 0x00FFFF);
+    mid = static_cast<unsigned char>((val16 >> 8) & 0xFF);
+    low = static_cast<unsigned char>(val16 & 0xFF);
+}
+
+// Обновляем mid, low => формируем OUT_KPA[1], затем отправляем 2 слова
+static void setMidLowAndSend(unsigned char mid, unsigned char low)
+{
+    // Берём старший байт, если он есть
+    unsigned long oldHigh = (OUT_KPA[0] & 0xFF0000);
+
+    // Собираем новые 2 байта
+    unsigned long newVal = (static_cast<unsigned long>(mid) << 8)
+                           | static_cast<unsigned long>(low);
+
+    OUT_KPA[0] = oldHigh | newVal;
+
+    // Дополнительно формируем OUT_KPA[1].
+    // Например, если у вас логика "0x80 | (OUT_KPA[0] & 0xFFFFFF00)",
+    // то:
+    OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
+
+    // Отправляем в канал 2 => 2 слова
+    BUF256x32_write(1, OUT_KPA, 2);
+    SO_pusk(1);
+}
+
+// Стрелка "Вправо": mid++
+void arrowRight()
+{
+    if (!isNkkSet()) return;  // без НКК не работает
+
+    unsigned char mid, low;
+    getMidLow(mid, low);
+
+    // "Вправо" => mid++
+    if (mid < 0x7F)
+        ++mid;
+
+    setMidLowAndSend(mid, low);
+}
+
+// Стрелка "Влево": mid--
+void arrowLeft()
+{
+    if (!isNkkSet()) return;
+
+    unsigned char mid, low;
+    getMidLow(mid, low);
+
+    if (mid > 0x00)
+        --mid;
+
+    setMidLowAndSend(mid, low);
+}
+
+// Стрелка "Вверх": low++
+void arrowUp()
+{
+    if (!isNkkSet()) return;
+
+    unsigned char mid, low;
+    getMidLow(mid, low);
+
+    // "Вверх" => low++
+    qDebug() << "нажимается";
+    if (low < 0x7F)
+        ++low;
+
+    setMidLowAndSend(mid, low);
+}
+
+// Стрелка "Вниз": low--
+void arrowDown()
+{
+    if (!isNkkSet()) return;
+
+    unsigned char mid, low;
+    getMidLow(mid, low);
+
+    // "Вниз" => low--
+    if (low > 0x00)
+        --low;
+
+    setMidLowAndSend(mid, low);
+}
+
+// Клавиша 'O': вернуть камеру в 0x00_40_40
+void arrowResetToStart()
+{
+    if (!isNkkSet()) return;
+
+    // mid = 0x40, low = 0x40 => 0x004040
+    unsigned char mid = 0x40;
+    unsigned char low = 0x40;
+    setMidLowAndSend(mid, low);
+}
 
 QIcon createCircleIcon(const QColor &color) {
     QPixmap pixmap(16, 16);
@@ -180,7 +330,6 @@ void handleStartButtonClick()
             }
         }
 
-        // --- (1) Проверяем CH2 (без 2с задержки) ---
         if (!State_ECE0206_1) {
             hECE0206_1 = OpenDeviceByIndex(1, &Error);
             if (hECE0206_1 == INVALID_HANDLE_VALUE) {

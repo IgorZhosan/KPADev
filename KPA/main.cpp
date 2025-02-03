@@ -480,8 +480,6 @@ int main(int argc, char *argv[])
 
     pushButton_3 = w.findChild<QPushButton*>("pushButton_3");
     QObject::connect(pushButton_3, &QPushButton::clicked, &on_pushButton_3_clicked);
-    w.show();
-
     toolButton_14 = w.findChild<QToolButton*>("toolButton_14");
     toolButton_14->setIcon(createCircleIcon(Qt::red));
     toolButton_15 = w.findChild<QToolButton*>("toolButton_15");
@@ -496,6 +494,15 @@ int main(int argc, char *argv[])
     toolButton_19->setIcon(createCircleIcon(Qt::red));
     toolButton_20 = w.findChild<QToolButton*>("toolButton_20");
     toolButton_20->setIcon(createCircleIcon(Qt::red));
+
+    turning_on_the_equipment->setFocusPolicy(Qt::NoFocus);
+    checking_the_operation->setFocusPolicy(Qt::NoFocus);
+
+    w.show();
+    w.setFocusPolicy(Qt::StrongFocus);
+    w.activateWindow();
+    w.raise();
+    setupArrowShortcuts(&w);
 
     return a.exec();
 }

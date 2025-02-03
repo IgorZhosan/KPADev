@@ -54,6 +54,7 @@ struct INPUTPARAM {
 extern INPUTPARAM ParamCod;
 
 extern ULONG IN_KPA[11];
+extern ULONG OUT_KPA[2];
 
 // Объявление функции
 void receiveDataAndDisplay();

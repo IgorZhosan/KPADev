@@ -59,6 +59,13 @@ void handleButtonClick11();
 void handleButtonClick12();
 void handleButtonClick13();
 void handleButtonClick14();
+void arrowUp();
+void arrowDown();
+void arrowLeft();
+void arrowRight();
+void arrowResetToStart();
+void setupArrowShortcuts(QWidget* parent);
+
 void handleButtonClick15();
 void on_pushButton_3_clicked();
 void handleClearButton();
@@ -69,6 +76,7 @@ void SI_clear_array(UCHAR Device, UCHAR ChanNumber);
 void SI_pusk(UCHAR Device, UCHAR ChanNumber, UCHAR Mode, UCHAR Parity, UCHAR Freq);
 void SI_stop(UCHAR Device, UCHAR ChanNumber);
 void SO_stop(UCHAR Device);
+
 
 
 #endif // BUTTONHANDLERS_H
