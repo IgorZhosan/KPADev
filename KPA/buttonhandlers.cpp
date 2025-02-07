@@ -21,7 +21,6 @@ bool State_ECE0206_1 = false;
 bool isReceivingData = false;
 bool isTerminalPause = false;
 bool clickedPreparation = false;
-
 bool clicledStartbutton = false;
 bool clickedButton1 = false;
 bool clickedButton2 = false;
@@ -49,11 +48,12 @@ UCHAR bufOutput[10] = {0};
 DWORD Error = 0;
 
 
+////////////////////////////////////////////////////////////////////////
+//           Горячие клавиши стрелок + Reset (клавиша 'O')
+////////////////////////////////////////////////////////////////////////
 void setupArrowShortcuts(QWidget* parent)
 {
-    // Чтобы стрелки работали по всему приложению,
-    // а не только при фокусе, используем Qt::ApplicationShortcut.
-
+    // Чтобы стрелки работали по всему приложению, а не только при фокусе
     auto upShortcut = new QShortcut(QKeySequence(Qt::Key_Up), parent);
     upShortcut->setContext(Qt::ApplicationShortcut);
     QObject::connect(upShortcut, &QShortcut::activated, [](){
@@ -85,114 +85,127 @@ void setupArrowShortcuts(QWidget* parent)
     });
 }
 
-// Проверка, установлен ли бит НКК (бит 16 в OUT_AD9M2[0]):
+////////////////////////////////////////////////////////////////////////
+//         Проверка бита 16 (НКК) в OUT_AD9M2[0]
+////////////////////////////////////////////////////////////////////////
 static bool isNkkSet()
 {
     // Если (1<<16) в OUT_AD9M2[0], значит НКК есть
-    return ( (OUT_AD9M2[0] & (1UL << 16)) != 0 );
+    return ((OUT_AD9M2[0] & (1UL << 16)) != 0);
 }
 
-// Извлекаем mid (2-й байт) и low (3-й байт) из OUT_KPA[0]
-//   OUT_KPA[0]: [ HIGH_байт ][ mid ][ low ]
-static void getMidLow(unsigned char &mid, unsigned char &low)
+////////////////////////////////////////////////////////////////////////
+//  Извлекаем YMUPIN и ZMUPIN из OUT_KPA[0]:
+//  YMUPIN = [15..8],  ZMUPIN = [23..16].
+////////////////////////////////////////////////////////////////////////
+static void getYmuZmu(unsigned char &ymu, unsigned char &zmu)
 {
-    // Берём младшие 16 бит
-    unsigned long val16 = (OUT_KPA[0] & 0x00FFFF);
-    mid = static_cast<unsigned char>((val16 >> 8) & 0xFF);
-    low = static_cast<unsigned char>(val16 & 0xFF);
+    unsigned long val = OUT_KPA[0];
+    // YMUPIN = биты [15..8]
+    ymu = static_cast<unsigned char>((val >> 8) & 0xFF);
+    // ZMUPIN = биты [23..16]
+    zmu = static_cast<unsigned char>((val >> 16) & 0xFF);
 }
 
-// Обновляем mid, low => формируем OUT_KPA[1], затем отправляем 2 слова
-static void setMidLowAndSend(unsigned char mid, unsigned char low)
+////////////////////////////////////////////////////////////////////////
+//  Записываем YMUPIN и ZMUPIN обратно в OUT_KPA[0],
+//  не трогая биты [7..0] и [31..24].
+//  Затем формируем OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00).
+//  И отправляем оба слова на канал 2.
+////////////////////////////////////////////////////////////////////////
+static void setYmuZmuAndSend(unsigned char ymu, unsigned char zmu)
 {
-    // Берём старший байт, если он есть
-    unsigned long oldHigh = (OUT_KPA[0] & 0xFF0000);
+    // 1) Сохраняем биты [7..0]
+    unsigned long oldLow  = (OUT_KPA[0] & 0x000000FF);
 
-    // Собираем новые 2 байта
-    unsigned long newVal = (static_cast<unsigned long>(mid) << 8)
-                           | static_cast<unsigned long>(low);
+    // 2) Сохраняем биты [31..24]
+    unsigned long oldHigh = (OUT_KPA[0] & 0xFF000000);
 
+    // 3) Собираем новые биты для [15..8] (ymu) и [23..16] (zmu)
+    unsigned long newVal = oldLow
+                           | ((static_cast<unsigned long>(ymu) & 0xFF) << 8)
+                           | ((static_cast<unsigned long>(zmu) & 0xFF) << 16);
+
+    // 4) Склеиваем со старыми [31..24]
     OUT_KPA[0] = oldHigh | newVal;
 
-    // Дополнительно формируем OUT_KPA[1].
-    // Например, если у вас логика "0x80 | (OUT_KPA[0] & 0xFFFFFF00)",
-    // то:
+    // 5) Формируем второе слово (верхний байт = 0x80)
     OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
 
-    // Отправляем в канал 2 => 2 слова
+    // 6) Отправляем
     BUF256x32_write(1, OUT_KPA, 2);
     SO_pusk(1);
 }
 
-// Стрелка "Вправо": mid++
-void arrowRight()
-{
-    if (!isNkkSet()) return;  // без НКК не работает
+////////////////////////////////////////////////////////////////////////
+//    Логика стрелок:
+//    - Вверх  (Up)   => YMUPIN++ (макс 0x7F)
+//    - Вниз   (Down) => YMUPIN-- (мин 0x00)
+//    - Влево  (Left) => ZMUPIN-- (мин 0x00)
+//    - Вправо (Right)=> ZMUPIN++ (макс 0x7F)
+////////////////////////////////////////////////////////////////////////
 
-    unsigned char mid, low;
-    getMidLow(mid, low);
-
-    // "Вправо" => mid++
-    if (mid < 0x7F)
-        ++mid;
-
-    setMidLowAndSend(mid, low);
-}
-
-// Стрелка "Влево": mid--
-void arrowLeft()
-{
-    if (!isNkkSet()) return;
-
-    unsigned char mid, low;
-    getMidLow(mid, low);
-
-    if (mid > 0x00)
-        --mid;
-
-    setMidLowAndSend(mid, low);
-}
-
-// Стрелка "Вверх": low++
+// "Вверх": YMUPIN++
 void arrowUp()
 {
     if (!isNkkSet()) return;
+    unsigned char ymu, zmu;
+    getYmuZmu(ymu, zmu);
 
-    unsigned char mid, low;
-    getMidLow(mid, low);
-
-    // "Вверх" => low++
-    qDebug() << "нажимается";
-    if (low < 0x7F)
-        ++low;
-
-    setMidLowAndSend(mid, low);
+    if (ymu < 0x7F) {
+        ++ymu;
+    }
+    setYmuZmuAndSend(ymu, zmu);
 }
 
-// Стрелка "Вниз": low--
+// "Вниз": YMUPIN--
 void arrowDown()
 {
     if (!isNkkSet()) return;
+    unsigned char ymu, zmu;
+    getYmuZmu(ymu, zmu);
 
-    unsigned char mid, low;
-    getMidLow(mid, low);
-
-    // "Вниз" => low--
-    if (low > 0x00)
-        --low;
-
-    setMidLowAndSend(mid, low);
+    if (ymu > 0x00) {
+        --ymu;
+    }
+    setYmuZmuAndSend(ymu, zmu);
 }
 
-// Клавиша 'O': вернуть камеру в 0x00_40_40
+// "Влево": ZMUPIN--
+void arrowLeft()
+{
+    if (!isNkkSet()) return;
+    unsigned char ymu, zmu;
+    getYmuZmu(ymu, zmu);
+
+    if (zmu > 0x00) {
+        --zmu;
+    }
+    setYmuZmuAndSend(ymu, zmu);
+}
+
+// "Вправо": ZMUPIN++
+void arrowRight()
+{
+    if (!isNkkSet()) return;
+    unsigned char ymu, zmu;
+    getYmuZmu(ymu, zmu);
+
+    if (zmu < 0x7F) {
+        ++zmu;
+    }
+    setYmuZmuAndSend(ymu, zmu);
+}
+
+////////////////////////////////////////////////////////////////////////
+//  Клавиша 'O': сбрасываем YMUPIN=0x40, ZMUPIN=0x40
+////////////////////////////////////////////////////////////////////////
 void arrowResetToStart()
 {
     if (!isNkkSet()) return;
-
-    // mid = 0x40, low = 0x40 => 0x004040
-    unsigned char mid = 0x40;
-    unsigned char low = 0x40;
-    setMidLowAndSend(mid, low);
+    unsigned char ymu = 0x40;
+    unsigned char zmu = 0x40;
+    setYmuZmuAndSend(ymu, zmu);
 }
 
 QIcon createCircleIcon(const QColor &color) {

@@ -401,30 +401,22 @@ ULONG KS(ULONG *array, int size) // функция подсчета КС/ size -
     return summ;
 }
 
+// Инициализация, если хотим стартовать с YMUPIN=0x40, ZMUPIN=0x40
 void coder_CH2()
 {
-    // Проверяем, что ещё не инициализировано (0x000000)
-    if (OUT_KPA[0] == 0)
-    {
-        // Ставим "стартовое" значение
-        // (по аналогии с вашим кодом)
-        OUT_KPA[0]  = 0x00;
-        OUT_KPA[0] |= (0x40 << 8);   // 0x4000
-        OUT_KPA[0] |= (0x40 << 16); // 0x404000
-
-        // Также формируем OUT_KPA[1] (как было)
-
-    }
-    if (OUT_KPA[1] == 0) {
-        OUT_KPA[1] = 0x00;
-        OUT_KPA[1] |= (0x40 << 8);
-        OUT_KPA[1] |= (0x40 << 16);
+    static bool inited = false;
+    if (!inited) {
+        OUT_KPA[0] |= 0x40 << 8;
+        OUT_KPA[0] |= 0x40 << 16;
+        OUT_KPA[1] |= 0x40 << 8;
+        OUT_KPA[1] |= 0x40 << 16;
+        inited = true;
     }
 }
 
 void checkAndSendBroadcastKPA() {
     coder_CH2();
-    //BUF256x32_write(1, OUT_KPA, 2);
+    BUF256x32_write(1, OUT_KPA, 2);
     if (!isTerminalPause && terminal_down && kpaCheckBox->isChecked() && broadcast->isChecked()) {
         QString strout = "OUT: ";
         QString str;

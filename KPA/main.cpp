@@ -22,7 +22,6 @@
 #include <QLabel>
 #include <QToolButton>
 
-
 // Глобальные переменные для всех элементов интерфейса
 QTextEdit *terminal_down = nullptr;
 QTextEdit *terminal_up = nullptr;
@@ -56,8 +55,6 @@ QToolButton *toolButton_17 = nullptr;
 QToolButton *toolButton_18 = nullptr;
 QToolButton *toolButton_19 = nullptr;
 QToolButton *toolButton_20 = nullptr;
-
-
 
 // Добавляем глобальные переменные для чекбоксов ЛТ
 QCheckBox *out_lt1_checkbox = nullptr;
