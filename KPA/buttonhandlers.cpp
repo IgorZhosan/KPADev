@@ -51,9 +51,7 @@ DWORD Error = 0;
 int g_commandCounter = 0;         // Сколько раз ещё отправлять
 unsigned char g_commandDigit = 0; // Какая "X" в 0x0X4040
 unsigned char g_toggleStateF = 6;
-
-
-
+unsigned char g_toggleState7 = 0x09;
 
 ////////////////////////////////////////////////////////////////////////
 //         Проверка бита 16 (НКК) в OUT_AD9M2[0]
@@ -62,6 +60,90 @@ static bool isNkkSet()
 {
     // Если (1<<16) в OUT_AD9M2[0], значит НКК есть
     return ((OUT_AD9M2[0] & (1UL << 16)) != 0);
+}
+
+// Клавиша 'A': отправить 0x0C
+void handleKeyA()
+{
+   // qDebug() << "handleKeyA => nibble=0x0C";
+    if (!isNkkSet()) {
+     //   qDebug() << "NKK is not set => skipping 0x0C";
+        return;
+    }
+
+    g_commandDigit = 0x0C;       // [27..24] = 0x0C
+    g_commandCounter = 8;        // 8 отправок
+}
+
+// Клавиша 'Z': отправить 0x0D
+void handleKeyZ()
+{
+  //  qDebug() << "handleKeyZ => nibble=0x0D";
+    if (!isNkkSet()) {
+     //   qDebug() << "NKK is not set => skipping 0x0D";
+        return;
+    }
+
+    g_commandDigit = 0x0D;
+    g_commandCounter = 8;
+}
+
+// Клавиша 'S': отправить 0x0E
+void handleKeyS()
+{
+  //  qDebug() << "handleKeyS => nibble=0x0E";
+    if (!isNkkSet()) {
+      //  qDebug() << "NKK is not set => skipping 0x0E";
+        return;
+    }
+
+    g_commandDigit = 0x0E;
+    g_commandCounter = 8;
+}
+
+// Клавиша '0': всегда посылаем nibble=0x08
+void handleKey0()
+{
+
+    if (!isNkkSet()) {
+      //  qDebug() << "NKK not set => skipping 0x08";
+        return;
+    }
+
+    g_commandDigit = 0x08;       // nibble [27..24] = 8
+    g_commandCounter = 8;        // отправить 8 раз
+}
+
+// Клавиша '7': переключаемся между 0x09 и 0x0A
+void handleKey7()
+{
+  //  qDebug() << "handleKey7 pressed => toggling between 0x09 and 0x0A";
+
+    if (!isNkkSet()) {
+     //   qDebug() << "NKK not set => skipping toggle 7";
+        return;
+    }
+
+    // Если текущее состояние = 0x09, то теперь 0x0A, иначе 0x09
+    unsigned char newVal = (g_toggleState7 == 0x09) ? 0x0A : 0x09;
+    g_toggleState7 = newVal; // запоминаем, чтобы в следующий раз переключить обратно
+
+    g_commandDigit = newVal;
+    g_commandCounter = 8;
+}
+
+// Клавиша '8': всегда посылаем 0x0B
+void handleKey8()
+{
+  //  qDebug() << "handleKey8 pressed => 0x0B";
+
+    if (!isNkkSet()) {
+      //  qDebug() << "NKK not set => skipping 0x0B";
+        return;
+    }
+
+    g_commandDigit = 0x0B;
+    g_commandCounter = 8;
 }
 
 void handleKeyF()
@@ -83,6 +165,54 @@ void handleKeyF()
     // Запускаем тот же механизм, что и при «1..5»
     g_commandCounter = 8;
     g_commandDigit   = newDigit;
+}
+
+void setupAZSShortcuts(QWidget* parent)
+{
+    // Клавиша 'A'
+    auto keyA = new QShortcut(QKeySequence(Qt::Key_A), parent);
+    keyA->setContext(Qt::ApplicationShortcut);
+    QObject::connect(keyA, &QShortcut::activated, [](){
+        handleKeyA();
+    });
+
+    // Клавиша 'Z'
+    auto keyZ = new QShortcut(QKeySequence(Qt::Key_Z), parent);
+    keyZ->setContext(Qt::ApplicationShortcut);
+    QObject::connect(keyZ, &QShortcut::activated, [](){
+        handleKeyZ();
+    });
+
+    // Клавиша 'S'
+    auto keyS = new QShortcut(QKeySequence(Qt::Key_S), parent);
+    keyS->setContext(Qt::ApplicationShortcut);
+    QObject::connect(keyS, &QShortcut::activated, [](){
+        handleKeyS();
+    });
+}
+
+void setupAdditionalShortcuts(QWidget* parent)
+{
+    // Клавиша '0'
+    auto key0 = new QShortcut(QKeySequence(Qt::Key_0), parent);
+    key0->setContext(Qt::ApplicationShortcut);
+    QObject::connect(key0, &QShortcut::activated, [](){
+        handleKey0();
+    });
+
+    // Клавиша '7'
+    auto key7 = new QShortcut(QKeySequence(Qt::Key_7), parent);
+    key7->setContext(Qt::ApplicationShortcut);
+    QObject::connect(key7, &QShortcut::activated, [](){
+        handleKey7();
+    });
+
+    // Клавиша '8'
+    auto key8 = new QShortcut(QKeySequence(Qt::Key_8), parent);
+    key8->setContext(Qt::ApplicationShortcut);
+    QObject::connect(key8, &QShortcut::activated, [](){
+        handleKey8();
+    });
 }
 
 void setupToggleFShortcut(QWidget* parent)
