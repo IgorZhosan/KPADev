@@ -466,4 +466,5 @@ void Timer_Event() {
     checkAndSendBroadcastKPA();
     receiveDataIN_KPA();
     processSerialCommunication();
+    checkAndSendDigitCommand();
 }

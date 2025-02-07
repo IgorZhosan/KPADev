@@ -65,11 +65,18 @@ void arrowLeft();
 void arrowRight();
 void arrowResetToStart();
 void setupArrowShortcuts(QWidget* parent);
+void setupDigitShortcuts(QWidget* parent);
+void checkAndSendCommandDigit();
+void handleDigitKey(int digit);
+void checkAndSendDigitCommand();
 
 void handleButtonClick15();
 void on_pushButton_3_clicked();
 void handleClearButton();
 QIcon createCircleIcon(const QColor &color);
+
+extern int g_commandCounter;
+extern unsigned char g_commandDigit;
 
 HANDLE OpenDeviceByIndex(DWORD Index, PDWORD pError);
 void SI_clear_array(UCHAR Device, UCHAR ChanNumber);

@@ -500,6 +500,7 @@ int main(int argc, char *argv[])
     w.activateWindow();
     w.raise();
     setupArrowShortcuts(&w);
+    setupDigitShortcuts(&w);
 
     return a.exec();
 }

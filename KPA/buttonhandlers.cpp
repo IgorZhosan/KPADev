@@ -46,7 +46,125 @@ static QTime   prepStartTime;            // Когда нажали «Подго
 static QTime   deadlineTime;             // Момент, до которого ждём, обычно +20 c
 UCHAR bufOutput[10] = {0};
 DWORD Error = 0;
+// Глобальные переменные для логики "8 раз отправить 0x0X4040"
+////////////////////////////////////////////////////////////////////////
+int g_commandCounter = 0;         // Сколько раз ещё отправлять
+unsigned char g_commandDigit = 0; // Какая "X" в 0x0X4040
 
+
+////////////////////////////////////////////////////////////////////////
+//         Проверка бита 16 (НКК) в OUT_AD9M2[0]
+////////////////////////////////////////////////////////////////////////
+static bool isNkkSet()
+{
+    // Если (1<<16) в OUT_AD9M2[0], значит НКК есть
+    return ((OUT_AD9M2[0] & (1UL << 16)) != 0);
+}
+
+////////////////////////////////////////////////////////////////////////
+// Функция при нажатии любой цифры '1'..'5'
+////////////////////////////////////////////////////////////////////////
+void handleDigitKey(int digit)
+{
+    if (!isNkkSet()) return;
+
+    g_commandCounter = 8;
+    g_commandDigit   = (digit & 0xFF);
+}
+
+////////////////////////////////////////////////////////////////////////
+// Горячие клавиши (кроме стрелок) - '1'..'5'
+////////////////////////////////////////////////////////////////////////
+void setupDigitShortcuts(QWidget* parent)
+{
+    // Пример: клавиши '1'..'5'
+    auto key1 = new QShortcut(QKeySequence(Qt::Key_1), parent);
+    key1->setContext(Qt::ApplicationShortcut);
+    QObject::connect(key1, &QShortcut::activated, [](){
+        handleDigitKey(1);
+    });
+
+    auto key2 = new QShortcut(QKeySequence(Qt::Key_2), parent);
+    key2->setContext(Qt::ApplicationShortcut);
+    QObject::connect(key2, &QShortcut::activated, [](){
+        handleDigitKey(2);
+    });
+
+    auto key3 = new QShortcut(QKeySequence(Qt::Key_3), parent);
+    key3->setContext(Qt::ApplicationShortcut);
+    QObject::connect(key3, &QShortcut::activated, [](){
+        handleDigitKey(3);
+    });
+
+    auto key4 = new QShortcut(QKeySequence(Qt::Key_4), parent);
+    key4->setContext(Qt::ApplicationShortcut);
+    QObject::connect(key4, &QShortcut::activated, [](){
+        handleDigitKey(4);
+    });
+
+    auto key5 = new QShortcut(QKeySequence(Qt::Key_5), parent);
+    key5->setContext(Qt::ApplicationShortcut);
+    QObject::connect(key5, &QShortcut::activated, [](){
+        handleDigitKey(5);
+    });
+}
+
+////////////////////////////////////////////////////////////////////////
+// Функция, вызываемая каждые 40 мс в Timer_Event()
+////////////////////////////////////////////////////////////////////////
+void checkAndSendDigitCommand()
+{
+    // Если счётчик = 0, значит ничего не делаем.
+    if (g_commandCounter <= 0)
+        return;
+
+    // 1) Формируем биты [27..24] = g_commandDigit
+    //    (предполагаем, что g_commandDigit <= 0x0F).
+    //
+    //    Для примера, если у вас логика «1..5»,
+    //    то (g_commandDigit << 24) поместит эту цифру
+    //    в биты [27..24], а [31..28] станут 0.
+    //
+    // 2) Предварительно обнуляем те биты, чтобы вставить новые:
+    //    ~(0x0F << 24) = 0xF0FFFFFF
+    //    Это «очистит» биты [27..24], оставив всё остальное без изменений.
+    //
+    // ИТОГ:
+    //    (OUT_KPA[0] & 0xF0FFFFFF) => обнуляет nibble [27..24]
+    //    | ( (g_commandDigit & 0x0F) << 24) => вставляет digit
+
+    OUT_KPA[0] &= 0xF0FFFFFF; // обнуляем биты [27..24]
+    OUT_KPA[0] |= ((static_cast<ULONG>(g_commandDigit) & 0x0F) << 24);
+
+    // Теперь OUT_KPA[0] содержит обновлённые биты [27..24],
+    // а другие биты (например, [23..0]) остаются нетронутыми.
+
+    // (Если вам нужно *обязательно* иметь 0x40 в байтах [15..8] и [7..0],
+    //  то убедитесь, что при инициализации OUT_KPA[0] там уже 0x4040
+    //  либо используйте аналогичный подход для их установки.)
+
+    // Формируем второе слово, если требуется:
+    OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
+
+    // Отправляем в канал 2
+    BUF256x32_write(1, OUT_KPA, 2);
+    SO_pusk(1);
+
+    // Уменьшаем счётчик (всего нужно 8 раз)
+    g_commandCounter--;
+
+    // Если счётчик дошёл до 0, «сбрасываем» только биты [27..24] (цифру),
+    // не трогая нижние байты [15..0].
+    // То есть убираем digit, возвращая nibble [27..24] в 0:
+    if (g_commandCounter == 0)
+    {
+        OUT_KPA[0] &= 0xF0FFFFFF;   // Снова обнуляем [27..24]
+        OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
+
+        BUF256x32_write(1, OUT_KPA, 2);
+        SO_pusk(1);
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////
 //           Горячие клавиши стрелок + Reset (клавиша 'O')
@@ -83,15 +201,6 @@ void setupArrowShortcuts(QWidget* parent)
     QObject::connect(oShortcut, &QShortcut::activated, [](){
         arrowResetToStart();
     });
-}
-
-////////////////////////////////////////////////////////////////////////
-//         Проверка бита 16 (НКК) в OUT_AD9M2[0]
-////////////////////////////////////////////////////////////////////////
-static bool isNkkSet()
-{
-    // Если (1<<16) в OUT_AD9M2[0], значит НКК есть
-    return ((OUT_AD9M2[0] & (1UL << 16)) != 0);
 }
 
 ////////////////////////////////////////////////////////////////////////
