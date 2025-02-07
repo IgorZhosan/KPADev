@@ -50,6 +50,9 @@ DWORD Error = 0;
 ////////////////////////////////////////////////////////////////////////
 int g_commandCounter = 0;         // Сколько раз ещё отправлять
 unsigned char g_commandDigit = 0; // Какая "X" в 0x0X4040
+unsigned char g_toggleStateF = 6;
+
+
 
 
 ////////////////////////////////////////////////////////////////////////
@@ -59,6 +62,37 @@ static bool isNkkSet()
 {
     // Если (1<<16) в OUT_AD9M2[0], значит НКК есть
     return ((OUT_AD9M2[0] & (1UL << 16)) != 0);
+}
+
+void handleKeyF()
+{
+    // При нажатии F — переключаем с 6 на 7 или обратно:
+    // Простейший способ — если =6 => делаем 7, иначе 6
+    unsigned char newDigit = (g_toggleStateF == 6) ? 7 : 6;
+
+    // Запоминаем в g_toggleStateF для следующего раза
+    g_toggleStateF = newDigit;
+
+    // Проверяем, установлен ли бит [27..24], если нужно
+    // Но вы говорили «нужно проверить НКК». Если у вас isNkkSet()
+    // зависит от OUT_AD9M2[0], окей:
+    if (!isNkkSet()) {
+        return;
+    }
+
+    // Запускаем тот же механизм, что и при «1..5»
+    g_commandCounter = 8;
+    g_commandDigit   = newDigit;
+}
+
+void setupToggleFShortcut(QWidget* parent)
+{
+    auto keyF = new QShortcut(QKeySequence(Qt::Key_F), parent);
+    keyF->setContext(Qt::ApplicationShortcut);
+
+    QObject::connect(keyF, &QShortcut::activated, [](){
+        handleKeyF();
+    });
 }
 
 ////////////////////////////////////////////////////////////////////////

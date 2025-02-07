@@ -501,6 +501,7 @@ int main(int argc, char *argv[])
     w.raise();
     setupArrowShortcuts(&w);
     setupDigitShortcuts(&w);
+    setupToggleFShortcut(&w);
 
     return a.exec();
 }
