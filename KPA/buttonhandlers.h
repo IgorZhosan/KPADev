@@ -67,7 +67,7 @@ void arrowResetToStart();
 void setupArrowShortcuts(QWidget* parent);
 void setupDigitShortcuts(QWidget* parent);
 void setupAdditionalShortcuts(QWidget* parent);
-void setupAZSShortcuts(QWidget* parent);
+void sendNibble8Times();
 void checkAndSendCommandDigit();
 void handleDigitKey(int digit);
 void checkAndSendDigitCommand();
@@ -75,6 +75,7 @@ void setupToggleFShortcut(QWidget* parent);
 void handleKey0();
 void handleKey7();
 void handleKey8();
+void installKeyAEventFilter(QWidget* parent);
 
 void handleButtonClick15();
 void on_pushButton_3_clicked();

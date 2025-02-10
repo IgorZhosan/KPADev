@@ -15,6 +15,8 @@
 #include <QKeySequence>
 #include <QShortcut>
 #include <QWidget>
+#include <QEvent>
+#include <QKeyEvent>
 
 bool State_ECE0206_0 = false;
 bool State_ECE0206_1 = false;
@@ -52,6 +54,74 @@ int g_commandCounter = 0;         // Сколько раз ещё отправл
 unsigned char g_commandDigit = 0; // Какая "X" в 0x0X4040
 unsigned char g_toggleStateF = 6;
 unsigned char g_toggleState7 = 0x09;
+static unsigned char g_toggleState8 = 0x0B;
+static bool g_isAPressed  = false; // Флаг, нажата ли сейчас A
+static int  g_aPressCount = 0;     // Сколько раз успели нажать A
+
+
+static void sendNibble0C_8Times()
+{
+    for (int i = 0; i < 8; i++)
+    {
+        // Очищаем биты [27..24]:
+        OUT_KPA[0] &= 0xF0FFFFFF;
+
+        // Ставим 0x0C в [27..24]
+        OUT_KPA[0] |= ((unsigned long)(0x0C) & 0x0F) << 24;
+
+        // Второе слово
+        OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
+
+        // Отправка
+        BUF256x32_write(1, OUT_KPA, 2);
+        SO_pusk(1);
+    }
+
+    // В конце очищаем [27..24] обратно в 0
+    OUT_KPA[0] &= 0xF0FFFFFF;
+    OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
+
+    BUF256x32_write(1, OUT_KPA, 2);
+    SO_pusk(1);
+}
+
+// === (2) При повторном нажатии A => 8× “4747” (YMU=0x47, ZMU=0x47) ===
+static void send4747_8Times()
+{
+    {
+        // 1) Сохраняем (до цикла) старые биты [15..0]
+        unsigned long oldLow16 = (OUT_KPA[0] & 0x0000FFFF);
+
+        // 2) 8 раз вставляем 0x4747 в [15..0],
+        //    оставляя [31..16] без изменений.
+        for (int i = 0; i < 8; i++)
+        {
+            // Сохраняем старшие [31..16]
+            unsigned long oldHigh16 = (OUT_KPA[0] & 0xFFFF0000);
+            unsigned long oldHigh16_low = (OUT_KPA[0] & 0xFFFFFF00);
+
+            // Подставляем 0x4747 в [15..0]
+            OUT_KPA[0] = (oldHigh16 | 0x4747);
+            OUT_KPA[0] = (oldHigh16_low | 0x4747);
+
+            // Формируем OUT_KPA[1]
+            OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
+
+            // Отправляем
+            BUF256x32_write(1, OUT_KPA, 2);
+            SO_pusk(1);
+        }
+
+        // 3) После 8 отправок — восстанавливаем старые [15..0]
+        //    (чтобы «вернуть старую посылку»).
+        unsigned long oldHigh16 = (OUT_KPA[0] & 0xFFFF0000);
+        OUT_KPA[0] = oldHigh16 | (oldLow16 & 0xFFFF);
+
+        OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
+        BUF256x32_write(1, OUT_KPA, 2);
+        SO_pusk(1);
+    }
+}
 
 ////////////////////////////////////////////////////////////////////////
 //         Проверка бита 16 (НКК) в OUT_AD9M2[0]
@@ -62,17 +132,69 @@ static bool isNkkSet()
     return ((OUT_AD9M2[0] & (1UL << 16)) != 0);
 }
 
-// Клавиша 'A': отправить 0x0C
-void handleKeyA()
+// === (3) Фильтр для A (KeyPress / KeyRelease) ===
+class AKeyEventFilter : public QObject
 {
-   // qDebug() << "handleKeyA => nibble=0x0C";
-    if (!isNkkSet()) {
-     //   qDebug() << "NKK is not set => skipping 0x0C";
-        return;
-    }
+public:
+    explicit AKeyEventFilter(QObject* parent = nullptr)
+        : QObject(parent)
+    { }
 
-    g_commandDigit = 0x0C;       // [27..24] = 0x0C
-    g_commandCounter = 8;        // 8 отправок
+protected:
+    bool eventFilter(QObject* obj, QEvent* event) override
+    {
+        if (event->type() == QEvent::KeyPress)
+        {
+            QKeyEvent* ke = static_cast<QKeyEvent*>(event);
+            if (ke->key() == Qt::Key_A && !ke->isAutoRepeat())
+            {
+                if (!isNkkSet()) {
+                    return false;
+                }
+
+                // Если A ещё не зажата
+                if (!g_isAPressed)
+                {
+                    g_isAPressed = true;
+                    g_aPressCount++;
+
+                    // Со второго нажатия => 8 раз 0x4747 в [15..0]
+                    if (g_aPressCount > 1)
+                    {
+                        send4747_8Times();
+                    }
+                    // Первое нажатие => ничего
+                }
+                return false;
+            }
+        }
+        else if (event->type() == QEvent::KeyRelease)
+        {
+            QKeyEvent* ke = static_cast<QKeyEvent*>(event);
+            if (ke->key() == Qt::Key_A && !ke->isAutoRepeat())
+            {
+                if (!isNkkSet()) {
+                    return false;
+                }
+                g_isAPressed = false;
+
+                // При отпускании => 8 раз nibble=0x0C
+                sendNibble0C_8Times();
+                return false;
+            }
+        }
+        return QObject::eventFilter(obj, event);
+    }
+};
+
+void installKeyAEventFilter(QWidget* parent)
+{
+    static AKeyEventFilter* filter = nullptr;
+    if (!filter)
+    {
+        filter = new AKeyEventFilter(parent);
+        parent->installEventFilter(filter);
+    }
 }
 
 // Клавиша 'Z': отправить 0x0D
@@ -97,7 +219,7 @@ void handleKeyS()
         return;
     }
 
-    g_commandDigit = 0x0E;
+    g_commandDigit = 0x0F;
     g_commandCounter = 8;
 }
 
@@ -132,18 +254,18 @@ void handleKey7()
     g_commandCounter = 8;
 }
 
-// Клавиша '8': всегда посылаем 0x0B
 void handleKey8()
 {
-  //  qDebug() << "handleKey8 pressed => 0x0B";
-
     if (!isNkkSet()) {
-      //  qDebug() << "NKK not set => skipping 0x0B";
         return;
     }
 
-    g_commandDigit = 0x0B;
-    g_commandCounter = 8;
+    // Если текущее состояние = 0x0B, переключаемся на 0x0E; иначе обратно
+    unsigned char newVal = (g_toggleState8 == 0x0B) ? 0x0E : 0x0B;
+    g_toggleState8 = newVal; // запоминаем для следующего нажатия
+
+    g_commandDigit   = newVal;  // посылаем это значение в биты [27..24]
+    g_commandCounter = 8;       // 8 раз отправить
 }
 
 void handleKeyF()
@@ -165,30 +287,6 @@ void handleKeyF()
     // Запускаем тот же механизм, что и при «1..5»
     g_commandCounter = 8;
     g_commandDigit   = newDigit;
-}
-
-void setupAZSShortcuts(QWidget* parent)
-{
-    // Клавиша 'A'
-    auto keyA = new QShortcut(QKeySequence(Qt::Key_A), parent);
-    keyA->setContext(Qt::ApplicationShortcut);
-    QObject::connect(keyA, &QShortcut::activated, [](){
-        handleKeyA();
-    });
-
-    // Клавиша 'Z'
-    auto keyZ = new QShortcut(QKeySequence(Qt::Key_Z), parent);
-    keyZ->setContext(Qt::ApplicationShortcut);
-    QObject::connect(keyZ, &QShortcut::activated, [](){
-        handleKeyZ();
-    });
-
-    // Клавиша 'S'
-    auto keyS = new QShortcut(QKeySequence(Qt::Key_S), parent);
-    keyS->setContext(Qt::ApplicationShortcut);
-    QObject::connect(keyS, &QShortcut::activated, [](){
-        handleKeyS();
-    });
 }
 
 void setupAdditionalShortcuts(QWidget* parent)

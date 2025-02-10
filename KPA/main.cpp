@@ -503,7 +503,7 @@ int main(int argc, char *argv[])
     setupDigitShortcuts(&w);
     setupToggleFShortcut(&w);
     setupAdditionalShortcuts(&w);
-    setupAZSShortcuts(&w);
+    installKeyAEventFilter(&w);
 
     return a.exec();
 }
