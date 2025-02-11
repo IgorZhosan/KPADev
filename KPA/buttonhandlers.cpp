@@ -59,17 +59,31 @@ static bool g_isAPressed  = false; // Флаг, нажата ли сейчас A
 static int  g_aPressCount = 0;     // Сколько раз успели нажать A
 
 
-static void sendNibble0C_8Times()
+// === (1) Посылка 0x004747 (zmu=0x47, ymu=0x47) в [23..8],
+//     при этом сохраняем [31..24] и [7..0].
+static void send004747_8Times()
 {
+    // Полностью запоминаем исходное значение:
+    unsigned long oldValue = OUT_KPA[0];
+
+    // Зададим ymu и zmu явно (по условию)
+    const unsigned long ymu = 0x47; // пойдёт в [15..8]
+    const unsigned long zmu = 0x47; // пойдёт в [23..16]
+
+    // Сформируем новое значение:
+    // - Сохраняем биты [31..24] и [7..0] из oldValue
+    // - Вставляем zmu в [23..16] и ymu в [15..8]
+    unsigned long newValue =
+        (oldValue & 0xFF0000FFUL)        // Маска, сохраняющая [31..24] и [7..0]
+        | ((zmu & 0xFFUL) << 16)         // zmu в [23..16]
+        | ((ymu & 0xFFUL) << 8);         // ymu в [15..8]
+
+    // Отправляем 8 раз
     for (int i = 0; i < 8; i++)
     {
-        // Очищаем биты [27..24]:
-        OUT_KPA[0] &= 0xF0FFFFFF;
+        OUT_KPA[0] = newValue;
 
-        // Ставим 0x0C в [27..24]
-        OUT_KPA[0] |= ((unsigned long)(0x0C) & 0x0F) << 24;
-
-        // Второе слово
+        // Формируем второе слово (как в старом коде):
         OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
 
         // Отправка
@@ -77,62 +91,49 @@ static void sendNibble0C_8Times()
         SO_pusk(1);
     }
 
-    // В конце очищаем [27..24] обратно в 0
-    OUT_KPA[0] &= 0xF0FFFFFF;
+    // После цикла — восстанавливаем исходное значение OUT_KPA[0]
+    OUT_KPA[0] = oldValue;
     OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
-
     BUF256x32_write(1, OUT_KPA, 2);
     SO_pusk(1);
 }
 
-// === (2) При повторном нажатии A => 8× “4747” (YMU=0x47, ZMU=0x47) ===
-static void send4747_8Times()
+// === (2) Посылка nibble=0x0C в биты [27..24] 8 раз,
+//     при отпускании A.
+//     Сохраняем исходное значение и восстанавливаем после цикла.
+static void sendNibble0C_8Times()
 {
+    // Сохраняем целиком старое значение:
+    unsigned long oldValue = OUT_KPA[0];
+
+    // 8 раз выставляем nibble=0x0C в биты [27..24]
+    for (int i = 0; i < 8; i++)
     {
-        // 1) Сохраняем (до цикла) старые биты [15..0]
-        unsigned long oldLow16 = (OUT_KPA[0] & 0x0000FFFF);
-
-        // 2) 8 раз вставляем 0x4747 в [15..0],
-        //    оставляя [31..16] без изменений.
-        for (int i = 0; i < 8; i++)
-        {
-            // Сохраняем старшие [31..16]
-            unsigned long oldHigh16 = (OUT_KPA[0] & 0xFFFF0000);
-            unsigned long oldHigh16_low = (OUT_KPA[0] & 0xFFFFFF00);
-
-            // Подставляем 0x4747 в [15..0]
-            OUT_KPA[0] = (oldHigh16 | 0x4747);
-            OUT_KPA[0] = (oldHigh16_low | 0x4747);
-
-            // Формируем OUT_KPA[1]
-            OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
-
-            // Отправляем
-            BUF256x32_write(1, OUT_KPA, 2);
-            SO_pusk(1);
-        }
-
-        // 3) После 8 отправок — восстанавливаем старые [15..0]
-        //    (чтобы «вернуть старую посылку»).
-        unsigned long oldHigh16 = (OUT_KPA[0] & 0xFFFF0000);
-        OUT_KPA[0] = oldHigh16 | (oldLow16 & 0xFFFF);
+        // (Сбрасываем [27..24], ставим 0x0C)
+        OUT_KPA[0] = (oldValue & 0xF0FFFFFF) | ((0x0CUL & 0x0F) << 24);
 
         OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
+
+        // Отправка
         BUF256x32_write(1, OUT_KPA, 2);
         SO_pusk(1);
     }
+
+    // Восстанавливаем исходное значение
+    OUT_KPA[0] = oldValue;
+    OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
+    BUF256x32_write(1, OUT_KPA, 2);
+    SO_pusk(1);
 }
 
-////////////////////////////////////////////////////////////////////////
-//         Проверка бита 16 (НКК) в OUT_AD9M2[0]
-////////////////////////////////////////////////////////////////////////
+// === (3) Проверка бита 16 (НКК) ===
 static bool isNkkSet()
 {
     // Если (1<<16) в OUT_AD9M2[0], значит НКК есть
     return ((OUT_AD9M2[0] & (1UL << 16)) != 0);
 }
 
-// === (3) Фильтр для A (KeyPress / KeyRelease) ===
+// === (4) Фильтр для A ===
 class AKeyEventFilter : public QObject
 {
 public:
@@ -148,6 +149,7 @@ protected:
             QKeyEvent* ke = static_cast<QKeyEvent*>(event);
             if (ke->key() == Qt::Key_A && !ke->isAutoRepeat())
             {
+                // Проверяем бит НКК
                 if (!isNkkSet()) {
                     return false;
                 }
@@ -158,10 +160,10 @@ protected:
                     g_isAPressed = true;
                     g_aPressCount++;
 
-                    // Со второго нажатия => 8 раз 0x4747 в [15..0]
+                    // Со второго и далее нажатия => 8 раз 0x004747
                     if (g_aPressCount > 1)
                     {
-                        send4747_8Times();
+                        send004747_8Times();
                     }
                     // Первое нажатие => ничего
                 }
@@ -173,12 +175,13 @@ protected:
             QKeyEvent* ke = static_cast<QKeyEvent*>(event);
             if (ke->key() == Qt::Key_A && !ke->isAutoRepeat())
             {
+                // Проверяем бит НКК
                 if (!isNkkSet()) {
                     return false;
                 }
                 g_isAPressed = false;
 
-                // При отпускании => 8 раз nibble=0x0C
+                // При отпускании => 8 раз nibble=0x0C в биты [27..24]
                 sendNibble0C_8Times();
                 return false;
             }
@@ -187,6 +190,7 @@ protected:
     }
 };
 
+// Установка фильтра
 void installKeyAEventFilter(QWidget* parent)
 {
     static AKeyEventFilter* filter = nullptr;
