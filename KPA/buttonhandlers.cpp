@@ -91,10 +91,10 @@ static void send004040_8Times()
     }
 
     // Восстанавливаем старое значение
-    OUT_KPA[0] = oldValue;
-    OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
-    BUF256x32_write(1, OUT_KPA, 2);
-    SO_pusk(1);
+   // OUT_KPA[0] = oldValue;
+   // OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
+   // BUF256x32_write(1, OUT_KPA, 2);
+   // SO_pusk(1);
 }
 
 // === Отправка 0x004747 8 раз ===
@@ -184,6 +184,8 @@ protected:
 
                         // Затем 8 раз 0x004747
                         send004747_8Times();
+
+                        send004040_8Times();
                     }
                     // На первое нажатие => ничего не отправляем
                 }
@@ -206,6 +208,7 @@ protected:
 
                 // При отпускании каждого нажатия => 8 раз nibble=0x0C
                 sendNibble0C_8Times();
+                send004040_8Times();
                 return false;
             }
         }
