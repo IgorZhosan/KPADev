@@ -65,83 +65,80 @@ static bool isNkkSet()
     return ((OUT_AD9M2[0] & (1UL << 16)) != 0);
 }
 
-// === Отправка 0x004040 8 раз ===
+// === (1) Отправка 0x004040 (8 раз) — в конце оставляем 0x004040
 static void send004040_8Times()
 {
-    // Запоминаем исходное значение OUT_KPA[0]
-    unsigned long oldValue = OUT_KPA[0];
-
-    // Формируем 0x004040:
-    // [23..16] = 0x40, [15..8] = 0x40, сохраняем [31..24] и [7..0].
-    const unsigned long zmu = 0x40; // [23..16]
-    const unsigned long ymu = 0x40; // [15..8]
-
-    unsigned long newValue =
-        (oldValue & 0xFF0000FFUL)      // Сохраняем [31..24] и [7..0]
-        | ((zmu & 0xFFUL) << 16)       // zmu -> [23..16]
-        | ((ymu & 0xFFUL) << 8);       // ymu -> [15..8]
-
+    // Можно не восстанавливать старое значение — в итоге оно
+    // и останется «0x004040».
     for (int i = 0; i < 8; i++)
     {
-        OUT_KPA[0] = newValue;
+        // Зануляем биты [23..8] и ставим 0x4040
+        // Если нужно сохранять [31..24] и [7..0], меняйте логику.
+        OUT_KPA[0] = (OUT_KPA[0] & 0xFF0000FF)
+                     | (0x40UL << 16)
+                     | (0x40UL << 8);
+
         OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
 
         BUF256x32_write(1, OUT_KPA, 2);
         SO_pusk(1);
     }
-
-    // Восстанавливаем старое значение
-   // OUT_KPA[0] = oldValue;
-   // OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
-   // BUF256x32_write(1, OUT_KPA, 2);
-   // SO_pusk(1);
+    // После цикла OUT_KPA[0] уже с 0x4040 в [15..8] и [23..16].
+    // Больше ничего не делаем — «0x004040» и останется.
 }
 
-// === Отправка 0x004747 8 раз ===
+// === (2) Отправка 0x004747 (8 раз) — в конце восстанавливаем 0x004040
 static void send004747_8Times()
 {
     unsigned long oldValue = OUT_KPA[0];
 
-    const unsigned long ymu = 0x47; // [15..8]
-    const unsigned long zmu = 0x47; // [23..16]
-
-    unsigned long newValue =
-        (oldValue & 0xFF0000FFUL)      // Сохраняем [31..24] и [7..0]
-        | ((zmu & 0xFFUL) << 16)       // zmu -> [23..16]
-        | ((ymu & 0xFFUL) << 8);       // ymu -> [15..8]
-
     for (int i = 0; i < 8; i++)
     {
-        OUT_KPA[0] = newValue;
+        // В младшие 16 бит ставим 0x4747,
+        // при желании сохраняя [31..24] и [7..0].
+        OUT_KPA[0] = (OUT_KPA[0] & 0xFF0000FF)
+                     | (0x47UL << 16)
+                     | (0x47UL << 8);
+
         OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
 
         BUF256x32_write(1, OUT_KPA, 2);
         SO_pusk(1);
     }
 
-    // Восстанавливаем старое значение
-    OUT_KPA[0] = oldValue;
+    // В конце возвращаем «0x004040»
+    OUT_KPA[0] = (OUT_KPA[0] & 0xFF0000FF)
+                 | (0x40UL << 16)
+                 | (0x40UL << 8);
+
     OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
     BUF256x32_write(1, OUT_KPA, 2);
     SO_pusk(1);
 }
 
-// === Отправка nibble=0x0C в [27..24] 8 раз ===
+// === (3) Отправка nibble=0x0C (8 раз), затем возвращаем 0x004040
 static void sendNibble0C_8Times()
 {
-    unsigned long oldValue = OUT_KPA[0];
-
+    // 8 раз nibble=0x0C
     for (int i = 0; i < 8; i++)
     {
-        OUT_KPA[0] = (oldValue & 0xF0FFFFFFUL) | ((0x0CUL & 0x0FUL) << 24);
+        // Ставим 0x0C в [27..24],
+        // остальные биты оставляем
+        OUT_KPA[0] = (OUT_KPA[0] & 0xF0FFFFFFUL)
+                     | (0x0CUL << 24);
+
         OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
 
         BUF256x32_write(1, OUT_KPA, 2);
         SO_pusk(1);
     }
 
-    // Восстанавливаем старое
-    OUT_KPA[0] = oldValue;
+    // После этих 8 отправок теперь ставим опять 0x4040 в младшие 16 бит
+    // (а биты [27..24] можем вернуть в 0, если нужно).
+    OUT_KPA[0] = (OUT_KPA[0] & 0xF00000FFUL) // обнуляем [27..24], сохраняем [31..28], [7..0]
+                 | (0x40UL << 16)
+                 | (0x40UL << 8);
+
     OUT_KPA[1] = 0x80 | (OUT_KPA[0] & 0xFFFFFF00);
     BUF256x32_write(1, OUT_KPA, 2);
     SO_pusk(1);
@@ -162,32 +159,27 @@ protected:
         if (event->type() == QEvent::KeyPress)
         {
             QKeyEvent* ke = static_cast<QKeyEvent*>(event);
-            // Отлавливаем нажатие A
             if (ke->key() == Qt::Key_A && !ke->isAutoRepeat())
             {
-                // Если нужна проверка на НКК
                 if (!isNkkSet()) {
                     return false;
                 }
 
-                // Проверяем, зажата ли уже A
                 if (!g_isAPressed)
                 {
                     g_isAPressed = true;
                     g_aPressCount++;
 
-                    // Со второго нажатия и далее:
+                    // 2-е и последующие нажатия:
                     if (g_aPressCount > 1)
                     {
-                        // Сначала 8 раз 0x004040
+                        // 8 раз 0x4040
                         send004040_8Times();
-
-                        // Затем 8 раз 0x004747
+                        // 8 раз 0x4747 (в конце -> 0x4040)
                         send004747_8Times();
 
-                        send004040_8Times();
                     }
-                    // На первое нажатие => ничего не отправляем
+                    // На первое нажатие — ничего
                 }
                 return false;
             }
@@ -195,20 +187,17 @@ protected:
         else if (event->type() == QEvent::KeyRelease)
         {
             QKeyEvent* ke = static_cast<QKeyEvent*>(event);
-            // Отлавливаем отпускание A
             if (ke->key() == Qt::Key_A && !ke->isAutoRepeat())
             {
-                // Проверка НКК (если требуется)
                 if (!isNkkSet()) {
                     return false;
                 }
-
-                // Сброс флага "A зажата"
                 g_isAPressed = false;
 
-                // При отпускании каждого нажатия => 8 раз nibble=0x0C
+                // При отпускании => 8 раз nibble=0x0C,
+                // затем возвращаемся к 0x4040
                 sendNibble0C_8Times();
-                send004040_8Times();
+
                 return false;
             }
         }
@@ -216,10 +205,8 @@ protected:
     }
 };
 
-// Установка фильтра
 void installKeyAEventFilter(QWidget* parent)
 {
-    // Обязательно, чтобы виджет принимал клавиатуру
     parent->setFocusPolicy(Qt::StrongFocus);
 
     static AKeyEventFilter* filter = nullptr;
@@ -229,6 +216,7 @@ void installKeyAEventFilter(QWidget* parent)
         parent->installEventFilter(filter);
     }
 }
+
 
 // Клавиша 'Z': отправить 0x0D
 void handleKeyZ()
@@ -786,6 +774,7 @@ void handleStartButtonClick()
         if (isDeviceConnected)
         {
             clicledStartbutton = true;
+            g_aPressCount = 0;
             if (handleStartButton) {
                 handleStartButton->setCheckable(true);
                 handleStartButton->setChecked(true);
@@ -924,6 +913,8 @@ void preparation(bool checked)
 {
     // Синхронизируем clickedPreparation
     clickedPreparation = checked;
+
+    g_aPressCount = 0;
 
     // Если нет readinessTimer, создаём
     if (!readinessTimer) {
@@ -1169,6 +1160,8 @@ void handleButtonClick3()
         // Если нужно — оповестить пользователя, выходим
         return;
     }
+
+    g_aPressCount = 0;
 
     // 1) Сбрасываем старую индикацию (строка=2, колонки=2 и 3)
     {
