@@ -92,7 +92,7 @@ static void send004747_8Times()
 {
     unsigned long oldValue = OUT_KPA[0];
 
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 16; i++)
     {
         // В младшие 16 бит ставим 0x4747,
         // при желании сохраняя [31..24] и [7..0].
@@ -120,7 +120,7 @@ static void send004747_8Times()
 static void sendNibble0C_8Times()
 {
     // 8 раз nibble=0x0C
-    for (int i = 0; i < 8; i++)
+    for (int i = 0; i < 16; i++)
     {
         // Ставим 0x0C в [27..24],
         // остальные биты оставляем
